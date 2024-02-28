@@ -1,0 +1,54 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "bundler/setup"
+require "elasticsearch"
+require "elasticsearch/persistence"
+require "stretchy"
+
+# You can add fixtures and/or initialization code here to make experimenting
+# with your gem easier. You can also use a different console, if you like.
+
+# (If you use this, don't forget to add pry to your Gemfile!)
+# require "pry"
+# Pry.start
+
+require "irb"
+
+banner = <<~BANNER
+
+                                                d8b                
+           d8P                     d8P          ?88                
+        d888888P                d888888P         88b               
+ .d888b,  ?88'    88bd88b d8888b  ?88'   d8888b  888888b ?88   d8P 
+ ?8b,     88P     88P'  `d8b_,dP  88P   d8P' `P  88P `?8bd88   88  
+   `?8b   88b    d88     88b      88b   88b     d88   88P?8(  d88  
+`?888P'   `?8b  d88'     `?888P'  `?8b  `?888P'd88'   88b`?88P'?8b 
+                                                                )88
+                                                               ,d8P
+                                                            `?888P'
+BANNER
+
+print Rainbow(banner).red
+print "\t    " * 7
+print Rainbow(" v#{Stretchy::VERSION}").white.faint
+print "\n\n"
+
+@client = Elasticsearch::Client.new url: "http://localhost:9200" 
+# Elasticsearch::Persistence.client = @client
+
+class Resource
+   # include Elasticsearch::Model
+   include Elasticsearch::Persistence::Model
+
+   attribute :name, String
+   attribute :email, String
+   attribute :phone, String
+   attribute :position, Hash
+   attribute :gender, String
+   attribute :age, Integer
+end
+
+IRB.start(__FILE__)
+
+

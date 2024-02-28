@@ -1,0 +1,7 @@
+# Dockerfile.elasticsearch
+
+# Base image
+FROM docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+
+# Environment variables
+ENV discovery.type=single-node
