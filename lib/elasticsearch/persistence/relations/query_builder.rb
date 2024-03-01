@@ -6,6 +6,7 @@ module Elasticsearch
         attr_reader :structure, :values
 
         def initialize(values)
+          @structure = Jbuilder.new ignore_nil: true
           @values = values
         end
 
@@ -81,7 +82,7 @@ module Elasticsearch
           build_fields unless fields.blank?
           build_source unless source.blank?
           build_aggregations unless aggregations.blank?
-          structure.attributes!
+          structure.attributes!.with_indifferent_access
         end
 
         private
@@ -104,7 +105,7 @@ module Elasticsearch
             structure.bool do
                   structure.must query unless missing_bool_query?
                   structure.must_not must_nots unless must_nots.nil?
-                  structure.should shoulds unless shoulds.nil?
+                  structure.set! :should, shoulds unless shoulds.nil?
 
               build_filtered_query if query_filters || or_filters
 
@@ -115,7 +116,7 @@ module Elasticsearch
               structure.extract! query_string_options, *query_string_options.keys
               structure.query query_strings
             end unless query_strings.nil?
-          end
+          end.with_indifferent_access
         end
 
         def build_filtered_query

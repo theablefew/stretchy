@@ -93,6 +93,10 @@ module Elasticsearch
               @default_sort_key
             end
 
+            def default_size(size = 10000)
+              @default_size = size
+            end
+
             private
 
             # Return a Relation instance to chain queries
@@ -133,12 +137,7 @@ module Elasticsearch
             end
           end
 
-          # Set up common attributes
-          #
-          attribute :created_at, DateTime, default: lambda { |o, a| Time.now.utc }
-          attribute :updated_at, DateTime, default: lambda { |o, a| Time.now.utc }
 
-          default_sort_key :created_at
 
           attr_reader :hit
         end

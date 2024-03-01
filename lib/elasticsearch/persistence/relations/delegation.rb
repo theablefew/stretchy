@@ -1,3 +1,5 @@
+# TODO: Break out modules into separate files
+
 module Elasticsearch
   module Persistence
     module Delegation # :nodoc:

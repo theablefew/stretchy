@@ -9,7 +9,7 @@ module Elasticsearch
             if current_scope
               current_scope.clone
             else
-              default_scoped.size(10000)
+              default_scoped.size(default_size)
             end
           end
 
@@ -31,7 +31,7 @@ module Elasticsearch
           def scope(name, body, &block)
             if dangerous_class_method?(name)
               raise ArgumentError, "You tried to define a scope named \"#{name}\" " \
-                "on the model \"#{self.name}\", but Active Record already defined " \
+                "on the model \"#{self.name}\", but there's already defined " \
                 "a class method with the same name."
             end
 

@@ -7,3 +7,5 @@
 /spec/reports/
 /tmp/
 PLAN.md
+.irb-history
+Gemfile.lock

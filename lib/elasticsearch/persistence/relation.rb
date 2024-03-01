@@ -50,6 +50,7 @@ module Elasticsearch
         #
         # @return [Array] The results of the relation.
         def to_a
+
           load
           @records
         end
@@ -139,13 +140,17 @@ module Elasticsearch
         #
         # @return [String] The string representation of the relation.
         def inspect
-          entries = to_a.results.take([size_value.to_i + 1, 11].compact.min).map!(&:inspect)
-          message = {}
-          message = {total: to_a.total, max: to_a.total}
-          message.merge!(aggregations: results.aggregations.keys) unless results.aggregations.nil?
-          message = message.each_pair.collect { |k,v|  "#{k}: #{v}" }
-          message.unshift entries.join(', ') unless entries.size.zero?
-          "#<#{self.class.name} #{message.join(', ')}>"
+          begin
+            entries = to_a.results.take([size_value.to_i + 1, 11].compact.min).map!(&:inspect)
+            message = {}
+            message = {total: to_a.total.value, max: to_a.total.value}
+            message.merge!(aggregations: results.aggregations.keys) unless results.aggregations.nil?
+            message = message.each_pair.collect { |k,v|  "#{k}: #{v}" }
+            message.unshift entries.join(', ') unless entries.size.zero?
+            "#<#{self.class.name} #{message.join(', ')}>"
+          rescue Exception => e
+            raise e
+          end
         end
 
         private

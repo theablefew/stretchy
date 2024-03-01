@@ -24,7 +24,7 @@ module Elasticsearch
           # @return [Integer]
           #
           def count(query_or_definition = nil, options = {})
-            gateway.count(query_or_definition, options)
+            gateway.count(query_or_definition, options)["count"]
           end
 
           # Returns all models efficiently via the Elasticsearch's scan/scroll API

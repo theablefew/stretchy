@@ -4,7 +4,8 @@ require 'amazing_print'
 require 'rainbow'
 require 'elasticsearch/rails'
 require 'elasticsearch/persistence'
-require 'active_support/concern'
+require 'active_support/concern' 
+require 'active_support/core_ext'
 
 require_relative "stretchy/version"
 require_relative "stretchy/instrumentation"
