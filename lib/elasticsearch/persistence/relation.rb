@@ -148,8 +148,8 @@ module Elasticsearch
             message = message.each_pair.collect { |k,v|  "#{k}: #{v}" }
             message.unshift entries.join(', ') unless entries.size.zero?
             "#<#{self.class.name} #{message.join(', ')}>"
-          rescue Exception => e
-            raise e
+          rescue StandardError => e
+            e
           end
         end
 

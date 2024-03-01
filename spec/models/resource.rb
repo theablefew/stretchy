@@ -1,7 +1,4 @@
-class Resource
-    include Elasticsearch::Persistence::Model
-    include Stretchy::Associations 
-    include Stretchy::Refreshable
+class Resource < Stretchy::Record
 
     index_name "resource_test"
     attribute :name, String

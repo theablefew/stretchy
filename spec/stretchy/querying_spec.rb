@@ -14,7 +14,7 @@ describe "QueryMethods" do
         context 'querying' do
             before(:context) do
                 # described_class.delete_index! if described_class.index_exists?
-                resources =  [
+                records =  [
                     {"name": "John Doe", "email": "john@example.com", "phone": "123-456-7890", "position": {"name": "Software Engineer", "level": "Senior"}, "gender": "male", "age": 30, "income": 100000, "income_after_raise": 0},
                     {"name": "Jane Smith", "email": "jane@example.com", "phone": "987-654-3210", "position": {"name": "Product Manager", "level": "Senior"}, "gender": "female", "age": 35, "income": 120000, "income_after_raise": 0},
                     {"name": "Michael Johnson", "email": "michael@example.com", "phone": "555-123-4567", "position": {"name": "Data Scientist", "level": "Senior"}, "gender": "male", "age": 40, "income": 150000, "income_after_raise": 0},
@@ -35,8 +35,9 @@ describe "QueryMethods" do
                     {"name": "David Turner", "email": "david@example.com", "phone": "555-123-4567", "position": {"name": "Data Scientist", "level": "Senior"}, "gender": "male", "age": 39, "income": 150000, "income_after_raise": 0},
                     {"name": "Emma Allen", "email": "emma@example.com", "phone": "555-987-6543", "position": {"name": "CEO", "level": "Senior"}, "gender": "female", "age": 26, "income": 200000, "income_after_raise": 0} 
                 ]
-                described_class.gateway.client.bulk(body: resources.collect { |r| described_class.new(r).to_bulk })
-                described_class.refresh_index!
+                described_class.bulk_in_batches(records, size: 100) do |batch|
+                    batch.map! { |record| described_class.new(record).to_bulk }
+                end
             end
     
             after(:context) do

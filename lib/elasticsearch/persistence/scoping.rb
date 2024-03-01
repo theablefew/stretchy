@@ -9,6 +9,7 @@ module Elasticsearch
       end
 
       module ClassMethods
+        
         def current_scope
            ScopeRegistry.value_for(:current_scope, base_class.to_s)
         end

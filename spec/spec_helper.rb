@@ -14,7 +14,9 @@
 #
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 require 'simplecov'
-SimpleCov.start
+SimpleCov.start do
+  add_filter '/spec/'
+end
 require 'stretchy'
 require 'active_support/core_ext'
 # require 'elasticsearch/persistence'

@@ -8,7 +8,10 @@ module Stretchy
                 include Elasticsearch::Persistence::Model
                 include Stretchy::Associations 
                 include Stretchy::Refreshable
+                include Stretchy::Indexing::Bulk
 
+                # Defaults max record size returned by #all
+                # overriden by #size
                 default_size 10000
 
                 # Set up common attributes

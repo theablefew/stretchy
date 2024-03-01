@@ -64,21 +64,6 @@ module Stretchy
       end
     end
 
-    ## Instance Methods
-    def to_bulk(method = :index)
-      case method
-      when :index
-        { index: { _index: self.class.gateway.index, data: self.as_json.except(:id) } }
-      when :delete
-        { delete: { _index: self.class.gateway.index, _id: self.id } }
-      when :update
-        { update: { _index: self.class.gateway.index, _id: self.id, data: { doc: self.as_json.except(:id) } } }
-      end
-    end
-
-    def update_all(**attributes)
-      self.class.gateway.client.bulk(body: br)
-    end
 
     def new_record?
       self.id.nil?
