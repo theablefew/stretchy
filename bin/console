@@ -34,20 +34,6 @@ print "\t    " * 7
 print Rainbow(" v#{Stretchy::VERSION}").white.faint
 print "\n\n"
 
-@client = Elasticsearch::Client.new url: "http://localhost:9200" 
-
-class Resource
-   include Elasticsearch::Persistence::Model
-   include Stretchy::Associations
-
-   attribute :name, String
-   attribute :email, String
-   attribute :phone, String
-   attribute :position, Stretchy::Attributes::Hash
-   attribute :gender, String
-   attribute :age, Integer
-end
-
 IRB.start(__FILE__)
 
 
