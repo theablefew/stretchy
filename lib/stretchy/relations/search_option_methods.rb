@@ -1,5 +1,5 @@
 module Stretchy
-  module Relation
+  module Relations
 
     module SearchOptionMethods
       extend ActiveSupport::Concern

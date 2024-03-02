@@ -1,5 +1,5 @@
 module Stretchy
-  module Relation
+  module Relations
 
       module FinderMethods
 
@@ -31,7 +31,7 @@ module Stretchy
         def count!
           @values[:count] = true
           @values.delete(:size)
-          spawn.to_a["count"]
+          spawn.results
         end
 
       end

@@ -5,20 +5,51 @@ module Stretchy
 
             base.class_eval do
 
-                include Elasticsearch::Persistence::Model
+                extend Stretchy::Delegation::GatewayDelegation
+
+                include ActiveModel::Model
+                include ActiveModel::Attributes
+                include ActiveModel::AttributeAssignment
+                include ActiveModel::Naming
+                include ActiveModel::Conversion
+                include ActiveModel::Serialization
+                include ActiveModel::Serializers::JSON
+                include ActiveModel::Validations
+                include ActiveModel::Validations::Callbacks
+                extend ActiveModel::Callbacks
+
+                define_model_callbacks :create, :save, :update, :destroy
+                define_model_callbacks :find, :touch, only: :after
+
+                include Stretchy::Model::Callbacks
+                include Stretchy::Indexing::Bulk
+                include Stretchy::Persistence
                 include Stretchy::Associations 
                 include Stretchy::Refreshable
-                include Stretchy::Indexing::Bulk
+                include Stretchy::Common
+                include Stretchy::Scoping
+                include Stretchy::Utils
+
+                extend Stretchy::Delegation::DelegateCache
+                extend Stretchy::Querying
+
+                # Set up common attributes
+                attribute :id, :string #, default: lambda { SecureRandom.uuid }
+                attribute :created_at, :datetime, default: lambda {  Time.now.utc }
+                attribute :updated_at, :datetime, default: lambda { Time.now.utc }
+
+                # Set the default sort key to be used in sort operations
+                default_sort_key :created_at
 
                 # Defaults max record size returned by #all
                 # overriden by #size
                 default_size 10000
 
-                # Set up common attributes
-                attribute :created_at, DateTime, default: lambda { |o, a| Time.now.utc }
-                attribute :updated_at, DateTime, default: lambda { |o, a| Time.now.utc }
+            end
 
-                default_sort_key :created_at
+            def initialize(attributes = {})
+                self.assign_attributes(attributes) if attributes
+                super()
             end
 
         end

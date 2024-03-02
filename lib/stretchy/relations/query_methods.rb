@@ -1,7 +1,7 @@
 require 'active_support/core_ext/array/wrap'
 
 module Stretchy
-  module Relation
+  module Relations
     module QueryMethods
       extend ActiveSupport::Concern
 
@@ -212,7 +212,7 @@ module Stretchy
       end
 
       def aggregation!(name, options = {}, &block)
-        self.aggregation_values += [{name: name, args: options}]
+        self.aggregation_values += [{name: name, args: assume_keyword_field(options)}]
         self
       end
 
@@ -319,6 +319,42 @@ module Stretchy
       end
 
       private
+
+      # If terms are used, we assume that the field is a keyword field
+      # and append .keyword to the field name
+      # {terms: {field: 'gender'}}
+      # or nested aggs
+      # {terms: {field: 'gender'}, aggs: {name: {terms: {field: 'position.name'}}}}
+      # should be converted to
+      # {terms: {field: 'gender.keyword'}, aggs: {name: {terms: {field: 'position.name.keyword'}}}}
+      # {date_histogram: {field: 'created_at', interval: 'day'}}
+      # TODO: There may be cases where we don't want to add .keyword to the field and there should be a way to override this
+      KEYWORD_AGGREGATION_FIELDS = [:terms, :rare_terms, :significant_terms, :cardinality, :string_stats]
+      def assume_keyword_field(args={}, parent_match=false)
+        if args.is_a?(Hash)
+          args.each do |k, v|
+            if v.is_a?(Hash) 
+              assume_keyword_field(v, KEYWORD_AGGREGATION_FIELDS.include?(k))
+            else
+              next unless v.is_a?(String) || v.is_a?(Symbol)
+              args[k] = ([:field, :fields].include?(k.to_sym) && v !~ /\.keyword$/ && parent_match) ? "#{v}.keyword" : v.to_s
+            end
+          end
+        end
+      end
+              # args.transform_values do |value|
+        #   if value.is_a?(Hash)
+        #     value.transform_values! do |v|
+        #       if v.is_a?(Hash) && v.key?('field') && KEYWORD_AGGREGATION_FIELDS.include?(value.keys.first.to_sym)
+        #         v['field'] = (v['field'] !~ /\.keyword$/) ? "#{v['field']}.keyword" : v['field'].to_s
+        #       end
+        #       v
+        #     end
+        #     assume_keyword_field(value)
+        #   else
+        #     value
+        #   end
+        # end
 
       def check_if_method_has_arguments!(method_name, args)
         if args.blank?

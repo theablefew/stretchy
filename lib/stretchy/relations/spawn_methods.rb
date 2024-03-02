@@ -1,9 +1,8 @@
 require 'active_support/core_ext/hash/except'
 require 'active_support/core_ext/hash/slice'
-# require 'elasticsearch/persistence/relation/merger'
 
 module Stretchy
-  module Relation
+  module Relations
 
       module SpawnMethods
         def spawn

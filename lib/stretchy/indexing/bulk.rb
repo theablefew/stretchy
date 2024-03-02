@@ -6,7 +6,7 @@ module Stretchy
             class_methods do
 
                 def bulk(records)
-                    gateway.client.bulk body: records
+                    self.gateway.client.bulk body: records
                 end
 
                 # bulk_in_batches(records, size: 100) do |batch|
@@ -18,7 +18,7 @@ module Stretchy
                         yield batch if block_given?
                         bulk(batch)
                     end
-                    refresh_index!
+                    self.refresh_index!
                     bulk_results
                 end
 
@@ -35,11 +35,11 @@ module Stretchy
             def to_bulk(method = :index)
                 case method
                 when :index
-                  { index: { _index: self.class.gateway.index, data: self.as_json.except(:id) } }
+                  { index: { _index: self.class.index_name, data: self.as_json.except(:id) } }
                 when :delete
-                  { delete: { _index: self.class.gateway.index, _id: self.id } }
+                  { delete: { _index: self.class.index_name, _id: self.id } }
                 when :update
-                  { update: { _index: self.class.gateway.index, _id: self.id, data: { doc: self.as_json.except(:id) } } }
+                  { update: { _index: self.class.index_name, _id: self.id, data: { doc: self.as_json.except(:id) } } }
                 end
             end
 
