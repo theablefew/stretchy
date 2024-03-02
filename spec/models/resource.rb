@@ -1,12 +1,14 @@
 class Resource < Stretchy::Record
-
     index_name "resource_test"
-    attribute :name, String
-    attribute :email, String
-    attribute :phone, String
-    attribute :position, Stretchy::Attributes::Hash
-    attribute :gender, String
-    attribute :age, Integer
-    attribute :income, Integer
-    attribute :income_after_raise, Integer
+
+    attribute :name,                :string
+    attribute :email,               :string
+    attribute :phone,               :string
+    attribute :position,            :hash
+    attribute :gender,              :string
+    attribute :age,                 :integer
+    attribute :income,              :integer
+    attribute :income_after_raise,  :integer
+
+
  end

@@ -7,10 +7,7 @@ describe Stretchy::Record do
   describe Post do
 
     context 'when inherited' do
-      it 'includes Elasticsearch::Persistence::Model' do
-          expect(described_class).to include(Elasticsearch::Persistence::Model)
-      end
-      
+
       it 'includes Stretchy::Associations' do
           expect(described_class).to include(Stretchy::Associations)
       end
@@ -20,13 +17,17 @@ describe Stretchy::Record do
       end
 
       it 'infers the index name' do
-          expect(described_class.index_name).to eq('posts')
+          expect(described_class.index_name).to eq(described_class.model_name.collection)
       end
 
       context 'defaults' do
         context 'attributes' do
           it 'includes an id' do
             expect(described_class.new).to respond_to(:id)
+          end
+
+          it 'is assigned an id on create' do
+            expect(described_class.create.id).to be_a(String)
           end
 
           it 'includes created_at and updated_at' do
@@ -50,6 +51,36 @@ describe Stretchy::Record do
         end
       end
 
+      context 'crud' do
+
+        it 'creates' do
+          document = described_class.create({title: "hello", body: "world", actor: {name: "John", age: 30, username: 'johnny'}, tags: ["hello", "world"], flagged: false})
+          described_class.refresh_index!
+          expect(document.id).not_to be_nil 
+        end
+
+        it 'saves' do
+          document = described_class.new({title: "hello", body: "world", actor: {name: "John", age: 30, username: 'johnny'}, tags: ["hello", "world"], flagged: false})
+          document.save
+          expect(document.id).not_to be_nil 
+        end
+
+        it 'deletes' do
+          document = described_class.create({title: "hello", body: "world", actor: {name: "John", age: 30, username: 'johnny'}, tags: ["hello", "world"], flagged: false})
+          expect(document.delete).to be_truthy
+        end
+
+        it 'updates' do
+          document = described_class.create({title: "hello", body: "world", actor: {name: "John", age: 30, username: 'johnny'}, tags: ["hello", "world"], flagged: false})
+          document.update({title: "goodbye"})
+          expect(document.title).to eq("goodbye")
+          described_class.refresh_index!
+          expect(described_class.last.title).to eq("goodbye")
+
+        end
+
+      end
+
       context 'scoping' do
         before(:example) do
 
@@ -70,7 +101,7 @@ describe Stretchy::Record do
         end
 
         it 'returns a relation' do
-            expect(described_class.all.class.superclass).to eq(Elasticsearch::Persistence::Relation)
+            expect(described_class.all.class.superclass).to eq(Stretchy::Relation)
         end
 
         it 'counts' do
@@ -84,7 +115,7 @@ describe Stretchy::Record do
 
           context 'after defining a scope for flagged records' do
             it 'returns a relation' do
-              expect(described_class.flagged.class.superclass).to eq(Elasticsearch::Persistence::Relation)
+              expect(described_class.flagged.class.superclass).to eq(Stretchy::Relation)
             end
 
             it 'returns only flagged records' do
@@ -94,7 +125,6 @@ describe Stretchy::Record do
         end
       end
 
-      context 'indexing' do
         context 'bulk' do
           before(:each) do
             records = [
@@ -126,19 +156,19 @@ describe Stretchy::Record do
             expect(batch_results.first['items'].size).to eq(2)
           end
 
-          it 'bulk indexes in batches' do 
+          it 'indexes in batches' do 
             expect(described_class).to respond_to(:bulk_in_batches)
             expect(described_class.count).to eq(4)
           end
 
-          it 'bulk updates in batches' do
+          it 'updates in batches' do
             described_class.bulk_in_batches(described_class.all, size: 100) do |batch|
               batch.map! { |record| record.flagged = true; record.to_bulk(:update) }
             end
             expect(described_class.flagged.count).to eq(4)
           end
 
-          it 'bulk deletes in batches' do
+          it 'deletes in batches' do
             described_class.bulk_in_batches(described_class.all, size: 2) do |batch|
               expect(batch.size).to eq(2)
               batch.map! { |record| record.to_bulk(:delete) }
@@ -149,6 +179,5 @@ describe Stretchy::Record do
           
         end
       end
-    end
   end
 end

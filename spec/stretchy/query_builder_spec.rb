@@ -1,7 +1,7 @@
 require 'spec_helper'
-require 'elasticsearch/persistence/relations/query_builder'
+# require 'stretchy/relations/query_builder'
 
-describe Elasticsearch::Persistence::Relations::QueryBuilder do
+describe Stretchy::Relations::QueryBuilder do
   let(:values) { { aggregation: {categories: { field: 'category', size: 10 }}, filter: { term: { status: 'active' } } } }
   subject { described_class.new(values) }
 

@@ -12,7 +12,7 @@ describe "QueryMethods" do
     describe Resource do 
 
         context 'querying' do
-            before(:context) do
+            before(:each) do
                 # described_class.delete_index! if described_class.index_exists?
                 records =  [
                     {"name": "John Doe", "email": "john@example.com", "phone": "123-456-7890", "position": {"name": "Software Engineer", "level": "Senior"}, "gender": "male", "age": 30, "income": 100000, "income_after_raise": 0},
@@ -32,28 +32,46 @@ describe "QueryMethods" do
                     {"name": "Sophie Young", "email": "sophie@example.com", "phone": "555-987-6543", "position": {"name": "UX Designer", "level": "Junior"}, "gender": "female", "age": 24, "income": 75000, "income_after_raise": 0},
                     {"name": "Joseph Turner", "email": "joseph@example.com", "phone": "555-456-7890", "position": {"name": "Software Engineer", "level": "Senior"}, "gender": "male", "age": 34, "income": 120000, "income_after_raise": 0},
                     {"name": "Chloe Harris", "email": "chloe@example.com", "phone": "555-654-3210", "position": {"name": "Product Manager", "level": "Senior"}, "gender": "female", "age": 33, "income": 130000, "income_after_raise": 0},
-                    {"name": "David Turner", "email": "david@example.com", "phone": "555-123-4567", "position": {"name": "Data Scientist", "level": "Senior"}, "gender": "male", "age": 39, "income": 150000, "income_after_raise": 0},
-                    {"name": "Emma Allen", "email": "emma@example.com", "phone": "555-987-6543", "position": {"name": "CEO", "level": "Senior"}, "gender": "female", "age": 26, "income": 200000, "income_after_raise": 0} 
+                    {"name": "David Turner", "email": "david@example.com", "phone": "555-123-4567", "position": {"name": "Data Scientist", "level": "Senior"}, "gender": "male", "age": 39, "income": 150000, "income_after_raise": 160000},
+                    {"name": "Emma Allen", "email": "emma@example.com", "phone": "555-987-6543", "position": {"name": "CEO", "level": "Senior"}, "gender": "female", "age": 26, "income": 200000, "income_after_raise": 250000} 
                 ]
                 described_class.bulk_in_batches(records, size: 100) do |batch|
                     batch.map! { |record| described_class.new(record).to_bulk }
                 end
             end
     
-            after(:context) do
+            after(:each) do
                 described_class.delete_index! if described_class.index_exists?
             end
-            
-            let(:subject) { 
-                described_class.create({"name": "David Brown", "email": "david@example.com", "phone": "555-456-7890", "position": {"name": "Software Engineer", "level": "Junior"}, "gender": "male", "age": 25})
-            }
+
+            context 'counting' do
+                it 'with a query' do
+                    count = described_class.where(gender: :female).count
+                    expect(count).to be_a(Integer)
+                    expect(count).to eq(10)
+                end
+
+                it 'with a filter' do
+                    count = described_class.filter(:terms, gender: [:female]).count
+                    expect(count).to be_a(Integer)
+                    expect(count).to eq(10)
+                end
+
+                it 'responds to count without a query' do
+                    expect(described_class.count).to be_a(Integer)
+                    expect(described_class.count).to eq(19)
+                end
+            end
 
             context '.where' do
+                let(:subject) { 
+                    described_class.create({"name": "David Brown", "email": "david@example.com", "phone": "555-456-7890", "position": {"name": "Software Engineer", "level": "Junior"}, "gender": "male", "age": 25, "income": 80000, "income_after_raise": 90000})
+                }
                 it 'returns resources with matching attributes' do
                     r = subject
                     described_class.refresh_index!
                     expect(described_class.where(age: 25).map(&:id)).to include(r.id)
-        
+                    r.delete
                 end
             end
 
@@ -93,33 +111,17 @@ describe "QueryMethods" do
                 end
             end
 
-            context 'counting' do
-                it 'with a query' do
-                    count = described_class.where(gender: :female).count
-                    expect(count).to be_a(Integer)
-                    expect(count).to eq(10)
-                end
-
-                it 'with a filter' do
-                    count = described_class.filter(:terms, gender: [:female]).count
-                    expect(count).to be_a(Integer)
-                    expect(count).to eq(10)
-                end
-
-                it 'responds to count without a query' do
-                    expect(described_class.count).to be_a(Integer)
-                    expect(described_class.count).to eq(21)
-                end
-            end
 
             context 'finding' do
                 it 'returns the first resource' do
-                    first_resource = described_class.create({"created_at": 2.years.ago, "name": "Chuck Brown", "email": "chuck@example.com", "phone": "555-456-2093", "position": {"name": "Software Engineer", "level": "Junior"}, "gender": "male", "age": 55})
+                    first_resource = described_class.create({"created_at": 2.years.ago, "name": "Chuck Founder", "email": "chuck@example.com", "phone": "555-456-2093", "position": {"name": "Software Engineer", "level": "Junior"}, "gender": "male", "age": 55})
+                    described_class.refresh_index!
                     expect(described_class.first.id).to eq(first_resource.id)
                 end
 
                 it 'returns the last resource' do
-                    last_resource = described_class.create({"name": "Chuck Brown", "email": "chuck@example.com", "phone": "555-456-2093", "position": {"name": "Software Engineer", "level": "Junior"}, "gender": "male", "age": 55})
+                    last_resource = described_class.create({"name": "Buck Finale", "email": "buck@example.com", "phone": "555-456-2093", "position": {"name": "Software Engineer", "level": "Junior"}, "gender": "male", "age": 55})
+                    described_class.refresh_index!
                     expect(described_class.last.id).to eq(last_resource.id)
                     last_resource.delete
                 end
