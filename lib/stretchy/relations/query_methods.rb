@@ -342,19 +342,6 @@ module Stretchy
           end
         end
       end
-              # args.transform_values do |value|
-        #   if value.is_a?(Hash)
-        #     value.transform_values! do |v|
-        #       if v.is_a?(Hash) && v.key?('field') && KEYWORD_AGGREGATION_FIELDS.include?(value.keys.first.to_sym)
-        #         v['field'] = (v['field'] !~ /\.keyword$/) ? "#{v['field']}.keyword" : v['field'].to_s
-        #       end
-        #       v
-        #     end
-        #     assume_keyword_field(value)
-        #   else
-        #     value
-        #   end
-        # end
 
       def check_if_method_has_arguments!(method_name, args)
         if args.blank?
