@@ -2,10 +2,9 @@ module Stretchy
     module Utils
         extend ActiveSupport::Concern
 
-        class_methods do
 
-            def to_curl(arguments = {}, end_point = "_search")
-                host = gateway.client.transport.transport.hosts&.first || gateway.client.transport.transport.options[:url]
+            def self.to_curl(klass, arguments = {}, end_point = "_search")
+                host = klass.gateway.client.transport.transport.hosts&.first || klass.gateway.client.transport.transport.options[:url]
                 arguments[:index] = "_all" if !arguments[:index] && arguments[:type]
 
                 valid_params = [
@@ -66,6 +65,5 @@ module Stretchy
                 Rainbow("curl -X #{method.to_s.upcase} '#{CGI.unescape(trace_url)}'#{trace_body}\n").color :white
             end
 
-        end
     end
 end

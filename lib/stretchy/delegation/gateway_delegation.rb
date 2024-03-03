@@ -18,6 +18,8 @@ module Stretchy
                 :count,
         to: :gateway
 
+      include Rails::Instrumentation::Publishers::Record
+
       def index_name(name=nil, &block)
           if name || block_given?
             return (@index_name = name || block)
