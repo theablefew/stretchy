@@ -129,14 +129,10 @@ module Stretchy
             end
           end unless or_filters.blank?
 
-          # structure.bool do
-            # structure.must do
-              query_filters.each do |f|
-                structure.child! do
-                  structure.set! f[:name], extract_filters(f[:name], f[:args])
-                end
-              # end
-            # end
+          query_filters.each do |f|
+            structure.child! do
+              structure.set! f[:name], extract_filters(f[:name], f[:args])
+            end
           end unless query_filters.blank?
         end
       end
