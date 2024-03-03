@@ -1,5 +1,4 @@
 require 'spec_helper'
-# require 'stretchy/relations/query_builder'
 
 describe Stretchy::Relations::QueryBuilder do
   let(:values) { { aggregation: {categories: { field: 'category', size: 10 }}, filter: { term: { status: 'active' } } } }
@@ -73,7 +72,7 @@ describe Stretchy::Relations::QueryBuilder do
             let(:filters) { {filter: [name: :active, args: {term: {status: :active}}]} }
     
             it 'builds the query structure' do
-                expect(subject.send(:build_query)[:bool][:filter][:bool][:must]).to include({active: {term: {status: :active}}}.with_indifferent_access)
+                expect(subject.send(:build_query)[:bool][:filter]).to include({active: {term: {status: :active}}}.with_indifferent_access)
             end
     
         end

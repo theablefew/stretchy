@@ -132,6 +132,18 @@ describe "QueryMethods" do
                     expect(described_class.routing('123').first).to be_a(described_class)
                 end
             end
+
+            context 'query string' do
+                it 'filter with query string' do
+                    result = described_class.filter(:query_string, {query: "Mia OR Isabella", default_field: "name"} )
+                    expect(result.map(&:name)).to include("Mia Rodriguez", "Isabella Lewis")
+                end
+
+                it 'returns hits' do
+                    result = described_class.query_string("gender:male", default_field: "name")
+                    expect(result.map(&:gender)).to all(eq('male') )
+                end
+            end
         end
     end
 end
