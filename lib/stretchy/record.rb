@@ -18,8 +18,7 @@ module Stretchy
                 include ActiveModel::Validations::Callbacks
                 extend ActiveModel::Callbacks
 
-                define_model_callbacks :create, :save, :update, :destroy
-                define_model_callbacks :find, :touch, only: :after
+
 
                 include Stretchy::Model::Callbacks
                 include Stretchy::Indexing::Bulk

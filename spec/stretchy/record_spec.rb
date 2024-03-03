@@ -20,6 +20,25 @@ describe Stretchy::Record do
           expect(described_class.index_name).to eq(described_class.model_name.collection)
       end
 
+      it 'inspects records' do
+          d = described_class.new
+          inspect_matches = d.attributes.map {|k,v| d.inspect =~ Regexp.new("#{k}\:\s")}
+          expect(inspect_matches).to all(be_truthy)
+      end
+
+      xit 'timestamps records' do
+        
+      end
+
+      context 'circuit_breaker_callbacks' do
+        it 'esnures query has an option' do
+          described_class.query_must_have :routing, in: :search_option, validate_with: Proc.new { |options, values| options.include? :routing }
+          expect(described_class).to respond_to(:_circuit_breaker_callbacks)
+          expect { described_class.first }.to raise_error(Stretchy::Errors::QueryOptionMissing)
+          described_class._circuit_breaker_callbacks.clear
+        end
+      end
+
       context 'defaults' do
         context 'attributes' do
           it 'includes an id' do
@@ -33,7 +52,6 @@ describe Stretchy::Record do
           it 'includes created_at and updated_at' do
             expect(described_class.new).to respond_to(:created_at)
             expect(described_class.new).to respond_to(:updated_at)
-
           end
         end
 
@@ -76,7 +94,18 @@ describe Stretchy::Record do
           expect(document.title).to eq("goodbye")
           described_class.refresh_index!
           expect(described_class.last.title).to eq("goodbye")
+        end
 
+        it 'refreshes index after save' do
+          document = described_class.new({title: "hello", body: "world", actor: {name: "John", age: 30, username: 'johnny'}, tags: ["hello", "world"], flagged: false})
+          expect(document).to receive(:refresh_index)
+          document.save
+        end
+
+        it 'refreshes index after destroy' do
+          document = described_class.create({title: "hello", body: "world", actor: {name: "John", age: 30, username: 'johnny'}, tags: ["hello", "world"], flagged: false})
+          expect(document).to receive(:refresh_index)
+          document.destroy
         end
 
       end

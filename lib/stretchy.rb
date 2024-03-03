@@ -19,6 +19,9 @@ require_relative "stretchy/version"
 require_relative "stretchy/instrumentation/railtie" if defined?(Rails)
 
 module Stretchy
+  module Errors
+    class QueryOptionMissing < StandardError; end
+  end
 
   class << self
     def logger

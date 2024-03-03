@@ -6,16 +6,13 @@ module Stretchy
 
 
         included do
+          mattr_accessor :_circuit_breaker_callbacks, default: []
 
-          instance_variable_set("@_circuit_breaker_callbacks", [])
-
+          define_model_callbacks :create, :save, :update, :destroy
+          define_model_callbacks :find, :touch, only: :after
         end
 
         class_methods do
-
-          def circuit_breaker_callbacks
-            instance_variable_get("@_circuit_breaker_callbacks") || []
-          end
 
           def query_must_have(*args, &block)
             options = args.extract_options!
@@ -24,7 +21,7 @@ module Stretchy
 
             options[:message] = "does not exist in #{options[:in]}." unless options.has_key? :message
 
-            instance_variable_get("@_circuit_breaker_callbacks") << {name: args.first, options: options, callback: cb}
+            _circuit_breaker_callbacks << {name: args.first, options: options, callback: cb}
 
           end
         end

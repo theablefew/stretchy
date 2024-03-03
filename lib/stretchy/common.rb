@@ -3,7 +3,7 @@ module Stretchy
         extend ActiveSupport::Concern
 
         def inspect
-            "#<#{self.class.name} #{attributes.map { |k,v| "#{k}: #{v}" }.join(', ')}>"
+            "#<#{self.class.name} #{attributes.map { |k,v| "#{k}: #{v.blank? ? 'nil' : v}" }.join(', ')}>"
         end
 
 
