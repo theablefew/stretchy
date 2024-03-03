@@ -114,7 +114,7 @@ module Stretchy
         # @return [Array] The results of the query.
         def exec_queries
           # Run safety callback
-          klass.circuit_breaker_callbacks.each do |cb|
+          klass._circuit_breaker_callbacks.each do |cb|
             current_scope_values = self.send("#{cb[:options][:in]}_values")
             next if skip_callbacks_values.include? cb[:name]
             valid = if cb[:callback].nil?
@@ -123,7 +123,7 @@ module Stretchy
               cb[:callback].call(current_scope_values.collect(&:keys).flatten, current_scope_values)
             end
 
-            raise Elasticsearch::Persistence::Model::QueryOptionMissing, "#{cb[:name]} #{cb[:options][:message]}" unless valid
+            raise Stretchy::Errors::QueryOptionMissing, "#{cb[:name]} #{cb[:options][:message]}" unless valid
           end
 
           @records = @klass.fetch_results(query_builder)
