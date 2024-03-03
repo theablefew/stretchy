@@ -9,9 +9,9 @@ module Stretchy
 
     def fetch_results(es)
       unless es.count?
-        gateway.search(es.to_elastic, es.search_options)
+        base_class.search(es.to_elastic, es.search_options)
       else
-        gateway.count(es.to_elastic, es.search_options)
+        base_class.count(es.to_elastic, es.search_options)
       end
     end
 

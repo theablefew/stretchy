@@ -144,6 +144,21 @@ describe "QueryMethods" do
                     expect(result.map(&:gender)).to all(eq('male') )
                 end
             end
+
+            context 'sorting' do
+
+                it 'accepts fields as keyword arguments' do
+                    result = described_class.order(age: :desc, name: :asc, created_at: {order: :desc, mode: :avg})
+                    expected = {:sort=>[{:age=>:desc}, {:name=>:asc}, {:created_at=>{:order=>:desc, :mode=>:avg}}]}
+                    expect(result.to_elastic).to eq(expected.with_indifferent_access)
+                end
+
+                it 'is aliased as sort' do
+                    result = described_class.sort(age: :desc)
+                    expected = {:sort=>[{:age=>:desc}]}
+                    expect(result.to_elastic).to eq(expected.with_indifferent_access)
+                end
+            end
         end
     end
 end

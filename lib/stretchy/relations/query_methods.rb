@@ -6,10 +6,23 @@ module Stretchy
       extend ActiveSupport::Concern
 
 
-       MULTI_VALUE_METHODS = [:where, :order, :field, :highlight, :source,
-                              :must_not, :should, :query_string,
-                              :aggregation, :search_option,
-                              :filter, :or_filter, :extending, :skip_callbacks]
+       MULTI_VALUE_METHODS = [
+        :where,
+        :order, 
+        :field,
+        :highlight,
+        :source,
+        :must_not,
+        :should,
+        :query_string,
+        :aggregation,
+        :search_option,
+        :filter, 
+        :or_filter,
+        :extending,
+        :skip_callbacks
+      ]
+
       SINGLE_VALUE_METHODS = [:size]
 
       class WhereChain
@@ -50,17 +63,53 @@ module Stretchy
       end
 
 
-
+      # Allows you to add one or more sorts on specified fields.
+      #
+      # @overload order(attribute: direction, ...)
+      #   @param attribute [Symbol] the attribute to sort by
+      #   @param direction [Symbol] the direction to sort in (:asc or :desc)
+      #
+      # @overload order(attribute: {order: direction, mode: mode, ...}, ...)
+      #   @param params [Hash] attributes to sort by
+      #   @param params [Symbol] :attribute the attribute name as key to sort by
+      #   @param options [Hash]  a hash containing possible sorting options 
+      #   @option options [Symbol] :order the direction to sort in (:asc or :desc)
+      #   @option options [Symbol] :mode the mode to use for sorting (:avg, :min, :max, :sum, :median)
+      #   @option options [Symbol] :numeric_type the numeric type to use for sorting (:double, :long, :date, :date_nanos) 
+      #   @option options [Symbol] :missing the value to use for documents without the field
+      #   @option options [Hash] :nested the nested sorting options
+      #   @option nested [String] :path the path to the nested object
+      #   @option nested [Hash] :filter the filter to apply to the nested object
+      #   @option nested [Hash] :max_children the maximum number of children to consider per root document when picking the sort value. Defaults to unlimited
+      #
+      # @example
+      #   Model.order(created_at: :asc)
+      #     # Elasticsearch equivalent
+      #     #=> "sort" : [{"created_at" : "asc"}]
+      #
+      #   Model.order(age: :desc, name: :asc, price: {order: :desc, mode: :avg})
+      #
+      #     # Elasticsearch equivalent
+      #     #=> "sort" : [
+      #         { "price" : {"order" : "desc", "mode": "avg"}},
+      #         { "name" : "asc" },
+      #         { "age" : "desc" }
+      #       ]
+      #
+      # @return [Stretchy::Relation] a new relation with the specified order
+      # @see #sort
       def order(*args)
         check_if_method_has_arguments!(:order, args)
         spawn.order!(*args)
       end
 
-      def order!(*args)
-        self.order_values += [preprocess_order_args(args)]
+      def order!(*args) # :nodoc:
+        self.order_values += args.first.zip.map(&:to_h)
         self
       end
 
+      # Alias for {#order}
+      # @see #order
       alias :sort :order
 
 
@@ -68,7 +117,7 @@ module Stretchy
         spawn.skip_callbacks!(*args)
       end
 
-      def skip_callbacks!(*args)
+      def skip_callbacks!(*args) # :nodoc:
         self.skip_callbacks_values += args
         self
       end
@@ -80,7 +129,7 @@ module Stretchy
         spawn.size!(args)
       end
 
-      def size!(args)
+      def size!(args) # :nodoc:
         self.size_value = args
         self
       end
@@ -100,7 +149,6 @@ module Stretchy
         end
       end
 
-      alias :must :where
 
       def where!(opts, *rest) # :nodoc:
         if opts == :chain
@@ -114,6 +162,8 @@ module Stretchy
           self
         end
       end
+      
+      alias :must :where
 
 
 
@@ -150,9 +200,8 @@ module Stretchy
         end
       end
 
-      alias :where_not :must_not
 
-      def must_not!(opts, *rest)
+      def must_not!(opts, *rest) # :nodoc:
         if opts == :chain
           WhereChain.new(self)
         else
@@ -160,6 +209,8 @@ module Stretchy
           self
         end
       end
+      
+      alias :where_not :must_not
 
 
 
@@ -174,7 +225,7 @@ module Stretchy
         end
       end
 
-      def should!(opts, *rest)
+      def should!(opts, *rest) # :nodoc:
         if opts == :chain
           WhereChain.new(self)
         else
@@ -188,7 +239,7 @@ module Stretchy
         spawn.or_filter!(name, options, &block)
       end
 
-      def or_filter!(name, options = {}, &block)
+      def or_filter!(name, options = {}, &block) # :nodoc:
         self.or_filter_values += [{name: name, args: options}]
         self
       end
@@ -199,7 +250,7 @@ module Stretchy
         spawn.filter!(name, options, &block)
       end
 
-      def filter!(name, options = {}, &block)
+      def filter!(name, options = {}, &block) # :nodoc:
         self.filter_values += [{name: name, args: options}]
         self
       end
@@ -211,7 +262,7 @@ module Stretchy
         spawn.aggregation!(name, options, &block)
       end
 
-      def aggregation!(name, options = {}, &block)
+      def aggregation!(name, options = {}, &block) # :nodoc:
         self.aggregation_values += [{name: name, args: assume_keyword_field(options)}]
         self
       end
@@ -224,7 +275,7 @@ module Stretchy
       end
       alias :fields :field
 
-      def field!(*args)
+      def field!(*args) # :nodoc:
         self.field_values += args
         self
       end
@@ -236,7 +287,7 @@ module Stretchy
         spawn.source!(*args)
       end
 
-      def source!(*args)
+      def source!(*args) # :nodoc:
         self.source_values += args
         self
       end
@@ -260,37 +311,21 @@ module Stretchy
         self
       end
 
-      def build_where(opts, other = [])
-        case opts
-        when String, Array
-          #TODO: Remove duplication with: /activerecord/lib/active_record/sanitization.rb:113
-          values = Hash === other.first ? other.first.values : other
 
-          values.grep(Stretchy::Relation) do |rel|
-            self.bind_values += rel.bind_values
-          end
 
-          [other.empty? ? opts : ([opts] + other)]
-        when Hash
-          [other.empty? ? opts : ([opts] + other)]
-        else
-          [opts]
-        end
-      end
+
 
       def highlight(*args)
         spawn.highlight!(*args)
       end
 
-      def highlight!(*args)
+      def highlight!(*args) # :nodoc:
         self.highlight_values += args
         self
       end
 
 
       # Returns a chainable relation with zero records.
-      #
-      #
       def none
         extending(NullRelation)
       end
@@ -316,6 +351,24 @@ module Stretchy
         extend(*extending_values) if extending_values.any?
 
         self
+      end
+
+      def build_where(opts, other = [])
+        case opts
+        when String, Array
+          #TODO: Remove duplication with: /activerecord/lib/active_record/sanitization.rb:113
+          values = Hash === other.first ? other.first.values : other
+
+          values.grep(Stretchy::Relation) do |rel|
+            self.bind_values += rel.bind_values
+          end
+
+          [other.empty? ? opts : ([opts] + other)]
+        when Hash
+          [other.empty? ? opts : ([opts] + other)]
+        else
+          [opts]
+        end
       end
 
       private
@@ -360,12 +413,6 @@ module Stretchy
                                  "directions are: #{VALID_DIRECTIONS.inspect}" unless VALID_DIRECTIONS.include?(value)
           end
         end
-      end
-
-      def preprocess_order_args(order_args)
-        args = order_args.reject{ |arg| arg.is_a?(Hash) }.take(2)
-        return [Hash[[args]]] if args.length == 2
-        order_args.select { |arg| arg.is_a?(Hash)}.flatten
       end
 
       def add_relations_to_bind_values(attributes)
