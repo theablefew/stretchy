@@ -111,6 +111,7 @@ module Stretchy
           end unless missing_bool_query? && missing_query_filter?
 
 
+
           structure.query_string do
             structure.extract! query_string_options, *query_string_options.keys
             structure.query query_strings
@@ -128,13 +129,9 @@ module Stretchy
             end
           end unless or_filters.blank?
 
-          structure.bool do
-            structure.must do
-              query_filters.each do |f|
-                structure.child! do
-                  structure.set! f[:name], extract_filters(f[:name], f[:args])
-                end
-              end
+          query_filters.each do |f|
+            structure.child! do
+              structure.set! f[:name], extract_filters(f[:name], f[:args])
             end
           end unless query_filters.blank?
         end
@@ -162,18 +159,6 @@ module Stretchy
               structure.set! highlight, extract_highlighter(highlight)
             end
           end
-        end
-      end
-
-      def build_filters
-        filters.each do |f|
-          structure.filter extract_filters(f[:name], f[:args])
-        end
-      end
-
-      def build_or_filters
-        or_filters.each do |f|
-          structure.filter extract_filters(f[:name], f[:args])
         end
       end
 

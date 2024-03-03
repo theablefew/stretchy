@@ -266,7 +266,7 @@ module Stretchy
           #TODO: Remove duplication with: /activerecord/lib/active_record/sanitization.rb:113
           values = Hash === other.first ? other.first.values : other
 
-          values.grep(Elasticsearch::Persistence::Relation) do |rel|
+          values.grep(Stretchy::Relation) do |rel|
             self.bind_values += rel.bind_values
           end
 
