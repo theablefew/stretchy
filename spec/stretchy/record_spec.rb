@@ -129,8 +129,19 @@ describe Stretchy::Record do
             described_class.delete_index! if described_class.index_exists?
         end
 
-        it 'returns a relation' do
-            expect(described_class.all.class.superclass).to eq(Stretchy::Relation)
+        context 'relation' do
+          it 'returns a relation' do
+              expect(described_class.all.class.superclass).to eq(Stretchy::Relation)
+          end
+        
+          it 'builds a record from a relation' do
+            expect(described_class.all.build(title: 'neat')).to be_a(described_class)
+          end
+
+          it 'returns as json' do
+            expect(described_class.all.as_json).to be_a(Array)
+            expect(described_class.all.as_json.first).to be_a(Hash)
+          end
         end
 
         it 'counts' do

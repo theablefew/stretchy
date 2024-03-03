@@ -42,8 +42,15 @@ describe "Aggregations" do
             expect(terms_aggregation.aggregations).to be_a(Hash) 
         end
 
-        it 'allows access to named aggregation' do
-            expect(terms_aggregation.aggregations).to respond_to(:gender)
+        context 'relation' do
+            it 'allows access to named aggregation' do
+                expect(terms_aggregation.aggregations).to respond_to(:gender)
+            end
+
+            it 'shows aggregations in inspect' do
+                expect(terms_aggregation.inspect).to include('aggregations')
+            end
+
         end
 
 
