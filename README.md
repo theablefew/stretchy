@@ -1,4 +1,6 @@
-# Stretchy
+[![Ruby CI](https://github.com/theablefew/stretchy/actions/workflows/spec.yml/badge.svg)](https://github.com/theablefew/stretchy/actions/workflows/spec.yml)
+
+# stretchy
 
 Stretchy provides a seamless ActiveRecord-like interface for interacting with Elasticsearch models in a Rails environment. It simplifies the process of querying, aggregating, and managing Elasticsearch-backed models, allowing Rails developers to work with search indices as comfortably as they would with traditional relational databases.
 
