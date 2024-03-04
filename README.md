@@ -1,4 +1,4 @@
-stretchy
+stretchy-model
 ===
 
 <p>
@@ -112,11 +112,11 @@ Blanket (6.322ms) curl -X GET 'http://localhost:9200/blankets/_search?size=1' -d
 
 Install the gem and add to the application's Gemfile by executing:
 
-    $ bundle add stretchy
+    $ bundle add stretchy-model
 
 If bundler is not being used to manage dependencies, install the gem by executing:
 
-    $ gem install stretchy
+    $ gem install stretchy-model
 
 ## Development
 
