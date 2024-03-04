@@ -6,20 +6,12 @@ jobs:
   test:
 
     runs-on: ${{matrix.os}}-latest
-    services:
-      elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch:${{matrix.elasticsearch}}
-        env: 
-          discovery.type: single-node
-          ES_JAVA_OPTS: "-Xms512m -Xmx512m"
-        ports:  
-        - 9200:9200
 
     strategy:
       matrix:
         os: ['ubuntu']
         ruby: ['3.1', '2.7']
-        elasticsearch: ['7.10.1', '8.12.2']
+        elasticsearch: ['7.x-SNAPSHOT', '8.12.2']
         # opensearch: ['2.12.0']
 
 
@@ -29,6 +21,17 @@ jobs:
         uses: ruby/setup-ruby@ec02537da5712d66d4d50a0f33b7eb52773b5ed1
         with:
           ruby-version: ${{ matrix.ruby }}
+      - name: Increase system limits
+        run: |
+          sudo swapoff -a
+          sudo sysctl -w vm.swappiness=1
+          sudo sysctl -w fs.file-max=262144
+          sudo sysctl -w vm.max_map_count=262144
+      - name: Set up Elasticsearch ${{ matrix.elasticsearch }}
+        uses: elastic/elastic-github-actions/elasticsearch@master
+        with:
+          stack-version: ${{matrix.elasticsearch}}
+          security-enabled: false
       - name: Install dependencies
         run: bundle install
       - name: Run tests
