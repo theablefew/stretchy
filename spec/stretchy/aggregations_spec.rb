@@ -366,8 +366,10 @@ describe "Aggregations" do
                         :upper, :lower, :upper_population, :lower_population, :upper_sampling, :lower_sampling
                     )
 
-                    expect(extended_stats_agg.aggregations.age_stats.except(:std_deviation_bounds).values).to all(be_a(Numeric))
-                    expect(extended_stats_agg.aggregations.age_stats.std_deviation_bounds.values).to all(be_a(Numeric))
+                    aggs = extended_stats_agg.aggregations.age_stats
+                    std_deviation_bounds = aggs.delete(:std_deviation_bounds)
+                    expect(aggs.values).to all(be_a(Numeric))
+                    expect(std_deviation_bounds.values).to all(be_a(Numeric))
                     
 
                 end
