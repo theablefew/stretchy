@@ -8,7 +8,7 @@ jobs:
     runs-on: ${{matrix.os}}-latest
     services:
       elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch:#{{matrix.elasticsearch}}
+        image: docker.elastic.co/elasticsearch/elasticsearch:${{matrix.elasticsearch}}
         env: 
           discovery.type: single-node
           ES_JAVA_OPTS: "-Xms512m -Xmx512m"
