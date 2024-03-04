@@ -48,7 +48,7 @@ module Stretchy
 
 
       def exec_queries
-        @records = OpenStruct.new(klass: Elasticsearch::Persistence::Repository::Class, total: 0, results: []).freeze
+        @records = OpenStruct.new(klass: NullRelation, total: 0, results: []).freeze
       end
   end
 end

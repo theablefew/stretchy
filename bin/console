@@ -2,17 +2,7 @@
 # frozen_string_literal: true
 
 require "bundler/setup"
-require "elasticsearch"
-require "elasticsearch/persistence"
 require "stretchy"
-
-# You can add fixtures and/or initialization code here to make experimenting
-# with your gem easier. You can also use a different console, if you like.
-
-# (If you use this, don't forget to add pry to your Gemfile!)
-# require "pry"
-# Pry.start
-
 require "irb"
 
 banner = <<~BANNER
@@ -33,6 +23,15 @@ print Rainbow(banner).red
 print "\t    " * 7
 print Rainbow(" v#{Stretchy::VERSION}").white.faint
 print "\n\n"
+
+ActiveSupport::Notifications.subscribe 'search.elasticsearch' do |name, start, finish, id, payload|
+   message = [
+      Rainbow("  #{payload[:klass]}").bright, 
+      "(#{(finish.to_time - start.to_time).round(2)}ms)",
+      Stretchy::Utils.to_curl(payload[:klass].constantize, payload[:search])
+   ].join(" ")
+   Stretchy.logger.debug(Rainbow(message).color(:yellow))
+end
 
 IRB.start(__FILE__)
 

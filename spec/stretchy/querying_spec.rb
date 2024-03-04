@@ -79,6 +79,16 @@ describe "QueryMethods" do
                 it 'returns resources without the specified attribute' do
                     expect(described_class.must_not(gender: 'male').map(&:id)).not_to include(subject.id)
                 end
+                 
+                it 'is aliased as .where_not' do
+                    expect(described_class.where_not(gender: 'male').map(&:id)).not_to include(subject.id)
+                end
+            end
+
+            context '.should' do
+                it 'returns resources with the specified attribute' do
+                    expect(described_class.should(age: 33).map(&:age)).to all(eq(33))
+                end
             end
 
             context '.filter' do
@@ -144,6 +154,55 @@ describe "QueryMethods" do
                     expect(result.map(&:gender)).to all(eq('male') )
                 end
             end
+
+            context 'sorting' do
+
+                it 'accepts fields as keyword arguments' do
+                    result = described_class.order(age: :desc, name: :asc, created_at: {order: :desc, mode: :avg})
+                    expected = {:sort=>[{:age=>:desc}, {:name=>:asc}, {:created_at=>{:order=>:desc, :mode=>:avg}}]}
+                    expect(result.to_elastic).to eq(expected.with_indifferent_access)
+                end
+
+                it 'is aliased as sort' do
+                    result = described_class.sort(age: :desc)
+                    expected = {:sort=>[{:age=>:desc}]}
+                    expect(result.to_elastic).to eq(expected.with_indifferent_access)
+                end
+            end
+
+            context 'fields' do
+                it 'returns only the specified fields' do
+                    result = described_class.fields(:id, :name, :email)
+                    expected = {:fields=>[:id, :name, :email]}
+                    expect(result.to_elastic).to eq(expected.with_indifferent_access)
+                end
+            end
+
+            context 'source' do
+
+                it 'returns only the specified fields' do
+                    result = described_class.source(includes: [:name, :email])
+                    expected = {:_source=>{:includes=>[:name, :email]}}
+                    expect(result.to_elastic).to eq(expected.with_indifferent_access)
+                end
+            end
+
+            context 'highlight' do
+                it 'returns highlighted fields' do
+                    result = described_class.highlight(:body)
+                    expected = {:highlight=>{:fields=>{body: {}}}}
+                    expect(result.to_elastic).to eq(expected.with_indifferent_access)
+                end
+            end
+
+            it 'adds exists with has_field' do
+                expect(described_class.has_field(:name).to_elastic[:query][:bool]).to eq({:filter=>[{:exists=>{:field=>:name}}]}.with_indifferent_access)
+            end
+
+            it 'returns a null relation' do
+                expect(described_class.none.class).to eq("#{described_class.name}::Stretchy_Relation".constantize)
+            end
+
         end
     end
 end
