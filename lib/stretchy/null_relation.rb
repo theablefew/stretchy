@@ -46,9 +46,8 @@ module Stretchy
       other.spawn
     end
 
-
-      def exec_queries
-        @records = OpenStruct.new(klass: NullRelation, total: 0, results: []).freeze
-      end
+    def exec_queries
+      @records = OpenStruct.new(klass: NullRelation, total: 0, results: []).freeze
+    end
   end
 end
