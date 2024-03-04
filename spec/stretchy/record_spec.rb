@@ -37,6 +37,14 @@ describe Stretchy::Record do
           expect { described_class.first }.to raise_error(Stretchy::Errors::QueryOptionMissing)
           described_class._circuit_breaker_callbacks.clear
         end
+
+        it 'skips callbacks' do
+          record = described_class.create title: "hello"
+          described_class.query_must_have :routing, in: :search_option, validate_with: Proc.new { |options, values| options.include? :routing }
+          expect(described_class.skip_callbacks(:routing).first.id).to eq(record.id)
+          described_class._circuit_breaker_callbacks.clear
+          record.delete
+        end
       end
 
       context 'defaults' do

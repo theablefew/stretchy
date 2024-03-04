@@ -111,6 +111,13 @@ module Stretchy
       alias :sort :order
 
 
+      # Allows you to skip callbacks for the specified fields that are added by query_must_have for 
+      # the current query.
+      #
+      # @example
+      #  Model.skip_callbacks(:routing)
+      # 
+      # @returns [Stretchy::Relation] a new relation with the specified callbacks skipped
       def skip_callbacks(*args)
         spawn.skip_callbacks!(*args)
       end
@@ -543,18 +550,7 @@ module Stretchy
         end
       end
 
-      VALID_DIRECTIONS = [:asc, :desc, :ASC, :DESC,
-                          'asc', 'desc', 'ASC', 'DESC'] # :nodoc:
 
-      def validate_order_args(args)
-        args.each do |arg|
-          next unless arg.is_a?(Hash)
-          arg.each do |_key, value|
-            raise ArgumentError, "Direction \"#{value}\" is invalid. Valid " \
-                                 "directions are: #{VALID_DIRECTIONS.inspect}" unless VALID_DIRECTIONS.include?(value)
-          end
-        end
-      end
 
       def add_relations_to_bind_values(attributes)
         if attributes.is_a?(Hash)

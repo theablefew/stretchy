@@ -195,6 +195,14 @@ describe "QueryMethods" do
                 end
             end
 
+            it 'adds exists with has_field' do
+                expect(described_class.has_field(:name).to_elastic[:query][:bool]).to eq({:filter=>[{:exists=>{:field=>:name}}]}.with_indifferent_access)
+            end
+
+            it 'returns a null relation' do
+                expect(described_class.none.class).to eq("#{described_class.name}::Stretchy_Relation".constantize)
+            end
+
         end
     end
 end
