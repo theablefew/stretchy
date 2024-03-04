@@ -137,9 +137,13 @@ describe "QueryMethods" do
                 end
             end
 
-            context 'routing' do
-                xit 'returns resources with matching routing' do
-                    expect(described_class.routing('123').first).to be_a(described_class)
+            context 'search options' do
+                it 'sets routing' do
+                    expect(described_class.routing('123').search_option_values).to include(routing: '123')
+                end
+
+                it 'set pretty' do
+                    expect(described_class.search_options(pretty: true).search_option_values).to include(pretty: true)
                 end
             end
 

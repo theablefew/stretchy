@@ -92,6 +92,14 @@ describe Stretchy::Relations::QueryBuilder do
             expect(query).to eq({sort: sorts}.with_indifferent_access)
           end
         end
+
+        context 'search options' do
+          it 'accepts routing' do
+            subject = described_class.new(search_option: {routing: 'user_1'})
+            query = subject.values[:search_option].with_indifferent_access
+            expect(query).to eq({routing: 'user_1'}.with_indifferent_access)
+          end
+        end
   end
 
 

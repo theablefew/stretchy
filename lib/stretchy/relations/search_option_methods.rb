@@ -14,16 +14,6 @@ module Stretchy
         self
       end
 
-      def search_type(args)
-        check_if_method_has_arguments!(:search_type, args)
-        spawn.search_type!(args)
-      end
-
-      def search_type!(args)
-        merge_search_option_values(:search_type, args)
-        self
-      end
-
       def search_options(*args)
         spawn.search_options!(*args)
       end
