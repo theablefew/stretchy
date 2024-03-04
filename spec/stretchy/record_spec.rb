@@ -146,6 +146,11 @@ describe Stretchy::Record do
             expect(described_class.all.build(title: 'neat')).to be_a(described_class)
           end
 
+          it 'chains scopes' do
+            expected = {"query"=>{"bool"=>{"must"=>[{"term"=>{"title"=>"goats"}}, {"term"=>{"flagged"=>true}}, {"term"=>{"body"=>"full"}}]}}} 
+            expect(described_class.where(title: 'goats').flagged.full.to_elastic).to eq(expected)
+          end
+
           it 'returns as json' do
             expect(described_class.all.as_json).to be_a(Array)
             expect(described_class.all.as_json.first).to be_a(Hash)

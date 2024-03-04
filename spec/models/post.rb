@@ -9,9 +9,8 @@ class Post < Stretchy::Record
 
     # Scopes
     scope :flagged, -> { where(flagged: true) }
-    scope :tags, -> (size=10, tags) { puts "tags: #{tags}"
-        puts "size: #{size}"
-    }
+    scope :full, -> { where(body: 'full') }
+
     mapping do
         indexes :title, type: 'string', analyzer: 'english'
         indexes :body, type: 'string', analyzer: 'english'
