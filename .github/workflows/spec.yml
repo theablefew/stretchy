@@ -12,6 +12,8 @@ jobs:
         env: 
           discovery.type: single-node
           ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+        ports:  
+        - 9200:9200
 
     strategy:
       matrix:
