@@ -3,10 +3,8 @@ require 'zeitwerk'
 require 'amazing_print'
 require 'rainbow'
 require 'jbuilder'
-# require 'elasticsearch/rails'
 require 'elasticsearch/model'
 require 'elasticsearch/persistence'
-# require 'active_support/concern' 
 require 'active_model'
 require 'active_support/all'
 require 'active_model/type/array'
@@ -16,18 +14,37 @@ ActiveModel::Type.register(:array, ActiveModel::Type::Array)
 ActiveModel::Type.register(:hash, ActiveModel::Type::Hash)
 
 require_relative "stretchy/version"
-require_relative "stretchy/instrumentation/railtie" if defined?(Rails)
+require_relative "rails/instrumentation/railtie" if defined?(Rails)
 
 module Stretchy
   module Errors
     class QueryOptionMissing < StandardError; end
   end
 
+  class Configuration
+
+    attr_accessor :client
+
+    def initialize
+        @client = Elasticsearch::Client.new url: 'http://localhost:9200'
+    end
+
+  end
+
   class << self
     def logger
       @logger ||= Logger.new(STDOUT)
     end
+
+    def configuration
+        @configuration ||= Configuration.new
+    end
+
+    def configure
+      yield configuration
+    end
   end
+
 
 end
 
