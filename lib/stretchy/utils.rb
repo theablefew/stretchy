@@ -62,7 +62,7 @@ module Stretchy
                 trace_url += "?#{::Faraday::Utils::ParamsHash[params].to_query}" unless params.blank?
                 trace_body = body ? " -d '#{body.to_json}'" : ""
 
-                Rainbow("curl -X #{method.to_s.upcase} '#{CGI.unescape(trace_url)}'#{trace_body}\n").color :white
+                "curl -X#{method.to_s.upcase} '#{CGI.unescape(trace_url)}'#{trace_body}\n"
             end
 
     end
