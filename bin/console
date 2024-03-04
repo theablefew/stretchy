@@ -24,7 +24,7 @@ print "\t    " * 7
 print Rainbow(" v#{Stretchy::VERSION}").white.faint
 print "\n\n"
 
-ActiveSupport::Notifications.subscribe 'search.elasticsearch' do |name, start, finish, id, payload|
+ActiveSupport::Notifications.subscribe 'search.stretchy' do |name, start, finish, id, payload|
    message = [
       Rainbow("  #{payload[:klass]}").bright, 
       "(#{(finish.to_time - start.to_time).round(2)}ms)",

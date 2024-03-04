@@ -13,13 +13,13 @@ module Stretchy
       end
 
       def current_scope
-          # ScopeRegistry.new.registry[:current_scope][base_class.to_s]
-          ScopeRegistry.new.value_for(:current_scope, base_class.to_s)
+          ScopeRegistry.new.registry[:current_scope][base_class.to_s]
+          # ScopeRegistry.value_for(:current_scope, base_class.to_s)
       end
 
       def current_scope=(scope) #:nodoc:
-        # ScopeRegistry.new.registry[:current_scope][base_class.to_s] = scope
-        ScopeRegistry.new.set_value_for(:current_scope, base_class.to_s, scope)
+        ScopeRegistry.new.registry[:current_scope][base_class.to_s] = scope
+        # ScopeRegistry.set_value_for(:current_scope, base_class.to_s, scope)
       end
     end
 

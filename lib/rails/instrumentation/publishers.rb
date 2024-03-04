@@ -14,7 +14,7 @@ module Rails
                 end
 
                 def search_with_instrumentation!(query_or_definition, options={})
-                    ActiveSupport::Notifications.instrument "search.elasticsearch", 
+                    ActiveSupport::Notifications.instrument "search.stretchy", 
                       name: "Search", 
                       klass: self.base_class.to_s,
                       search: {index: self.index_name, body: query_or_definition }.merge(options) do
