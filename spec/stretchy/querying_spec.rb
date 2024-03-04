@@ -79,6 +79,16 @@ describe "QueryMethods" do
                 it 'returns resources without the specified attribute' do
                     expect(described_class.must_not(gender: 'male').map(&:id)).not_to include(subject.id)
                 end
+                 
+                it 'is aliased as .where_not' do
+                    expect(described_class.where_not(gender: 'male').map(&:id)).not_to include(subject.id)
+                end
+            end
+
+            context '.should' do
+                it 'returns resources with the specified attribute' do
+                    expect(described_class.should(age: 33).map(&:age)).to all(eq(33))
+                end
             end
 
             context '.filter' do
@@ -159,6 +169,32 @@ describe "QueryMethods" do
                     expect(result.to_elastic).to eq(expected.with_indifferent_access)
                 end
             end
+
+            context 'fields' do
+                it 'returns only the specified fields' do
+                    result = described_class.fields(:id, :name, :email)
+                    expected = {:fields=>[:id, :name, :email]}
+                    expect(result.to_elastic).to eq(expected.with_indifferent_access)
+                end
+            end
+
+            context 'source' do
+
+                it 'returns only the specified fields' do
+                    result = described_class.source(includes: [:name, :email])
+                    expected = {:_source=>{:includes=>[:name, :email]}}
+                    expect(result.to_elastic).to eq(expected.with_indifferent_access)
+                end
+            end
+
+            context 'highlight' do
+                it 'returns highlighted fields' do
+                    result = described_class.highlight(:body)
+                    expected = {:highlight=>{:fields=>{body: {}}}}
+                    expect(result.to_elastic).to eq(expected.with_indifferent_access)
+                end
+            end
+
         end
     end
 end

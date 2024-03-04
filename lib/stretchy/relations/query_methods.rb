@@ -1,5 +1,3 @@
-require 'active_support/core_ext/array/wrap'
-
 module Stretchy
   module Relations
     module QueryMethods
@@ -125,6 +123,15 @@ module Stretchy
       alias :sort :order
 
 
+      # Sets the maximum number of records to be retrieved.
+      #
+      # @param args [Integer] the maximum number of records to retrieve
+      #
+      # @example
+      #   Model.size(10)
+      #
+      # @return [ActiveRecord::Relation] a new relation, which reflects the limit
+      # @see #limit
       def size(args)
         spawn.size!(args)
       end
@@ -134,11 +141,35 @@ module Stretchy
         self
       end
 
+      # Alias for {#size}
+      # @see #size
       alias :limit :size
 
 
 
 
+      # Adds conditions to the query.
+      #
+      # Each argument is a hash where the key is the attribute to filter by and the value is the value to match.
+      #
+      # @overload where(*rest)
+      #   @param rest [Array<Hash>] keywords containing attribute-value pairs to match
+      #
+      # @example
+      #   Model.where(price: 10, color: :green)
+      #
+      #   # Elasticsearch equivalent
+      #   # => "query" : {
+      #          "bool" : {
+      #            "must" : [
+      #              { "term" : { "price" : 10 } },
+      #              { "term" : { "color" : "green" } }
+      #            ]
+      #          }
+      #        }
+      #
+      # @return [ActiveRecord::Relation, WhereChain] a new relation, which reflects the conditions, or a WhereChain if opts is :chain
+      # @see #must
       def where(opts = :chain, *rest)
         if opts == :chain
           WhereChain.new(spawn)
@@ -154,20 +185,32 @@ module Stretchy
         if opts == :chain
           WhereChain.new(self)
         else
-          #if Hash === opts
-            #opts = sanitize_forbidden_attributes(opts)
-          #end
-
           self.where_values += build_where(opts, rest)
           self
         end
       end
       
+      # Alias for {#where}
+      # @see #where
       alias :must :where
 
 
 
 
+      # Adds a query string to the search.
+      #
+      # The query string uses Elasticsearch's Query String Query syntax, which includes a series of terms and operators.
+      # Terms can be single words or phrases. Operators include AND, OR, and NOT, among others.
+      # Field names can be included in the query string to search for specific values in specific fields. (e.g. "eye_color: green")
+      # The default operator between terms are treated as OR operators.
+      #
+      # @param query [String] the query string
+      # @param rest [Array] additional arguments (not normally used)
+      #
+      # @example
+      #   Model.query_string("((big cat) OR (domestic cat)) AND NOT panther eye_color: green")
+      #
+      # @return [Stretchy::Relation] a new relation, which reflects the query string
       def query_string(opts = :chain, *rest)
         if opts == :chain
           WhereChain.new(spawn)
@@ -189,7 +232,18 @@ module Stretchy
 
 
 
-
+      # Adds negated conditions to the query.
+      #
+      # Each argument is a hash where the key is the attribute to filter by and the value is the value to exclude.
+      #
+      # @overload must_not(*rest)
+      #   @param rest [Array<Hash>] a hash containing attribute-value pairs to exclude
+      #
+      # @example
+      #   Model.must_not(color: 'blue', size: :large)
+      #
+      # @return [Stretchy::Relation] a new relation, which reflects the negated conditions
+      # @see #where_not
       def must_not(opts = :chain, *rest)
         if opts == :chain
           WhereChain.new(spawn)
@@ -210,11 +264,23 @@ module Stretchy
         end
       end
       
+      # Alias for {#must_not}
+      # @see #must_not
       alias :where_not :must_not
 
 
 
-
+      # Adds optional conditions to the query.
+      #
+      # Each argument is a hash where the key is the attribute to filter by and the value is the value to match optionally.
+      #
+      # @overload should(*rest)
+      #   @param rest [Array<Hash>] additional keywords containing attribute-value pairs to match optionally
+      #
+      # @example
+      #   Model.should(color: :pink, size: :medium)
+      #
+      # @return [Stretchy::Relation] a new relation, which reflects the optional conditions
       def should(opts = :chain, *rest)
         if opts == :chain
           WhereChain.new(spawn)
@@ -235,6 +301,9 @@ module Stretchy
       end
 
 
+
+
+      # @deprecated in elasticsearch 7.x+ use {#filter} instead
       def or_filter(name, options = {}, &block)
         spawn.or_filter!(name, options, &block)
       end
@@ -244,8 +313,19 @@ module Stretchy
         self
       end
 
-
-
+      # Adds a filter to the query.
+      #
+      # This method supports all filters supported by Elasticsearch.
+      #
+      # @overload filter(type, opts)
+      #   @param type [Symbol] the type of filter to add (:range, :term, etc.)
+      #   @param opts [Hash] a hash containing the attribute and value to filter by
+      #
+      # @example
+      #   Model.filter(:range, age: {gte: 30})
+      #   Model.filter(:term, color: :blue)
+      #
+      # @return [Stretchy::Relation] a new relation, which reflects the filter
       def filter(name, options = {}, &block)
         spawn.filter!(name, options, &block)
       end
@@ -257,7 +337,25 @@ module Stretchy
 
 
 
-
+      # Adds an aggregation to the query.
+      #
+      # @param name [Symbol, String] the name of the aggregation
+      # @param options [Hash] a hash of options for the aggregation
+      # @param block [Proc] an optional block to further configure the aggregation
+      #
+      # @example
+      #   Model.aggregation(:avg_price, field: :price)
+      #   Model.aggregation(:price_ranges) do
+      #     range field: :price, ranges: [{to: 100}, {from: 100, to: 200}, {from: 200}]
+      #   end
+      #
+      # Aggregation results are available in the `aggregations` method of the results under name provided in the aggregation.
+      #
+      # @example
+      #  results = Model.where(color: :blue).aggregation(:avg_price, field: :price)
+      #  results.aggregations.avg_price
+      #
+      # @return [Stretchy::Relation] a new relation
       def aggregation(name, options = {}, &block)
         spawn.aggregation!(name, options, &block)
       end
@@ -282,7 +380,28 @@ module Stretchy
 
 
 
-
+      # Controls which fields of the source are returned.
+      #
+      # This method supports source filtering, which allows you to include or exclude fields from the source. 
+      # You can specify fields directly, use wildcard patterns, or use an object containing arrays 
+      # of includes and excludes patterns.
+      #
+      # If the includes property is specified, only source fields that match one of its patterns are returned. 
+      # You can exclude fields from this subset using the excludes property.
+      #
+      # If the includes property is not specified, the entire document source is returned, excluding any 
+      # fields that match a pattern in the excludes property.
+      #
+      # @overload source(opts)
+      #   @param opts [Hash, Boolean] a hash containing :includes and/or :excludes arrays, or a boolean indicating whether 
+      #                               to include the source
+      #
+      # @example
+      #   Model.source(includes: [:name, :email])
+      #   Model.source(excludes: [:name, :email])
+      #   Model.source(false) # don't include source
+      #
+      # @return [Stretchy::Relation] a new relation, which reflects the source filtering
       def source(*args)
         spawn.source!(*args)
       end
@@ -294,8 +413,18 @@ module Stretchy
 
 
 
-
-      def has_field?(field)
+      # Checks if a field exists in the documents.
+      #
+      # This is a helper for the exists filter in Elasticsearch, which returns documents 
+      # that have at least one non-null value in the specified field.
+      #
+      # @param field [Symbol, String] the field to check for existence
+      #
+      # @example
+      #   Model.has_field(:name)
+      #
+      # @return [ActiveRecord::Relation] a new relation, which reflects the exists filter
+      def has_field(field)
         spawn.filter(:exists, {field: field})
       end
 
@@ -315,6 +444,18 @@ module Stretchy
 
 
 
+      # Highlights the specified fields in the search results.
+      #
+      # @example
+      #   Model.where(body: "turkey").highlight(:body)
+      #
+      # @param [Hash] args The fields to highlight. Each field is a key in the hash,
+      #   and the value is another hash specifying the type of highlighting.
+      #   For example, `{body: {type: :plain}}` will highlight the 'body' field
+      #   with plain type highlighting.
+      #
+      # @return [Stretchy::Relation] Returns a Stretchy::Relation object, which can be used
+      #   for chaining further query methods.
       def highlight(*args)
         spawn.highlight!(*args)
       end

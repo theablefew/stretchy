@@ -142,8 +142,8 @@ module Stretchy
           structure._source source.first
         else
           structure._source do
-              structure.include source.first.delete(:include) if source.first.has_key? :include
-              structure.exclude source.first.delete(:exclude) if source.first.has_key? :exclude
+              structure.includes source.first.delete(:includes) if source.first.has_key? :includes
+              structure.excludes source.first.delete(:excludes) if source.first.has_key? :excludes
           end
         end
       end
