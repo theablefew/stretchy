@@ -118,6 +118,32 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
     $ gem install stretchy-model
 
+<details>
+<summary>Rails Configuration</summary>
+
+
+
+```sh
+rails credentials:edit
+```
+
+#### Add elasticsearch credentials
+```yaml
+elasticsearch:
+   url: localhost:9200
+```
+
+#### Create an initializer 
+<p><sub><em>config/initializers/stretchy.rb</em></sub></p>
+
+```ruby {file=config/initializers/stretchy.rb}
+Stretchy.configure do |config|
+    config.client = Elasticsearch::Client.new url: Rails.application.credentials.elasticsearch.url, log: true
+end
+```
+</details>
+
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
