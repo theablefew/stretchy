@@ -128,6 +128,10 @@ After checking out the repo, run `bin/setup` to install dependencies. You can al
 > Full documentation on [Elasticsearch Query DSL and Aggregation options](https://github.com/elastic/elasticsearch-rails/tree/main/elasticsearch-persistence)
 
 ## Testing
+<details>
+<summary>Elasticsearch</summary>
+
+
 ```
 docker-compose up elasticsearch
 ```
@@ -135,6 +139,21 @@ docker-compose up elasticsearch
 ```
 bundle exec rspec
 ```
+
+</details>
+
+<details>
+<summary>Opensearch</summary>
+
+
+```
+docker-compose up opensearch
+```
+
+```
+ENV['BACKEND']=opensearch bundle rspec 
+```
+</details>
 
 ## Contributing
 
