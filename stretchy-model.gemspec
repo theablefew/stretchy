@@ -33,9 +33,9 @@ Gem::Specification.new do |spec|
   # spec.add_dependency "example-gem", "~> 1.0"
 
   spec.add_dependency "zeitwerk", "~> 2.4"
-  spec.add_dependency "elasticsearch-rails", ">= 7.1"
-  spec.add_dependency "elasticsearch-persistence", ">= 7.1"
-  spec.add_dependency "elasticsearch-model", ">= 7.1"
+  spec.add_dependency "elasticsearch-rails", "~> 7.1"
+  spec.add_dependency "elasticsearch-persistence", "~> 7.1"
+  spec.add_dependency "elasticsearch-model", "~> 7.1"
   spec.add_dependency "rainbow", "~> 3.0"
   spec.add_dependency "amazing_print", "~> 1.3"
   spec.add_dependency "jbuilder", "~> 2.11"
