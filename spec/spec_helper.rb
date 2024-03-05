@@ -19,10 +19,30 @@ SimpleCov.start do
 end
 require 'stretchy'
 require 'active_support/core_ext'
-# require 'elasticsearch/persistence'
+
+backend = ENV['BACKEND'] || 'elasticsearch'
+
+if backend == 'opensearch'
+  require 'opensearch'
+  Stretchy.configure do |config|
+    config.client = OpenSearch::Client.new(
+      host: 'https://localhost:9200',
+      user: 'admin',
+      password: 'admin',
+      transport_options: { ssl: { verify: false } }  # For testing only. Use certificate for validation.
+    )
+  end
+else
+  # Configure for Elasticsearch
+end
+
 
 
 RSpec.configure do |config|
+  if ENV['BACKEND'] == 'opensearch'
+    config.filter_run_excluding opensearch_incompatible: true
+  end
+
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
   # assertions if you prefer.
