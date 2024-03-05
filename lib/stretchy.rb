@@ -24,9 +24,25 @@ module Stretchy
   class Configuration
 
     attr_accessor :client
+    attr_accessor :opensearch
 
     def initialize
         @client = Elasticsearch::Client.new url: 'http://localhost:9200'
+        @opensearch = false
+    end
+
+    def client=(client)
+        @client = client
+        self.opensearch = true if @client.class.name =~ /OpenSearch/
+    end
+
+    def opensearch=(bool)
+        @opensearch = bool
+        OpenSearchCompatibility.opensearch_patch! if bool
+    end
+
+    def opensearch?
+        @opensearch
     end
 
   end
@@ -45,8 +61,9 @@ module Stretchy
     end
   end
 
-
 end
+
+
 
 loader = Zeitwerk::Loader.new
 loader.tag = File.basename(__FILE__, ".rb")
