@@ -1,0 +1,22 @@
+name: Release Gem
+
+on:
+  push:
+    tags:
+      - 'v*'
+    paths: 
+      - 'lib/stretchy/version.rb'
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publish gem
+        uses: dawidd6/action-publish-gem@v1
+        with:
+          api_key: ${{secrets.RUBYGEMS_API_KEY}}
+          github_token: ${{secrets.GITHUB_TOKEN}}
