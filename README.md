@@ -98,16 +98,6 @@ Model.bulk_in_batches(records, size: 100) do |batch|
 end
 ```
 
-
-## Instrumentation
-```ruby
-Blanket.first
-```
-
-```sh
-Blanket (6.322ms) curl -X GET 'http://localhost:9200/blankets/_search?size=1' -d '{"sort":{"date":"desc"}}'
-```
-
 ## Installation
 
 Install the gem and add to the application's Gemfile by executing:
@@ -131,6 +121,12 @@ rails credentials:edit
 ```yaml
 elasticsearch:
    url: localhost:9200
+
+# or opensearch
+# opensearch:
+#    host: https://localhost:9200
+#    user: admin
+#    password: admin
 ```
 
 #### Create an initializer 
@@ -154,6 +150,21 @@ After checking out the repo, run `bin/setup` to install dependencies. You can al
 > Full documentation on [Elasticsearch Query DSL and Aggregation options](https://github.com/elastic/elasticsearch-rails/tree/main/elasticsearch-persistence)
 
 ## Testing
+<details>
+<summary>Act</summary>
+
+Run github action workflow locally
+
+```sh
+brew install act --HEAD
+```
+
+```sh
+act -P ubuntu-latest=ghcr.io/catthehacker/ubuntu:runner-latest
+```
+
+</details>
+
 <details>
 <summary>Elasticsearch</summary>
 
