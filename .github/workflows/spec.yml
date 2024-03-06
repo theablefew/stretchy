@@ -1,6 +1,7 @@
 name: Ruby CI
 
 on: 
+  workflow_call: 
   pull_request:
 
 jobs:
@@ -41,17 +42,6 @@ jobs:
   opensearch:
   
       runs-on: ${{matrix.os}}-latest
-      # services: 
-      #   opensearch: 
-      #     image: opensearchproject/opensearch:2
-      #     ports: 
-      #       - 9200:9200
-      #     env:
-      #       discovery.type: single-node
-      #       OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
-      #       DISABLE_INSTALL_DEMO_CONFIG: true
-      #       DISABLE_SECURITY_PLUGIN: true
-      #       bootstrap.memory_lock: true
 
       strategy:
         matrix:
