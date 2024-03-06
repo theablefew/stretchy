@@ -4,7 +4,7 @@ on:
   pull_request:
 
 jobs:
-  test:
+  elasticsearch:
 
     runs-on: ${{matrix.os}}-latest
 
@@ -37,3 +37,47 @@ jobs:
         run: bundle install
       - name: Run tests
         run: bundle exec rspec
+
+  opensearch:
+  
+      runs-on: ${{matrix.os}}-latest
+      # services: 
+      #   opensearch: 
+      #     image: opensearchproject/opensearch:2
+      #     ports: 
+      #       - 9200:9200
+      #     env:
+      #       discovery.type: single-node
+      #       OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+      #       DISABLE_INSTALL_DEMO_CONFIG: true
+      #       DISABLE_SECURITY_PLUGIN: true
+      #       bootstrap.memory_lock: true
+
+      strategy:
+        matrix:
+          os: ['ubuntu']
+          ruby: ['3.1']
+          opensearch: ['2.12.0']
+
+      env:
+        BACKEND: opensearch
+        OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+        DISABLE_INSTALL_DEMO_CONFIG: true
+
+      steps:
+        - uses: actions/checkout@v4
+        - name: Set up OpenSearch ${{ matrix.opensearch }}
+          uses: theablefew/opensearch-github-actions/opensearch@main
+          with:
+            version: ${{ matrix.opensearch }}
+            security-disabled: true
+
+        - name: Set up Ruby ${{ matrix.ruby }}
+          uses: ruby/setup-ruby@ec02537da5712d66d4d50a0f33b7eb52773b5ed1
+          with:
+            ruby-version: ${{ matrix.ruby }}
+
+        - name: Install dependencies
+          run: bundle install
+        - name: Run tests
+          run: bundle exec rspec
