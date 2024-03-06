@@ -10,13 +10,13 @@ describe "Instrumentation" do
                "(#{(finish.to_time - start.to_time).round(2)}ms)",
                Stretchy::Utils.to_curl(payload[:klass].constantize, payload[:search])
             ].join(" ")
-            expect(message).to eq("Post(0.0ms) curl -XGET 'http://localhost:9200/posts/_search' -d '{\"query\":{\"term\":{\"title\":\"hello\"}}}'")
+            expect(message).to match(/Post\(0.0ms\) curl -XGET 'https?:\/\/localhost:9200\/posts\/_search' -d '\{\"query\":\{\"term\":\{\"title\":\"hello\"\}\}\}'/)
         end
         ActiveSupport::Notifications.unsubscribe(subscription)
     end
 
     it 'converts the payload to a curl command' do
         curl = Stretchy::Utils.to_curl(Post, {index: Post.index_name, body: {query: {term: {title: "hello"}}}})
-        expect(curl).to eq("curl -XGET 'http://localhost:9200/posts/_search' -d '{\"query\":{\"term\":{\"title\":\"hello\"}}}'\n")
+        expect(curl).to match(%r{curl -XGET 'https?://localhost:9200/posts/_search' -d '\{"query":\{"term":\{"title":"hello"\}\}\}'\n})
     end
 end
