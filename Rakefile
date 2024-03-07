@@ -31,6 +31,7 @@ def determine_new_version(version)
 end
 
 def create_release_branch(new_version, base_branch)
+  system("git stash save 'Changes before creating release branch'")
   system("git fetch origin #{base_branch}")
   branch_name = "release/v#{new_version}"
   system("git checkout -b #{branch_name} #{base_branch}")
