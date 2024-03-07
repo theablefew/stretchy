@@ -6,11 +6,15 @@ task default: %i[]
 require 'octokit' 
 require 'versionomy'
 
-
-def determine_new_version(version)
+def determine_current_version
   # Load current version
   load 'lib/stretchy/version.rb'
   current_version = Versionomy.parse(Stretchy::VERSION)
+end
+
+def determine_new_version(version)
+  # Load current version
+  current_version = determine_current_version
 
   # Determine new version
   case version.to_sym
@@ -58,11 +62,19 @@ namespace :publish do
     version = args[:version]
     base_branch = args[:base_branch]
   
+    old_version = determine_current_version
     new_version = determine_new_version(version)
     branch_name = create_release_branch(new_version, base_branch)
+    begin
     update_version_file(new_version)
     commit_and_push_changes(new_version, branch_name)
     create_pull_request(new_version, base_branch, branch_name)
+    rescue => e
+      puts "Error: #{e.message}"
+      puts "Rolling back changes"
+      system("git checkout #{base_branch}")
+      system("git branch -D #{branch_name}")
+    end
   end
 
   task :major do
