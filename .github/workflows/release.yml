@@ -19,6 +19,6 @@ jobs:
       - name: Publish gem
         uses: cadwallion/publish-rubygems-action@master
         env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.STRETCHY_PA_TOKEN}}
           RUBYGEMS_API_KEY: ${{secrets.RUBYGEMS_API_KEY}}
           RELEASE_COMMAND: rake release
