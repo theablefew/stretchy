@@ -26,7 +26,7 @@ def determine_new_version(version)
   when :patch
     current_version.bump(:tiny)
   else
-    version =~ /\Av\d+\.\d+\.\d+\z/ ? Versionomy.parse(version) : current_version
+    version =~ /\Av?\d+\.\d+\.\d+\z/ ? Versionomy.parse(version).to_s.gsub(/v/,'') : current_version
   end
 end
 
