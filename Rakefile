@@ -5,6 +5,7 @@ task default: %i[]
 
 require 'octokit' 
 require 'versionomy'
+require 'rainbow'
 
 def determine_current_version
   # Load current version
@@ -12,9 +13,9 @@ def determine_current_version
   current_version = Versionomy.parse(Stretchy::VERSION)
 end
 
-def determine_new_version(version=nil)
+def determine_new_version(version)
   # Load current version
-  current_version = version || determine_current_version
+  current_version = determine_current_version
 
   # Determine new version
   case version.to_sym
@@ -25,7 +26,7 @@ def determine_new_version(version=nil)
   when :patch
     current_version.bump(:tiny)
   else
-    Versionomy.parse(version)
+    version =~ /\Av\d+\.\d+\.\d+\z/ ? Versionomy.parse(version) : current_version
   end
 end
 
@@ -65,6 +66,7 @@ namespace :publish do
   
     old_version = determine_current_version
     new_version = determine_new_version(version)
+    puts Rainbow("Bumping version from #{old_version} to #{new_version}").green
     branch_name = create_release_branch(new_version, base_branch)
     begin
     update_version_file(new_version)
