@@ -1,28 +1,22 @@
 name: Release Gem
 
 on:
-  push:
-    branches: 
-      - main
-    tags:
-      - 'v*'
-    paths: 
+  pull_request:
+    types: [closed]
+    paths:
       - 'lib/stretchy/version.rb'
-
+    branches:
+      - main
 
 jobs:
-  # spec:
-    # uses: ./.github/workflows/spec.yml
-
   build:
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
     runs-on: ubuntu-latest
-    # needs: spec
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Publish gem
-        if: contains(github.ref, 'refs/tags/v')
         uses: cadwallion/publish-rubygems-action@master
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

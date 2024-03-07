@@ -49,7 +49,7 @@ def commit_and_push_changes(new_version, branch_name)
   system("git add lib/stretchy/version.rb")
   system("git commit -m 'Bump version to v#{new_version}'")
   system("git tag v#{new_version}")
-  system("git push origin #{branch_name} --tags")
+  system("git push origin #{branch_name} --tags -f")
 end
 
 def create_pull_request(new_version, base_branch, branch_name)
