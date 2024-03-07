@@ -9,12 +9,22 @@ stretchy-model
 
 </p>
 
-Stretchy provides Elasticsearch models in a Rails environment with an integrated ActiveRecord-like interface and features. 
+Stretchy provides Elasticsearch/Opensearch models in Rails applications with an Rails-like model interface.
 
 ## Features
 Stretchy simplifies the process of querying, aggregating, and managing Elasticsearch-backed models, allowing Rails developers to work with search indices as comfortably as they would with traditional Rails models.
 
-## Attributes
+* Model fully back by Elasticsearch/Opensearch
+* Chain queries, scopes and aggregations
+* Reduce Elasticsearch query complexity
+* Support for time-based indices and aliases
+* Associations to both ActiveRecord models and Stretchy::Record
+* Bulk Operations made easy
+* Validations, custom attributes, and more...
+
+## Models
+
+### Attributes
 
 ```ruby
 class Post < Stretchy::Record
@@ -22,27 +32,34 @@ class Post < Stretchy::Record
     attribute :title,                   :string
     attribute :body,                    :string
     attribute :flagged,                 :boolean,  default: false  
-    attribute :author,                   :hash 
+    attribute :author,                  :hash 
     attribute :tags,                    :array, default: []
 
 end
 ```
 >[!NOTE]
 >`created_at`, `:updated_at` and `:id` are automatically added to all `Stretchy::Records`
+> 
+> The `default_sort_key` is :created_at
 
 
-## Query
+### Query
+```ruby
+Post.where(title: :goat, flagged: false)
+#=> <Post id: 309sXA2s, title: "goat", body: "...", flagged: false, author...>
+```
+Query object fields with dot notation
 ```ruby
   Post.where('author.name': "Jadzia", flagged: true).first
   #=> <Post id: aW02w3092, title: "Fun Cats", body: "...", flagged: true,
   #         author: {name: "Jadzia", age: 20}, tags: ["cat", "amusing"]>
 ```
 
-## Aggregations
+### Aggregations
 ```ruby
 
-  result = Post.filter(:range, 'author.age': {gte: 18})
-    .aggregation(:post_frequency, date_histogram: {
+  result = Post.aggregation(:post_frequency, 
+    date_histogram: {
       field: :created_at,
       calender_interval: :month
     })
@@ -50,9 +67,15 @@ end
   result.aggregations.post_frequency
   #=> {buckets: [{key_as_string: "2024-01-01", doc_count: 20}, ...]}
 ```
+### Filters
 
-## Scopes
+```ruby
+Post.filter(:range, 'author.age': {gte: 18, lte: 30}).where(title: "Welcome")
+#=> filters authors with age greater than 18 and less than 30
+```
 
+### Scopes
+Scopes can contain any query methods, filters or aggregations, resulting in composable queries. 
 ```ruby
 class Post < Stretchy::Record
   # ...attributes
@@ -75,7 +98,19 @@ result = Post.flagged.top_links(10, "youtube.com")
 
 ```
 
-## Bulk Operations
+#### Shared scopes
+
+```ruby
+Post.using_time_based_indices(2.months.ago...Time.now).flagged
+# searches across post_2024_01,post_2024_02,post_2024_03 indexes
+```
+
+```ruby
+Post.between(12.days.ago...1.day.ago.end_of_day).where('author.name': "candy")
+#=> Candy's posts created between 12 days ago and end of day yesterday
+```
+
+### Bulk Operations
 
 
 ```ruby
