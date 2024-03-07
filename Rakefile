@@ -12,9 +12,9 @@ def determine_current_version
   current_version = Versionomy.parse(Stretchy::VERSION)
 end
 
-def determine_new_version(version)
+def determine_new_version(version=nil)
   # Load current version
-  current_version = determine_current_version
+  current_version = version || determine_current_version
 
   # Determine new version
   case version.to_sym
@@ -46,12 +46,13 @@ end
 def commit_and_push_changes(new_version, branch_name)
   system("git add lib/stretchy/version.rb")
   system("git commit -m 'Bump version to v#{new_version}'")
-  system("git push origin #{branch_name}")
+  system("git tag v#{new_version}")
+  system("git push origin #{branch_name} --tags")
 end
 
 def create_pull_request(new_version, base_branch, branch_name)
   # Create a pull request
-  client = Octokit::Client.new(access_token: ENV['GITHUB_TOKEN'])
+  client = Octokit::Client.new(access_token: ENV['GH_TOKEN'])
   client.create_pull_request('theablefew/stretchy', base_branch, branch_name, "Release v#{new_version}")
 end
 
@@ -72,6 +73,7 @@ namespace :publish do
     rescue => e
       puts "Error: #{e.message}"
       puts "Rolling back changes"
+      system("git tag -d v#{new_version}")
       system("git checkout #{base_branch}")
       system("git branch -D #{branch_name}")
     end
