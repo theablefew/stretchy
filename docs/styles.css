@@ -1,0 +1,47 @@
+:root {
+    --theme-color: #F9448F;
+    --secondary-color: #8E4EB0;
+}
+
+
+section.cover .cover-main>p:last-child a {
+    border-radius: 2rem;
+    border: 1px solid #F9448F;
+    border-color: var(--theme-color,#F9448F);
+    box-sizing: border-box;
+    color: #F9448F;
+    color: var(--theme-color,#F9448F);
+    display: inline-block;
+    font-size: 1.05rem;
+    letter-spacing: .1rem;
+    margin: .5rem 1rem;
+    padding: .75em 2rem;
+    text-decoration: none;
+    transition: all .15s ease;
+}
+
+section.cover .cover-main>p:last-child a:last-child {
+    background-color: #F9448F;
+    background-color: var(--theme-color,#F9448F);
+    color: #fff;
+}
+
+section.cover .cover-main>p:last-child a:hover {
+    color: #fff !important;
+    border-color: var(--secondary-color, #8E4EB0);
+    background-color: var(--secondary-color, #8E4EB0);
+    /* opacity: .8; */
+}
+
+.docsify-hide a:first-child>img{ display: none;}
+
+.sidebar h3 {
+    text-align: center;
+}
+
+
+
+
+/*dt,dd {
+    display: flex;
+} */

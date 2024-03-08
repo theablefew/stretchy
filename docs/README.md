@@ -1,8 +1,8 @@
 stretchy-model
 ===
 
-<p>
-    <a href="https://stretchy.io/" target="_blank"><img src="./stretchy.logo.png" alt="Stretchy Image" width="450" /></a>
+<p class="docsify-hide">
+    <a href="https://stretchy.io/" target="_blank"><img src="./stretchy.logo.png" alt="Gum Image" width="450" /></a>
     <br><br>
     <a href="https://github.com/theablefew/stretchy/releases"><img src="https://img.shields.io/github/v/release/theablefew/stretchy?sort=semver&color=blue"></a>
     <a href="https://github.com/theablefew/stretchy/actions"><img src="https://github.com/theablefew/stretchy/actions/workflows/spec.yml/badge.svg"></a>

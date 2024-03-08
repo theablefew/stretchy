@@ -4,7 +4,7 @@ module Stretchy
 
         included do
 
-            scope :between, lambda { |range| filter(:range, "date" => {gte: range.begin, lte: range.end}) }
+            scope :between, lambda { |range| filter(:range, created_at: {gte: range.begin, lte: range.end}) }
             scope :using_time_based_indices, lambda { |range| search_options(index: time_based_indices(range)) }
 
         end

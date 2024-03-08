@@ -1,0 +1,25 @@
+# module Stretchy::Associations [](#module-Stretchy::Associations) [](#top)
+ ## Public Instance Methods
+ ### _destroy() [](#method-i-_destroy)
+ ### _destroy=(bool) [](#method-i-_destroy-3D)
+ ### _type() [](#method-i-_type)
+ ### accepts_nested_attributes_for(association) [](#method-i-accepts_nested_attributes_for)
+ ### after_save_objects(s, association) [](#method-i-after_save_objects)
+ ### association_names() [](#method-i-association_names)
+ ### association_reflection(association) [](#method-i-association_reflection)
+ ### belongs_to(association, options = {}) [](#method-i-belongs_to)
+ ### dirty() [](#method-i-dirty)
+ ### find_or_create_by(**args) [](#method-i-find_or_create_by)
+ ### has_many(association, klass, options = {}) [](#method-i-has_many)
+ ### has_one(association, class_name: nil, foreign_key: nil, dependent: :destroy) [](#method-i-has_one)
+ ### marked_for_destruction?() [](#method-i-marked_for_destruction-3F)
+ ### new_record?() [](#method-i-new_record-3F)
+ ### reflect_on_association(association) [](#method-i-reflect_on_association)
+ ### save!() [](#method-i-save-21)
+ ### save_associations() [](#method-i-save_associations)
+ ### type() [](#method-i-type)
+ Required for Elasticsearch \< 7
+
+ ### update_all(records, **attributes) [](#method-i-update_all)
+ ### validates_associated(*attr_names) [](#method-i-validates_associated)
+ 

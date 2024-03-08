@@ -29,73 +29,84 @@ module Stretchy
         end
       end
 
-
+      # def select_values
+      #   @values[:select] || []
+      # end
+      #
+      # def select_values=(values)
+      #   raise ImmutableRelation if @loaded
+      #   @values[:select] = values
+      # end
       MULTI_VALUE_METHODS.each do |name|
         class_eval <<-CODE, __FILE__, __LINE__ + 1
-          def #{name}_values                   # def select_values
-            @values[:#{name}] || []            #   @values[:select] || []
-          end                                  # end
-                                               #
-          def #{name}_values=(values)          # def select_values=(values)
-            raise ImmutableRelation if @loaded #   raise ImmutableRelation if @loaded
-            @values[:#{name}] = values         #   @values[:select] = values
-          end                                  # end
+          def #{name}_values                   
+            @values[:#{name}] || []            
+          end                                  
+                                               
+          def #{name}_values=(values)          
+            raise ImmutableRelation if @loaded 
+            @values[:#{name}] = values         
+          end                                  
         CODE
       end
 
+      # def readonly_value
+      #   @values[:readonly]
+      # end
       SINGLE_VALUE_METHODS.each do |name|
         class_eval <<-CODE, __FILE__, __LINE__ + 1
-          def #{name}_value                    # def readonly_value
-            @values[:#{name}]                  #   @values[:readonly]
-          end                                  # end
+          def #{name}_value                    
+            @values[:#{name}]                  
+          end                                  
         CODE
       end
 
+      # def readonly_value=(value)
+      #   raise ImmutableRelation if @loaded
+      #   @values[:readonly] = value
+      # end
       SINGLE_VALUE_METHODS.each do |name|
         class_eval <<-CODE, __FILE__, __LINE__ + 1
-          def #{name}_value=(value)            # def readonly_value=(value)
-            raise ImmutableRelation if @loaded #   raise ImmutableRelation if @loaded
-            @values[:#{name}] = value          #   @values[:readonly] = value
-          end                                  # end
+          def #{name}_value=(value)            
+            raise ImmutableRelation if @loaded 
+            @values[:#{name}] = value          
+          end                                  
         CODE
       end
 
 
       # Allows you to add one or more sorts on specified fields.
       #
-      # @overload order(attribute: direction, ...)
-      #   @param attribute [Symbol] the attribute to sort by
-      #   @param direction [Symbol] the direction to sort in (:asc or :desc)
+      # Examples:
       #
-      # @overload order(attribute: {order: direction, mode: mode, ...}, ...)
-      #   @param params [Hash] attributes to sort by
-      #   @param params [Symbol] :attribute the attribute name as key to sort by
-      #   @param options [Hash]  a hash containing possible sorting options 
-      #   @option options [Symbol] :order the direction to sort in (:asc or :desc)
-      #   @option options [Symbol] :mode the mode to use for sorting (:avg, :min, :max, :sum, :median)
-      #   @option options [Symbol] :numeric_type the numeric type to use for sorting (:double, :long, :date, :date_nanos) 
-      #   @option options [Symbol] :missing the value to use for documents without the field
-      #   @option options [Hash] :nested the nested sorting options
-      #   @option nested [String] :path the path to the nested object
-      #   @option nested [Hash] :filter the filter to apply to the nested object
-      #   @option nested [Hash] :max_children the maximum number of children to consider per root document when picking the sort value. Defaults to unlimited
-      #
-      # @example
       #   Model.order(created_at: :asc)
-      #     # Elasticsearch equivalent
-      #     #=> "sort" : [{"created_at" : "asc"}]
+      #   # Elasticsearch equivalent
+      #   #=> "sort" : [{"created_at" : "asc"}]
       #
       #   Model.order(age: :desc, name: :asc, price: {order: :desc, mode: :avg})
+      #   # Elasticsearch equivalent
+      #   #=> "sort" : [
+      #       { "price" : {"order" : "desc", "mode": "avg"}},
+      #       { "name" : "asc" },
+      #       { "age" : "desc" }
+      #     ]
       #
-      #     # Elasticsearch equivalent
-      #     #=> "sort" : [
-      #         { "price" : {"order" : "desc", "mode": "avg"}},
-      #         { "name" : "asc" },
-      #         { "age" : "desc" }
-      #       ]
+      # attribute:: The Symbol attribute to sort by.
+      # direction:: The Symbol direction to sort in (:asc or :desc).
+      # params::    The Hash attributes to sort by (default: {}):
+      #             :attribute - The Symbol attribute name as key to sort by.
+      # options::   The Hash containing possible sorting options (default: {}):
+      #             :order        - The Symbol direction to sort in (:asc or :desc).
+      #             :mode         - The Symbol mode to use for sorting (:avg, :min, :max, :sum, :median).
+      #             :numeric_type - The Symbol numeric type to use for sorting (:double, :long, :date, :date_nanos).
+      #             :missing      - The Symbol value to use for documents without the field.
+      #             :nested       - The Hash nested sorting options (default: {}):
+      #               :path        - The String path to the nested object.
+      #               :filter      - The Hash filter to apply to the nested object.
+      #               :max_children - The Hash maximum number of children to consider per root document when picking the sort value. Defaults to unlimited.
       #
-      # @return [Stretchy::Relation] a new relation with the specified order
-      # @see #sort
+      # Returns a new Stretchy::Relation with the specified order.
+      # See: #sort
       def order(*args)
         check_if_method_has_arguments!(:order, args)
         spawn.order!(*args)
@@ -111,11 +122,15 @@ module Stretchy
       alias :sort :order
 
 
-      # Allows you to skip callbacks for the specified fields that are added by query_must_have for 
-      # the current query.
+      # Sets the maximum number of records to be retrieved.
+      #
+      # @param args [Integer] the maximum number of records to retrieve
       #
       # @example
-      #  Model.skip_callbacks(:routing)
+      #   Model.size(10)
+      #
+      # @return [ActiveRecord::Relation] a new relation, which reflects the limit
+      # @see #limit
       def skip_callbacks(*args)
         spawn.skip_callbacks!(*args)
       end
@@ -130,13 +145,13 @@ module Stretchy
 
       # Sets the maximum number of records to be retrieved.
       #
-      # @param args [Integer] the maximum number of records to retrieve
+      # args:: The maximum number of records to retrieve.
       #
-      # @example
+      # Example:
       #   Model.size(10)
       #
-      # @return [ActiveRecord::Relation] a new relation, which reflects the limit
-      # @see #limit
+      # Returns a new relation, which reflects the limit.
+      # See: #limit
       def size(args)
         spawn.size!(args)
       end
@@ -157,10 +172,9 @@ module Stretchy
       #
       # Each argument is a hash where the key is the attribute to filter by and the value is the value to match.
       #
-      # @overload where(*rest)
-      #   @param rest [Array<Hash>] keywords containing attribute-value pairs to match
+      # rest:: [Array<Hash>] keywords containing attribute-value pairs to match
       #
-      # @example
+      # Example:
       #   Model.where(price: 10, color: :green)
       #
       #   # Elasticsearch equivalent
@@ -173,8 +187,8 @@ module Stretchy
       #          }
       #        }
       #
-      # @return [ActiveRecord::Relation, WhereChain] a new relation, which reflects the conditions, or a WhereChain if opts is :chain
-      # @see #must
+      # Returns a new relation, which reflects the conditions, or a WhereChain if opts is :chain
+      # See: #must
       def where(opts = :chain, *rest)
         if opts == :chain
           WhereChain.new(spawn)
@@ -209,13 +223,13 @@ module Stretchy
       # Field names can be included in the query string to search for specific values in specific fields. (e.g. "eye_color: green")
       # The default operator between terms are treated as OR operators.
       #
-      # @param query [String] the query string
-      # @param rest [Array] additional arguments (not normally used)
+      # query:: [String] the query string
+      # rest:: [Array] additional arguments (not normally used)
       #
-      # @example
+      # Example:
       #   Model.query_string("((big cat) OR (domestic cat)) AND NOT panther eye_color: green")
       #
-      # @return [Stretchy::Relation] a new relation, which reflects the query string
+      # Returns a new relation, which reflects the query string
       def query_string(opts = :chain, *rest)
         if opts == :chain
           WhereChain.new(spawn)
@@ -241,14 +255,14 @@ module Stretchy
       #
       # Each argument is a hash where the key is the attribute to filter by and the value is the value to exclude.
       #
-      # @overload must_not(*rest)
-      #   @param rest [Array<Hash>] a hash containing attribute-value pairs to exclude
+      # opts:: [Hash] a hash containing attribute-value pairs to exclude
+      # rest:: [Array<Hash>] additional arguments (not normally used)
       #
-      # @example
+      # Example:
       #   Model.must_not(color: 'blue', size: :large)
       #
-      # @return [Stretchy::Relation] a new relation, which reflects the negated conditions
-      # @see #where_not
+      # Returns a new relation, which reflects the negated conditions
+      # See: #where_not
       def must_not(opts = :chain, *rest)
         if opts == :chain
           WhereChain.new(spawn)
@@ -279,13 +293,12 @@ module Stretchy
       #
       # Each argument is a hash where the key is the attribute to filter by and the value is the value to match optionally.
       #
-      # @overload should(*rest)
-      #   @param rest [Array<Hash>] additional keywords containing attribute-value pairs to match optionally
+      # rest:: [Array<Hash>] additional keywords containing attribute-value pairs to match optionally
       #
-      # @example
+      # Example:
       #   Model.should(color: :pink, size: :medium)
       #
-      # @return [Stretchy::Relation] a new relation, which reflects the optional conditions
+      # Returns a new relation, which reflects the optional conditions
       def should(opts = :chain, *rest)
         if opts == :chain
           WhereChain.new(spawn)
@@ -322,15 +335,14 @@ module Stretchy
       #
       # This method supports all filters supported by Elasticsearch.
       #
-      # @overload filter(type, opts)
-      #   @param type [Symbol] the type of filter to add (:range, :term, etc.)
-      #   @param opts [Hash] a hash containing the attribute and value to filter by
+      # type:: [Symbol] the type of filter to add (:range, :term, etc.)
+      # opts:: [Hash] a hash containing the attribute and value to filter by
       #
-      # @example
+      # Example:
       #   Model.filter(:range, age: {gte: 30})
       #   Model.filter(:term, color: :blue)
       #
-      # @return [Stretchy::Relation] a new relation, which reflects the filter
+      # Returns a new relation, which reflects the filter
       def filter(name, options = {}, &block)
         spawn.filter!(name, options, &block)
       end
@@ -344,11 +356,11 @@ module Stretchy
 
       # Adds an aggregation to the query.
       #
-      # @param name [Symbol, String] the name of the aggregation
-      # @param options [Hash] a hash of options for the aggregation
-      # @param block [Proc] an optional block to further configure the aggregation
+      # name:: [Symbol, String] the name of the aggregation
+      # options:: [Hash] a hash of options for the aggregation
+      # block:: [Proc] an optional block to further configure the aggregation
       #
-      # @example
+      # Example:
       #   Model.aggregation(:avg_price, field: :price)
       #   Model.aggregation(:price_ranges) do
       #     range field: :price, ranges: [{to: 100}, {from: 100, to: 200}, {from: 200}]
@@ -356,11 +368,11 @@ module Stretchy
       #
       # Aggregation results are available in the `aggregations` method of the results under name provided in the aggregation.
       #
-      # @example
+      # Example:
       #  results = Model.where(color: :blue).aggregation(:avg_price, field: :price)
       #  results.aggregations.avg_price
       #
-      # @return [Stretchy::Relation] a new relation
+      # Returns a new Stretchy::Relation
       def aggregation(name, options = {}, &block)
         spawn.aggregation!(name, options, &block)
       end
@@ -397,16 +409,15 @@ module Stretchy
       # If the includes property is not specified, the entire document source is returned, excluding any 
       # fields that match a pattern in the excludes property.
       #
-      # @overload source(opts)
-      #   @param opts [Hash, Boolean] a hash containing :includes and/or :excludes arrays, or a boolean indicating whether 
-      #                               to include the source
+      # opts:: [Hash, Boolean] a hash containing :includes and/or :excludes arrays, or a boolean indicating whether 
+      #                        to include the source
       #
-      # @example
+      # Example:
       #   Model.source(includes: [:name, :email])
       #   Model.source(excludes: [:name, :email])
       #   Model.source(false) # don't include source
       #
-      # @return [Stretchy::Relation] a new relation, which reflects the source filtering
+      # Returns a new relation, which reflects the source filtering
       def source(*args)
         spawn.source!(*args)
       end
@@ -423,12 +434,12 @@ module Stretchy
       # This is a helper for the exists filter in Elasticsearch, which returns documents 
       # that have at least one non-null value in the specified field.
       #
-      # @param field [Symbol, String] the field to check for existence
+      # field:: [Symbol, String] the field to check for existence
       #
-      # @example
+      # Example:
       #   Model.has_field(:name)
       #
-      # @return [ActiveRecord::Relation] a new relation, which reflects the exists filter
+      # Returns a new ActiveRecord::Relation, which reflects the exists filter
       def has_field(field)
         spawn.filter(:exists, {field: field})
       end
@@ -451,15 +462,15 @@ module Stretchy
 
       # Highlights the specified fields in the search results.
       #
-      # @example
-      #   Model.where(body: "turkey").highlight(:body)
-      #
-      # @param [Hash] args The fields to highlight. Each field is a key in the hash,
+      # args:: [Hash] The fields to highlight. Each field is a key in the hash,
       #   and the value is another hash specifying the type of highlighting.
       #   For example, `{body: {type: :plain}}` will highlight the 'body' field
       #   with plain type highlighting.
       #
-      # @return [Stretchy::Relation] Returns a Stretchy::Relation object, which can be used
+      # Example:
+      #   Model.where(body: "turkey").highlight(:body)
+      #
+      # Returns a Stretchy::Relation object, which can be used
       #   for chaining further query methods.
       def highlight(*args)
         spawn.highlight!(*args)
@@ -519,14 +530,19 @@ module Stretchy
 
       private
 
-      # If terms are used, we assume that the field is a keyword field
-      # and append .keyword to the field name
-      # {terms: {field: 'gender'}}
-      # or nested aggs
-      # {terms: {field: 'gender'}, aggs: {name: {terms: {field: 'position.name'}}}}
-      # should be converted to
-      # {terms: {field: 'gender.keyword'}, aggs: {name: {terms: {field: 'position.name.keyword'}}}}
-      # {date_histogram: {field: 'created_at', interval: 'day'}}
+      # This code is responsible for handling terms in the query. If terms are used, we assume that the field is a keyword field
+      # and append .keyword to the field name.
+      #
+      # For example, a query like this:
+      #   {terms: {field: 'gender'}}
+      # or nested aggs like this:
+      #   {terms: {field: 'gender'}, aggs: {name: {terms: {field: 'position.name'}}}}
+      # should be converted to this:
+      #   {terms: {field: 'gender.keyword'}, aggs: {name: {terms: {field: 'position.name.keyword'}}}}
+      #
+      # Date histograms are handled like this:
+      #   {date_histogram: {field: 'created_at', interval: 'day'}}
+      #
       # TODO: There may be cases where we don't want to add .keyword to the field and there should be a way to override this
       KEYWORD_AGGREGATION_FIELDS = [:terms, :rare_terms, :significant_terms, :cardinality, :string_stats]
       def assume_keyword_field(args={}, parent_match=false)

@@ -43,8 +43,8 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "rspec", "~> 3.9"
   spec.add_development_dependency "simplecov", "~> 0.21.2"
-  spec.add_development_dependency "yard", "~> 0.9.36"
   spec.add_development_dependency "opensearch-ruby", "~> 3.0"
+  spec.add_development_dependency "rdoc-markdown", "~> 0.4.2"
   spec.add_development_dependency "octokit", "~> 4.20"
   spec.add_development_dependency "versionomy", "~> 0.5.0"
   # For more information and examples about making a new gem, check out our
