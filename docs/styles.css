@@ -35,6 +35,12 @@ section.cover .cover-main>p:last-child a:hover {
 
 .docsify-hide a:first-child>img{ display: none;}
 
+.app-sub-sidebar li:before {
+    content: "";
+    padding-right: 4px;
+    float: left;
+}
+
 .sidebar h3 {
     text-align: center;
 }

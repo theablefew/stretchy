@@ -37,10 +37,7 @@ class Post < Stretchy::Record
 
 end
 ```
->[!NOTE]
 >`created_at`, `:updated_at` and `:id` are automatically added to all `Stretchy::Records`
-> 
-> The `default_sort_key` is :created_at
 
 
 ### Query
@@ -54,6 +51,8 @@ Query object fields with dot notation
   #=> <Post id: aW02w3092, title: "Fun Cats", body: "...", flagged: true,
   #         author: {name: "Jadzia", age: 20}, tags: ["cat", "amusing"]>
 ```
+
+> The `default_sort_key` is :created_at
 
 ### Aggregations
 ```ruby
