@@ -22,6 +22,47 @@ Stretchy simplifies the process of querying, aggregating, and managing Elasticse
 * Bulk Operations made easy
 * Validations, custom attributes, and more...
 
+## Installation
+
+Install the gem and add to the application's Gemfile by executing:
+
+    $ bundle add stretchy-model
+
+If bundler is not being used to manage dependencies, install the gem by executing:
+
+    $ gem install stretchy-model
+
+<details>
+<summary>Rails Configuration</summary>
+
+
+
+```sh
+rails credentials:edit
+```
+
+#### Add elasticsearch credentials
+```yaml
+elasticsearch:
+   url: localhost:9200
+
+# or opensearch
+# opensearch:
+#    host: https://localhost:9200
+#    user: admin
+#    password: admin
+```
+
+#### Create an initializer 
+<p><sub><em>config/initializers/stretchy.rb</em></sub></p>
+
+```ruby {file=config/initializers/stretchy.rb}
+Stretchy.configure do |config|
+    config.client = Elasticsearch::Client.new url: Rails.application.credentials.elasticsearch.url, log: true
+end
+```
+</details>
+
 ## Models
 
 ### Attributes
@@ -131,47 +172,6 @@ Model.bulk_in_batches(records, size: 100) do |batch|
     batch.map! { |record| Model.new(record).to_bulk }
 end
 ```
-
-## Installation
-
-Install the gem and add to the application's Gemfile by executing:
-
-    $ bundle add stretchy-model
-
-If bundler is not being used to manage dependencies, install the gem by executing:
-
-    $ gem install stretchy-model
-
-<details>
-<summary>Rails Configuration</summary>
-
-
-
-```sh
-rails credentials:edit
-```
-
-#### Add elasticsearch credentials
-```yaml
-elasticsearch:
-   url: localhost:9200
-
-# or opensearch
-# opensearch:
-#    host: https://localhost:9200
-#    user: admin
-#    password: admin
-```
-
-#### Create an initializer 
-<p><sub><em>config/initializers/stretchy.rb</em></sub></p>
-
-```ruby {file=config/initializers/stretchy.rb}
-Stretchy.configure do |config|
-    config.client = Elasticsearch::Client.new url: Rails.application.credentials.elasticsearch.url, log: true
-end
-```
-</details>
 
 
 ## Development
