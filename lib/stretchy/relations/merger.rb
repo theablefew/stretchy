@@ -114,7 +114,7 @@ module Stretchy
           lhs_wheres = relation.where_values
           rhs_wheres = values[:where] || []
 
-          lhs_filters = relation.filter_values
+          lhs_filters = relation.filter_query_values
           rhs_filters = values[:filter_query] || []
 
           removed, kept = partition_overwrites(lhs_wheres, rhs_wheres)
@@ -122,11 +122,11 @@ module Stretchy
           where_values = kept + rhs_wheres
 
           filters_removed, filters_kept = partition_overwrites(lhs_wheres, rhs_wheres)
-          filter_values =  rhs_filters
+          filter_query_values =  rhs_filters
 
 
           relation.where_values = where_values.empty? ? nil : where_values
-          relation.filter_values = filter_values.empty? ? nil : filter_values
+          relation.filter_query_values = filter_query_values.empty? ? nil : filter_query_values
 
           if values[:reordering]
             # override any order specified in the original relation

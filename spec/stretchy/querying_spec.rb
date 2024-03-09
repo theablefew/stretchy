@@ -52,7 +52,7 @@ describe "QueryMethods" do
                 end
 
                 it 'with a filter' do
-                    count = described_class.filter(:terms, gender: [:female]).count
+                    count = described_class.filter_query(:terms, gender: [:female]).count
                     expect(count).to be_a(Integer)
                     expect(count).to eq(10)
                 end
@@ -91,33 +91,33 @@ describe "QueryMethods" do
                 end
             end
 
-            context '.filter' do
+            context '.filter_query' do
                 it 'filters by term' do
-                    expect(described_class.filter(:term,  gender: 'male').map(&:gender)).to all(eq('male'))
-                    expect(described_class.filter(:term,  gender: 'female').map(&:gender)).to all(eq('female'))
+                    expect(described_class.filter_query(:term,  gender: 'male').map(&:gender)).to all(eq('male'))
+                    expect(described_class.filter_query(:term,  gender: 'female').map(&:gender)).to all(eq('female'))
                 end
 
                 it 'filters by range' do
-                    expect(described_class.filter(:range,  age: {gte: 30}).map(&:age)).to all(be >= 30)
-                    expect(described_class.filter(:range,  age: {lte: 30}).map(&:age)).to all(be <= 30)
+                    expect(described_class.filter_query(:range,  age: {gte: 30}).map(&:age)).to all(be >= 30)
+                    expect(described_class.filter_query(:range,  age: {lte: 30}).map(&:age)).to all(be <= 30)
                 end
 
                 it 'filters by terms' do
-                    expect(described_class.filter(:terms, 'position.name.keyword': ['Software Engineer', 'Product Manager']).map{|r| r.position['name']}).to all(be_in(['Software Engineer', 'Product Manager']))
+                    expect(described_class.filter_query(:terms, 'position.name.keyword': ['Software Engineer', 'Product Manager']).map{|r| r.position['name']}).to all(be_in(['Software Engineer', 'Product Manager']))
                 end
             
                 it 'filters by exists' do
-                    expect(described_class.filter(:exists, field: 'position.level').map{|r| r.position['level']}).to all(be_truthy)
+                    expect(described_class.filter_query(:exists, field: 'position.level').map{|r| r.position['level']}).to all(be_truthy)
                 end
 
                 # Doesn't seem to be supported in 7.x+
                 xit 'filters by or' do
-                    expect(described_class.filter(:or, [{term: {age: 25}}, {term: {age: 30}}]).map(&:age)).to all(include(25,30))
+                    expect(described_class.filter_query(:or, [{term: {age: 25}}, {term: {age: 30}}]).map(&:age)).to all(include(25,30))
                 end
 
                 # Doesn't seem to be supported in 7.x+
                 xit 'filters by not' do
-                    expect(described_class.filter(:not, {term: {age: 25}}).map(&:age)).not_to include(25)
+                    expect(described_class.filter_query(:not, {term: {age: 25}}).map(&:age)).not_to include(25)
                 end
             end
 
@@ -149,7 +149,7 @@ describe "QueryMethods" do
 
             context 'query string' do
                 it 'filter with query string' do
-                    result = described_class.filter(:query_string, {query: "Mia OR Isabella", default_field: "name"} )
+                    result = described_class.filter_query(:query_string, {query: "Mia OR Isabella", default_field: "name"} )
                     expect(result.map(&:name)).to include("Mia Rodriguez", "Isabella Lewis")
                 end
 

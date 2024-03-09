@@ -12,7 +12,7 @@ describe Stretchy::Relations::QueryBuilder do
 
   describe '#filters' do
     it 'returns the filters value' do
-      expect(subject.filters).to eq(values[:filter])
+      expect(subject.filters).to eq(values[:filter_query])
     end
   end
 
@@ -69,7 +69,7 @@ describe Stretchy::Relations::QueryBuilder do
 
         context 'when using filters' do
             let(:subject) { described_class.new(filters) }
-            let(:filters) { {filter: [name: :active, args: {term: {status: :active}}]} }
+            let(:filters) { {filter_query: [name: :active, args: {term: {status: :active}}]} }
     
             it 'builds the query structure' do
                 expect(subject.send(:build_query)[:bool][:filter]).to include({active: {term: {status: :active}}}.with_indifferent_access)

@@ -15,7 +15,7 @@ module Stretchy
         :query_string,
         :aggregation,
         :search_option,
-        :query_filter, 
+        :filter_query, 
         :or_filter,
         :extending,
         :skip_callbacks
@@ -308,7 +308,7 @@ module Stretchy
 
 
 
-      # @deprecated in elasticsearch 7.x+ use {#filter} instead
+      # @deprecated in elasticsearch 7.x+ use {#filter_query} instead
       def or_filter(name, options = {}, &block)
         spawn.or_filter!(name, options, &block)
       end
@@ -336,7 +336,7 @@ module Stretchy
       end
 
       def filter_query!(name, options = {}, &block) # :nodoc:
-        self.filter_values += [{name: name, args: options}]
+        self.filter_query_values += [{name: name, args: options}]
         self
       end
 
@@ -404,7 +404,7 @@ module Stretchy
       #
       # @return [ActiveRecord::Relation] a new relation, which reflects the exists filter
       def has_field(field)
-        spawn.filter(:exists, {field: field})
+        spawn.filter_query(:exists, {field: field})
       end
 
 
