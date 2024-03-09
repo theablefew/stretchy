@@ -14,7 +14,7 @@ module Stretchy
       end
 
       def filters
-        values[:filter]
+        values[:filter_query]
       end
 
       def or_filters
@@ -58,7 +58,7 @@ module Stretchy
       end
 
       def query_filters
-        values[:filter]
+        values[:filter_query]
       end
 
       def search_options

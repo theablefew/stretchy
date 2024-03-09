@@ -4,7 +4,7 @@ module Stretchy
     class Relation
 
         # These methods can accept multiple values.
-        MULTI_VALUE_METHODS  = [:order, :where, :or_filter, :filter, :bind, :extending, :unscope, :skip_callbacks]
+        MULTI_VALUE_METHODS  = [:order, :where, :or_filter, :filter_query, :bind, :extending, :unscope, :skip_callbacks]
 
         # These methods can accept a single value.
         SINGLE_VALUE_METHODS = [:limit, :offset, :routing, :size]
@@ -16,7 +16,7 @@ module Stretchy
         VALUE_METHODS = MULTI_VALUE_METHODS + SINGLE_VALUE_METHODS
 
         # Include modules.
-        include Relations::FinderMethods, Relations::SpawnMethods, Relations::QueryMethods, Relations::SearchOptionMethods, Delegation
+        include Relations::FinderMethods, Relations::SpawnMethods, Relations::QueryMethods, Relations::AggregationMethods, Relations::SearchOptionMethods, Delegation
 
         # Getters.
         attr_reader :klass, :loaded
