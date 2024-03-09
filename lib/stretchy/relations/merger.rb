@@ -50,7 +50,7 @@ module Stretchy
           @other    = other
         end
 
-        NORMAL_VALUES = [:where, :first, :last, :filter]
+        NORMAL_VALUES = [:where, :first, :last, :filter_query]
 
         def normal_values
           NORMAL_VALUES
@@ -67,7 +67,7 @@ module Stretchy
             unless value.nil? || (value.blank? && false != value)
               if name == :select
                 relation._select!(*value)
-              elsif name == :filter
+              elsif name == :filter_query
                 values.each do |v|
                   relation.send("#{name}!", v.first, v.last)
                 end
@@ -115,7 +115,7 @@ module Stretchy
           rhs_wheres = values[:where] || []
 
           lhs_filters = relation.filter_values
-          rhs_filters = values[:filter] || []
+          rhs_filters = values[:filter_query] || []
 
           removed, kept = partition_overwrites(lhs_wheres, rhs_wheres)
 
