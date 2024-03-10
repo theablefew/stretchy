@@ -184,6 +184,18 @@ describe "QueryMethods" do
                     query = subject.first!.to_elastic
                     expect(query).to eq({sort: [{'name.keyword': :asc}]}.with_indifferent_access)
                 end
+                
+                it 'changes first sort key to desc' do
+                    subject = described_class.sort(name: :asc, age: :desc)
+                    query = subject.last!.to_elastic
+                    expect(query[:sort]).to eq([{'name.keyword' => :desc}, {'age' => :desc}])
+                end
+
+                it 'changes first sort key to asc' do
+                    subject = described_class.sort(name: :desc, age: :desc)
+                    query = subject.first!.to_elastic
+                    expect(query[:sort]).to eq([{'name.keyword' => :asc}, {'age' => :desc}])
+                end
 
             end
 
