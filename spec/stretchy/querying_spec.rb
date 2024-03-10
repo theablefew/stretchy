@@ -61,6 +61,10 @@ describe "QueryMethods" do
                     expect(described_class.count).to be_a(Integer)
                     expect(described_class.count).to eq(19)
                 end
+
+                it 'removes order from count' do
+                    expect(described_class.order(age: :asc).count).to eq(19)
+                end
             end
 
             context '.where' do
