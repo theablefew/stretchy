@@ -8,7 +8,7 @@
 - Query Builder
 - Max Power
 
-[GitHub](https://github.com/docsifyjs/docsify/)
+[GitHub](https://github.com/theablefew/stretchy)
 [Get Started](#stretchy-model)
 
 ![color](#D0B6E1)
