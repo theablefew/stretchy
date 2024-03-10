@@ -115,7 +115,7 @@ describe "QueryMethods" do
                 
                   context 'when using regex' do
                     it 'handles regex' do
-                      expect(described_class.where(color: /gr(a|e)y/).to_elastic).to eq({regexp: {name: 'br.*n'}})
+                      expect(described_class.where(color: /gr(a|e)y/).to_elastic).to eq({query: {regexp: {'color.keyword': { value: 'gr(a|e)y' }}}}.with_indifferent_access)
                     end
                   end
                 

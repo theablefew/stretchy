@@ -187,27 +187,34 @@ module Stretchy
       # @return [ActiveRecord::Relation, WhereChain] a new relation, which reflects the conditions, or a WhereChain if opts is :chain
       # @see #must
       def where(opts = :chain, *rest)
+          puts "opts: #{opts} rest: #{rest}"
         if opts == :chain
           WhereChain.new(spawn)
         elsif opts.blank?
           self
         else
-          rest.each do |key, value|
+          opts.each do |key, value|
             case value
             when Range
               between(value, key)
             when Hash
               filter_query(:range, key => value) if value.keys.any? { |k| [:gte, :lte, :gt, :lt].include?(k) }
             when Regexp
-              regexp(key, value)
+              regexp(Hash[key, value])
             when Array
-              terms(key, value)
+              # handle ID queries
+              # if [:id, :_id].include?(key)
+
+              # else
+                spawn.where!(opts, *rest)
+              # end
             else
-              term(key, value)
+              spawn.where!(opts, *rest)
             end
           end
 
-          spawn.where!(opts, *rest)
+          self
+
         end
       end
 
