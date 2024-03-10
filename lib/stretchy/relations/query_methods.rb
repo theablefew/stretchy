@@ -187,7 +187,6 @@ module Stretchy
       # @return [ActiveRecord::Relation, WhereChain] a new relation, which reflects the conditions, or a WhereChain if opts is :chain
       # @see #must
       def where(opts = :chain, *rest)
-          puts "opts: #{opts} rest: #{rest}"
         if opts == :chain
           WhereChain.new(spawn)
         elsif opts.blank?
