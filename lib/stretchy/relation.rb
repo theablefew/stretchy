@@ -162,7 +162,7 @@ module Stretchy
         #
         # @return [QueryBuilder] The query builder for the relation.
         def query_builder
-          Relations::QueryBuilder.new(values)
+          Relations::QueryBuilder.new(values, klass.attribute_types)
         end
 
     end
