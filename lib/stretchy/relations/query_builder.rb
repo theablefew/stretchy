@@ -150,7 +150,7 @@ module Stretchy
       end
 
       def build_sort
-        structure.sort sort.flatten #.inject(Hash.new) { |h,v| h.merge(v) }
+        structure.sort sort.map { |arg| keyword_transformer.transform(arg) }.flatten
       end
 
       def build_highlights

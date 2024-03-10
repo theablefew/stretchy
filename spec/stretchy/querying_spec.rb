@@ -163,7 +163,7 @@ describe "QueryMethods" do
 
                 it 'accepts fields as keyword arguments' do
                     result = described_class.order(age: :desc, name: :asc, created_at: {order: :desc, mode: :avg})
-                    expected = {:sort=>[{:age=>:desc}, {:name=>:asc}, {:created_at=>{:order=>:desc, :mode=>:avg}}]}
+                    expected = {:sort=>[{:age=>:desc}, {'name.keyword'=>:asc}, {:created_at=>{:order=>:desc, :mode=>:avg}}]}
                     expect(result.to_elastic).to eq(expected.with_indifferent_access)
                 end
 
@@ -172,6 +172,31 @@ describe "QueryMethods" do
                     expected = {:sort=>[{:age=>:desc}]}
                     expect(result.to_elastic).to eq(expected.with_indifferent_access)
                 end
+
+                it 'overrides default sort with last' do
+                    subject = described_class.sort(name: :asc)
+                    query = subject.last!.to_elastic
+                    expect(query).to eq({sort: [{'name.keyword': :desc}]}.with_indifferent_access)
+                end
+
+                it 'overrides default sort with first' do
+                    subject = described_class.sort(name: :asc)
+                    query = subject.first!.to_elastic
+                    expect(query).to eq({sort: [{'name.keyword': :asc}]}.with_indifferent_access)
+                end
+                
+                it 'changes first sort key to desc' do
+                    subject = described_class.sort(name: :asc, age: :desc)
+                    query = subject.last!.to_elastic
+                    expect(query[:sort]).to eq([{'name.keyword' => :desc}, {'age' => :desc}])
+                end
+
+                it 'changes first sort key to asc' do
+                    subject = described_class.sort(name: :desc, age: :desc)
+                    query = subject.first!.to_elastic
+                    expect(query[:sort]).to eq([{'name.keyword' => :asc}, {'age' => :desc}])
+                end
+
             end
 
             context 'fields' do

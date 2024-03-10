@@ -9,7 +9,15 @@ module Stretchy
         end
 
         def first!
-          spawn.sort(Hash[default_sort_key, :asc]).spawn.size(1)
+          spawned = spawn
+          if spawned.order_values.length.zero? 
+            spawn.sort(Hash[default_sort_key, :asc]).spawn.size(1)
+          elsif spawned.order_values.length >= 1
+            first_order_value = spawned.order_values.shift
+            new_direction = Hash[first_order_value.keys.first, :asc] 
+            spawned.order_values.unshift(new_direction)
+            spawned.size(1)
+          end
           self
         end
 
@@ -19,7 +27,15 @@ module Stretchy
         end
 
         def last!
-          spawn.sort(Hash[default_sort_key, :desc]).spawn.size(1)
+          spawned = spawn
+          if spawned.order_values.length.zero?
+            spawn.sort(Hash[default_sort_key, :desc]).spawn.size(1)
+          elsif spawned.order_values.length >= 1
+            first_order_value = spawned.order_values.shift
+            new_direction = Hash[first_order_value.keys.first, :desc] 
+            spawned.order_values.unshift(new_direction)
+            spawned.size(1)
+          end
           self
         end
 
