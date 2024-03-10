@@ -31,6 +31,7 @@ module Stretchy
           end
 
           def protected?(arg)
+            return false if arg.nil?
             Stretchy::Relations::AggregationMethods::AGGREGATION_METHODS.include?(arg.to_sym)
           end
           
