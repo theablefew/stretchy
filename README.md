@@ -14,6 +14,8 @@ Stretchy provides Elasticsearch models in a Rails environment with an integrated
 ## Features
 Stretchy simplifies the process of querying, aggregating, and managing Elasticsearch-backed models, allowing Rails developers to work with search indices as comfortably as they would with traditional Rails models.
 
+[Read Documentation](https://theablefew.github.io/stretchy/#/)
+
 ## Attributes
 
 ```ruby
@@ -41,7 +43,7 @@ end
 ## Aggregations
 ```ruby
 
-  result = Post.filter(:range, 'author.age': {gte: 18})
+  result = Post.filter_query(:range, 'author.age': {gte: 18})
     .aggregation(:post_frequency, date_histogram: {
       field: :created_at,
       calender_interval: :month
