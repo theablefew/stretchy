@@ -31,6 +31,7 @@ describe Stretchy::Relations::QueryBuilder do
       multi_terms = {where: [{status: 'active'}, {category: 'ruby'}]}
       expect(described_class.new(multi_terms, attribute_types).query).to eq(subject.send(:compact_where, multi_terms[:where]))
     end
+
   end
 
   describe '#build_query' do

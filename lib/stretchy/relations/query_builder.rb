@@ -38,6 +38,10 @@ module Stretchy
         @shoulds ||= compact_where(values[:should])
       end
 
+      def regexes
+        @regexes ||= values[:regexp]
+      end
+
       def fields
         values[:field]
       end
@@ -88,7 +92,7 @@ module Stretchy
       private
 
       def missing_bool_query?
-        query.nil? && must_nots.nil? && shoulds.nil?
+        query.nil? && must_nots.nil? && shoulds.nil? && regexes.nil?
       end
 
       def missing_query_string?
@@ -102,7 +106,12 @@ module Stretchy
       def build_query
         return if missing_bool_query? && missing_query_string? && missing_query_filter?
         structure.query do
+          structure.regexp do
+            build_regexp unless regexes.nil?
+          end
+
           structure.bool do
+
                 structure.must query unless missing_bool_query?
                 structure.must_not must_nots unless must_nots.nil?
                 structure.set! :should, shoulds unless shoulds.nil?
@@ -118,6 +127,14 @@ module Stretchy
             structure.query query_strings
           end unless query_strings.nil?
         end.with_indifferent_access
+      end
+
+      def build_regexp
+        regexes.each do |args|
+            target_field = args.first.keys.first
+            value_field = args.first.values.first
+            structure.set! target_field, args.last.merge(value: value_field)
+        end
       end
 
       def build_filtered_query
