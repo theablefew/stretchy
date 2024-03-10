@@ -2,6 +2,27 @@ module Stretchy
     module Utils
         extend ActiveSupport::Concern
 
+            concerning :ConsoleMethods do
+                def reload!
+                    Stretchy.loader.reload
+                end
+
+                def banner
+                    banner = <<~BANNER
+                                    
+                                                                    d8b                
+                               d8P                     d8P          ?88                
+                            d888888P                d888888P         88b               
+                     .d888b,  ?88'    88bd88b d8888b  ?88'   d8888b  888888b ?88   d8P 
+                     ?8b,     88P     88P'  `d8b_,dP  88P   d8P' `P  88P `?8bd88   88  
+                       `?8b   88b    d88     88b      88b   88b     d88   88P?8(  d88  
+                    `?888P'   `?8b  d88'     `?888P'  `?8b  `?888P'd88'   88b`?88P'?8b 
+                                                                                    )88
+                                                                                   ,d8P
+                                                                                `?888P'
+                    BANNER
+                end
+            end
 
             def self.to_curl(klass, arguments = {}, end_point = "_search")
                 host = klass.gateway.client.transport.transport.hosts&.first || klass.gateway.client.transport.transport.options[:url]
