@@ -66,6 +66,27 @@ describe "QueryMethods" do
                     expect(described_class.order(age: :asc).count).to eq(19)
                 end
             end
+            context '.regexp' do
+                it 'adds a regexp query' do
+                    expect(described_class.regexp(name: /br.*n/).to_elastic).to eq({query: {regexp: {'name.keyword': { value: 'br.*n'}}}}.with_indifferent_access)
+                end
+
+                it 'adds a regexp query with flags' do
+                    expect(described_class.regexp(name: /br.*n/, flags: "ALL").to_elastic).to eq({query: {regexp: {'name.keyword': { value: 'br.*n', flags: "ALL"}}}}.with_indifferent_access)
+                end
+
+                it 'respects .where' do
+                    expect(described_class.where(name: "David Brown").regexp('position.name': /br.*n/).to_elastic).to eq({query: {bool: {must: {term: {'name.keyword': "David Brown"}}},regexp: {'position.name.keyword': { value: 'br.*n'}}}}.with_indifferent_access)
+                end
+
+                it 'handles case insensitive regex' do
+                    expect(described_class.regexp(name: /br.*n/i).to_elastic).to eq({query: {regexp: {'name.keyword': { value: 'br.*n', case_insensitive: true}}}}.with_indifferent_access)
+                end
+
+                it 'uses keyword when supplied' do
+                    expect(described_class.regexp(name: /br.*n/, use_keyword: true).to_elastic).to eq({query: {regexp: {'name.keyword': { value: 'br.*n'}}}}.with_indifferent_access)
+                end
+            end
 
             context '.where' do
                 let(:subject) { 
@@ -77,6 +98,39 @@ describe "QueryMethods" do
                     expect(described_class.where(age: 25).map(&:id)).to include(r.id)
                     r.delete
                 end
+
+                context 'when using ranges' do
+                    it 'handles date ranges' do
+                      expect(described_class.where(date: 2.days.ago...1.day.ago).to_elastic).to eq({range: {date: {gte: 2.days.ago, lt: 1.day.ago}}})
+                    end
+                
+                    it 'handles integer ranges' do
+                      expect(described_class.where(age: 18..30).to_elastic).to eq({range: {age: {gte: 18, lte: 30}}})
+                    end
+                
+                    it 'handles explicit range values' do
+                      expect(described_class.where(price: {gte: 100}).to_elastic).to eq({range: {price: {gte: 100}}})
+                    end
+                  end
+                
+                  context 'when using regex' do
+                    it 'handles regex' do
+                      expect(described_class.where(color: /gr(a|e)y/).to_elastic).to eq({regexp: {name: 'br.*n'}})
+                    end
+                  end
+                
+                  context 'when using terms' do
+                    it 'handles terms' do
+                      expect(described_class.where(name: ['Candy', 'Lilly']).to_elastic).to eq({terms: {name: ['Candy', 'Lilly']}})
+                    end
+                  end
+                
+                  context 'when using ids' do
+                    it 'handles ids' do
+                      expect(Model.where(id: [12, 80, 32]).to_elastic).to eq({ids: {values: [12, 80, 32]}})
+                    end
+                  end
+
             end
 
             context '.must_not' do

@@ -28,6 +28,7 @@ module Stretchy
                 include Stretchy::Common
                 include Stretchy::Scoping
                 include Stretchy::Utils
+                include Stretchy::SharedScopes
 
                 extend Stretchy::Delegation::DelegateCache
                 extend Stretchy::Querying

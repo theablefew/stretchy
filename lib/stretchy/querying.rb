@@ -6,7 +6,7 @@ module Stretchy
     delegate *Stretchy::Relations::AggregationMethods::AGGREGATION_METHODS, to: :all
 
     delegate :skip_callbacks, :routing, :search_options, to: :all
-    delegate :must, :must_not, :should, :where_not, :where, :filter_query, :query_string, to: :all
+    delegate :must, :must_not, :should, :where_not, :where, :filter_query, :query_string, :regexp, to: :all
 
     def fetch_results(es)
       unless es.count?
