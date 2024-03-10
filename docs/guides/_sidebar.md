@@ -7,3 +7,7 @@
     * [Scopes](guides/scopes)
     * [Aggregations](guides/aggregations)
     * [Working with mappings](guides/working-with-mappings)
+
+* __Examples__
+    * [Data Analysis](examples/data_analysis)
+    * [Time Series Data](examples/time_series_data)

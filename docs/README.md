@@ -70,7 +70,7 @@ end
 ```ruby
 class Post < Stretchy::Record
 
-    attribute :title,                   :string
+    attribute :title,                   :keyword
     attribute :body,                    :string
     attribute :flagged,                 :boolean,  default: false  
     attribute :author,                  :hash 
@@ -107,10 +107,10 @@ Query object fields with dot notation
   result.aggregations.post_frequency
   #=> {buckets: [{key_as_string: "2024-01-01", doc_count: 20}, ...]}
 ```
-### Filters
+### Query Filters
 
 ```ruby
-Post.filter(:range, 'author.age': {gte: 18, lte: 30}).where(title: "Welcome")
+Post.filter_query(:range, 'author.age': {gte: 18, lte: 30}).where(title: "Welcome")
 #=> filters authors with age greater than 18 and less than 30
 ```
 

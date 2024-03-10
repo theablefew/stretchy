@@ -72,7 +72,7 @@ end
 
 ```
 
->[!NOTE]
+>__NOTE__
 >
 > `created_at`, `updated_at` and `id` are automatically included
 
