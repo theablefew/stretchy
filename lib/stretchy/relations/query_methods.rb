@@ -15,7 +15,7 @@ module Stretchy
         :query_string,
         :aggregation,
         :search_option,
-        :filter, 
+        :filter_query, 
         :or_filter,
         :extending,
         :skip_callbacks
@@ -321,7 +321,7 @@ module Stretchy
 
 
 
-      # @deprecated in elasticsearch 7.x+ use {#filter} instead
+      # @deprecated in elasticsearch 7.x+ use {#filter_query} instead
       def or_filter(name, options = {}, &block)
         spawn.or_filter!(name, options, &block)
       end
@@ -335,52 +335,27 @@ module Stretchy
       #
       # This method supports all filters supported by Elasticsearch.
       #
-      # type:: [Symbol] the type of filter to add (:range, :term, etc.)
-      # opts:: [Hash] a hash containing the attribute and value to filter by
+      # @overload filter_query(type, opts)
+      #   @param type [Symbol] the type of filter to add (:range, :term, etc.)
+      #   @param opts [Hash] a hash containing the attribute and value to filter by
       #
-      # Example:
-      #   Model.filter(:range, age: {gte: 30})
-      #   Model.filter(:term, color: :blue)
+      # @example
+      #   Model.filter_query(:range, age: {gte: 30})
+      #   Model.filter_query(:term, color: :blue)
       #
-      # Returns a new relation, which reflects the filter
-      def filter(name, options = {}, &block)
-        spawn.filter!(name, options, &block)
+      # @return [Stretchy::Relation] a new relation, which reflects the filter
+      def filter_query(name, options = {}, &block)
+        spawn.filter_query!(name, options, &block)
       end
 
-      def filter!(name, options = {}, &block) # :nodoc:
-        self.filter_values += [{name: name, args: options}]
+      def filter_query!(name, options = {}, &block) # :nodoc:
+        self.filter_query_values += [{name: name, args: options}]
         self
       end
 
 
 
-      # Adds an aggregation to the query.
-      #
-      # name:: [Symbol, String] the name of the aggregation
-      # options:: [Hash] a hash of options for the aggregation
-      # block:: [Proc] an optional block to further configure the aggregation
-      #
-      # Example:
-      #   Model.aggregation(:avg_price, field: :price)
-      #   Model.aggregation(:price_ranges) do
-      #     range field: :price, ranges: [{to: 100}, {from: 100, to: 200}, {from: 200}]
-      #   end
-      #
-      # Aggregation results are available in the `aggregations` method of the results under name provided in the aggregation.
-      #
-      # Example:
-      #  results = Model.where(color: :blue).aggregation(:avg_price, field: :price)
-      #  results.aggregations.avg_price
-      #
-      # Returns a new Stretchy::Relation
-      def aggregation(name, options = {}, &block)
-        spawn.aggregation!(name, options, &block)
-      end
 
-      def aggregation!(name, options = {}, &block) # :nodoc:
-        self.aggregation_values += [{name: name, args: assume_keyword_field(options)}]
-        self
-      end
 
 
 
@@ -441,7 +416,7 @@ module Stretchy
       #
       # Returns a new ActiveRecord::Relation, which reflects the exists filter
       def has_field(field)
-        spawn.filter(:exists, {field: field})
+        spawn.filter_query(:exists, {field: field})
       end
 
 

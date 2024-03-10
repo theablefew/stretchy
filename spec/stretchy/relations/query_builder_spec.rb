@@ -2,7 +2,11 @@ require 'spec_helper'
 
 describe Stretchy::Relations::QueryBuilder do
   let(:values) { { aggregation: {categories: { field: 'category', size: 10 }}, filter: { term: { status: 'active' } } } }
-  subject { described_class.new(values) }
+  let(:attribute_types) { double('model', attribute_types: { "status": Stretchy::Attributes::Type::Keyword.new })}
+  before do
+    allow(attribute_types).to receive(:[])
+  end
+  subject { described_class.new(values, attribute_types) }
 
   describe '#aggregations' do
     it 'returns the aggregations value' do
@@ -12,7 +16,7 @@ describe Stretchy::Relations::QueryBuilder do
 
   describe '#filters' do
     it 'returns the filters value' do
-      expect(subject.filters).to eq(values[:filter])
+      expect(subject.filters).to eq(values[:filter_query])
     end
   end
 
@@ -25,7 +29,7 @@ describe Stretchy::Relations::QueryBuilder do
   describe '#where' do
     it 'returns the compacted where value' do
       multi_terms = {where: [{status: 'active'}, {category: 'ruby'}]}
-      expect(described_class.new(multi_terms).query).to eq(subject.send(:compact_where, multi_terms[:where]))
+      expect(described_class.new(multi_terms, attribute_types).query).to eq(subject.send(:compact_where, multi_terms[:where]))
     end
   end
 
@@ -41,7 +45,7 @@ describe Stretchy::Relations::QueryBuilder do
         end
 
         context 'when not missing bool query' do
-            let(:subject) { described_class.new(bool_query) }
+            let(:subject) { described_class.new(bool_query, attribute_types) }
 
             context 'when using where' do
                 let(:bool_query) { {where: [{status: :active}]}} 
@@ -69,7 +73,7 @@ describe Stretchy::Relations::QueryBuilder do
 
         context 'when using filters' do
             let(:subject) { described_class.new(filters) }
-            let(:filters) { {filter: [name: :active, args: {term: {status: :active}}]} }
+            let(:filters) { {filter_query: [name: :active, args: {term: {status: :active}}]} }
     
             it 'builds the query structure' do
                 expect(subject.send(:build_query)[:bool][:filter]).to include({active: {term: {status: :active}}}.with_indifferent_access)
@@ -98,6 +102,43 @@ describe Stretchy::Relations::QueryBuilder do
             subject = described_class.new(search_option: {routing: 'user_1'})
             query = subject.values[:search_option].with_indifferent_access
             expect(query).to eq({routing: 'user_1'}.with_indifferent_access)
+          end
+        end
+
+        context 'keywords' do
+          let(:model) do
+            class MyModel < Stretchy::Record
+              attribute :title, :keyword
+              attribute :status, :keyword
+              attribute :terms, :keyword
+              attribute :term, :keyword
+            end
+            MyModel
+          end
+          
+          let(:filters) { {filter_query: [name: :active, args: {term: {status: :active}}]} }
+
+          it 'converts aggregation keyword attribute names to .keyword' do
+            aggregation = {aggregation: [{ name: :terms, args: { terms: {field: 'value'}, aggs: { more_terms: { terms: { field: :title }}}}}]}
+            elastic_hash = described_class.new(aggregation, model.attribute_types).to_elastic
+            expect(elastic_hash).to eq({aggregations: {terms: {terms: {field: 'value'}, aggs: { more_terms: {terms: {field: 'title.keyword'}}}}}}.with_indifferent_access)
+          end
+
+          it 'converts filter keyword attribute names to .keyword' do
+            elastic_hash = described_class.new(filters, model.attribute_types).to_elastic
+            expect(elastic_hash).to eq({query: {bool: {filter: [{active: {term: {status: :active}}}]}}}.with_indifferent_access)
+          end
+
+          it 'converts where keyword attribute names to .keyword' do
+            where = {where: [{title: 'Lilly'}]}
+            elastic_hash = described_class.new(where, model.attribute_types).to_elastic
+            expect(elastic_hash).to eq({query: {bool: {must: {term: {'title.keyword' => 'Lilly'}}}}}.with_indifferent_access)
+          end
+
+          it 'converts must_not keyword attribute names to .keyword' do
+            must_not = {must_not: [{title: 'Lilly'}]}
+            elastic_hash = described_class.new(must_not, model.attribute_types).to_elastic
+            expect(elastic_hash).to eq({query: {bool: {must_not: {term: {'title.keyword' => 'Lilly'}}}}}.with_indifferent_access)
           end
         end
   end

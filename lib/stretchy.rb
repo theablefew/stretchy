@@ -10,13 +10,28 @@ require 'active_support/all'
 require 'active_model/type/array'
 require 'active_model/type/hash'
 
-ActiveModel::Type.register(:array, ActiveModel::Type::Array)
-ActiveModel::Type.register(:hash, ActiveModel::Type::Hash)
-
 require_relative "stretchy/version"
 require_relative "rails/instrumentation/railtie" if defined?(Rails)
 
+
+
 module Stretchy
+
+  def self.loader
+    @loader ||= begin
+      loader = Zeitwerk::Loader.new
+      loader.tag = File.basename(__FILE__, ".rb")
+      loader.inflector = Zeitwerk::GemInflector.new(__FILE__)
+      loader.push_dir(__dir__)
+      loader
+    end
+  end
+
+  def self.boot!
+    loader.setup
+    Stretchy::Attributes.register!
+  end
+
   module Errors
     class QueryOptionMissing < StandardError; end
   end
@@ -61,12 +76,9 @@ module Stretchy
     end
   end
 
+
 end
 
+Stretchy.loader.enable_reloading if defined?(Rails) && Rails.env.development? || ENV['RACK_ENV'] == 'development'
+Stretchy.boot!
 
-
-loader = Zeitwerk::Loader.new
-loader.tag = File.basename(__FILE__, ".rb")
-loader.inflector = Zeitwerk::GemInflector.new(__FILE__)
-loader.push_dir(__dir__)
-loader.setup

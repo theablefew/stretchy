@@ -2,9 +2,10 @@ module Stretchy
   module Relations
     class QueryBuilder
 
-      attr_reader :structure, :values
+      attr_reader :structure, :values, :attribute_types
 
-      def initialize(values)
+      def initialize(values, attribute_types = nil)
+        @attribute_types = attribute_types
         @structure = Jbuilder.new ignore_nil: true
         @values = values
       end
@@ -14,7 +15,7 @@ module Stretchy
       end
 
       def filters
-        values[:filter]
+        values[:filter_query]
       end
 
       def or_filters
@@ -58,7 +59,7 @@ module Stretchy
       end
 
       def query_filters
-        values[:filter]
+        values[:filter_query]
       end
 
       def search_options
@@ -165,7 +166,7 @@ module Stretchy
       def build_aggregations
         structure.aggregations do
           aggregations.each do |agg|
-            structure.set! agg[:name], aggregation(agg[:name], agg[:args])
+            structure.set! agg[:name], aggregation(agg[:name], keyword_transformer.transform(agg[:args], :name))
           end
         end
       end
@@ -199,12 +200,22 @@ module Stretchy
       def as_must(q)
         _must = []
         q.each do |arg|
-          arg.each_pair { |k,v| _must << (v.is_a?(Array) ? {terms: Hash[k,v]} : {term: Hash[k,v]}) } if arg.class == Hash
-          _must << {term: Hash[[arg.split(/:/).collect(&:strip)]]} if arg.class == String
-          _must << arg.first if arg.class == Array
+          case arg
+          when Hash
+            arg = keyword_transformer.transform(arg)
+            arg.each_pair do |k,v| 
+              # If v is an array, we build a terms query otherwise a term query
+              _must << (v.is_a?(Array) ? {terms: Hash[k,v]} : {term: Hash[k,v]}) 
+            end
+          when String
+            _must << {term: Hash[[arg.split(/:/).collect(&:strip)]]}
+          when Array
+            _must << arg.first
+          end
         end
         _must.length == 1 ? _must.first : _must
       end
+
 
       def as_query_string(q)
         _and = []
@@ -260,6 +271,9 @@ module Stretchy
         end
       end
 
+      def keyword_transformer
+        @keyword_transformer ||= Stretchy::Attributes::Transformers::KeywordTransformer.new(@attribute_types)
+      end
     end
   end
 end
