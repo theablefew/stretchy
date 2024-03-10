@@ -47,7 +47,9 @@ module Stretchy
         def count!
           @values[:count] = true
           @values.delete(:size)
-          spawn.results
+          spawned = spawn
+          spawned.order_values.clear
+          spawned.results
         end
 
       end
