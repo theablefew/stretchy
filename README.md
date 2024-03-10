@@ -21,10 +21,10 @@ Stretchy simplifies the process of querying, aggregating, and managing Elasticse
 ```ruby
 class Post < Stretchy::Record
 
-    attribute :title,                   :string
+    attribute :title,                   :keyword
     attribute :body,                    :string
     attribute :flagged,                 :boolean,  default: false  
-    attribute :author,                   :hash 
+    attribute :author,                  :hash 
     attribute :tags,                    :array, default: []
 
 end
