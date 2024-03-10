@@ -25,14 +25,16 @@ module Stretchy
           end
           
           def keyword?(arg)
-            attribute_types[arg.to_s].is_a?(Stretchy::Attributes::Type::Keyword)
+            attr = @attribute_types[arg.to_s] 
+            return false unless attr
+            attr.is_a?(Stretchy::Attributes::Type::Keyword)
           end
 
           def protected?(arg)
             Stretchy::Relations::AggregationMethods::AGGREGATION_METHODS.include?(arg.to_sym)
           end
           
-          def transform(item, *ignore)
+          def transform(item, *ignore) 
             item.each_with_object({}) do |(k, v), new_item|
               if ignore && ignore.include?(k)
                 new_item[k] = v
@@ -45,7 +47,7 @@ module Stretchy
               if new_value.is_a?(Hash)
                 new_value = transform(new_value)
               elsif new_value.is_a?(Array)
-                new_value = new_value.map { |i| i.is_a?(Hash) ? transform_keys_for_item(i) : i }
+                new_value = new_value.map { |i| i.is_a?(Hash) ? transform(i) : i }
               elsif new_value.is_a?(String) || new_value.is_a?(Symbol) 
                 new_value = "#{new_value}.keyword" if keyword?(new_value)
               end
