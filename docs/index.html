@@ -5,8 +5,11 @@
   <title>Document</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="description" content="Description">
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/v5-font-face.min.css" integrity="sha512-DG+gORwHSOHlIRwrUl2peOlG9vcxDg8qnbI1WkCfttaERikRSgrRoDeDa1PK4uZD24IJwAeKb6TuQk+/15b66A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
@@ -18,7 +21,11 @@
       coverpage: true,
       base_path: 'doc/',
       loadSidebar: true,
-      subMaxLevel: 3
+      subMaxLevel: 3,
+      copyCode: {
+        copyIcon: '<span class="fa fa-copy"></span>',
+        copyIconClass: 'fa fa-copy'
+      }
     }
   </script>
   <!-- Docsify v4 -->
@@ -26,7 +33,67 @@
   <script src="https://cdn.jsdelivr.net/npm/docsify-prism@latest/dist/docsify-prism.min.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/prismjs@v1.x/plugins/autoloader/prism-autoloader.min.js"></script>
-  <!-- Latest v2.x.x -->
-  <script src="https://unpkg.com/docsify-copy-code@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/fontawesome.min.js" integrity="sha512-C8qHv0HOaf4yoA7ISuuCTrsPX8qjolYTZyoFRKNA9dFKnxgzIHnYTOJhXQIt6zwpIFzCrRzUBuVgtC4e5K1nhA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script type="text/javascript">
+    window.onload = function() {
+      const copyButtonLabel = "Copy Code";
+
+      // define your function as a separate function so you can call it multiple times
+      function addCopyButtons() {
+        let blocks = document.querySelectorAll("pre");
+
+        blocks.forEach((block) => {
+          // only add button if browser supports Clipboard API and it doesn't already have a copy button
+          if (navigator.clipboard && !block.querySelector(".clipboard-copy")) {
+            let button = document.createElement("div");
+            button.classList.add("clipboard-copy");
+
+            let icon = document.createElement("i");
+            icon.classList.add("fa-solid", "fa-copy", "fa-lg");
+            button.append(icon);
+            let copyText = document.createElement("div");
+            copyText.classList.add("copy-text");
+            copyText.innerText = "Copied!";
+            button.appendChild(copyText);
+            block.appendChild(button);
+
+            button.addEventListener("click", async () => {
+              await copyCode(block);
+            });
+          }
+        });
+      }
+
+      // call your function initially to add copy buttons to existing content
+      addCopyButtons();
+
+      // create a MutationObserver to call your function when new content is added
+      let observer = new MutationObserver(addCopyButtons);
+      observer.observe(document.body, {childList: true, subtree: true});
+    }
+
+    async function copyCode(block) {
+        let code = block.querySelector("code");
+        let text = code.innerText;
+
+        await navigator.clipboard.writeText(text);
+
+        // change button text to indicate success
+        let button = block.querySelector(".clipboard-copy");
+        let icon = button.querySelector("i");
+        icon.classList.remove("fa-copy");
+        icon.classList.add("fa-check");
+
+        let copyText = button.querySelector(".copy-text");
+        copyText.classList.toggle("show");
+        button.appendChild(copyText);
+
+        setTimeout(() => {
+          icon.classList.remove("fa-check");
+          icon.classList.add("fa-copy");
+          copyText.classList.toggle("show");
+        }, 2000);
+      }
+  </script>
 </body>
 </html>

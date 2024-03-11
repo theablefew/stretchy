@@ -26,14 +26,18 @@ Stretchy simplifies the process of querying, aggregating, and managing Elasticse
 
 Install the gem and add to the application's Gemfile by executing:
 
-    $ bundle add stretchy-model
+```sh
+bundle add stretchy-model
+```
 
 If bundler is not being used to manage dependencies, install the gem by executing:
 
-    $ gem install stretchy-model
+```sh
+gem install stretchy-model
+```
 
 <details>
-<summary>Rails Configuration</summary>
+<summary><strong>Rails Configuration</strong></summary>
 
 
 
