@@ -45,6 +45,13 @@ module Stretchy
                 # overriden by #size
                 default_size 10000
 
+                attr_accessor :highlights
+
+                def initialize(attributes = {})
+                    @highlights = attributes.delete(:_highlights) 
+                    super(attributes)
+                end
+
             end
 
             def initialize(attributes = {})

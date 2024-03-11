@@ -174,7 +174,13 @@ module Stretchy
         structure.highlight do
           structure.fields do
             highlights.each do |highlight|
-              structure.set! highlight, extract_highlighter(highlight)
+              if highlight.is_a?(String) || highlight.is_a?(Symbol)
+                structure.set! highlight, {}
+              elsif highlight.is_a?(Hash)
+                highlight.each_pair do |k,v|
+                  structure.set! k, v
+                end
+              end
             end
           end
         end

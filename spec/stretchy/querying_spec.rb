@@ -278,9 +278,25 @@ describe "QueryMethods" do
 
             context 'highlight' do
                 it 'returns highlighted fields' do
-                    result = described_class.highlight(:body)
+                    result = described_class.highlight(body: {})
                     expected = {:highlight=>{:fields=>{body: {}}}}
                     expect(result.to_elastic).to eq(expected.with_indifferent_access)
+                end
+
+                it 'stores highlights' do
+                    result = described_class.query_string("name: Soph*").highlight(name: {pre_tags: "__", post_tags: "__"}).first
+                    expect(result.highlights).to eq({"name"=>["__Sophia__ Anderson"]})
+                end
+
+                it 'allows single symbol argument' do
+                    result = described_class.highlight(:body) 
+                    expected = {:highlight=>{:fields=>{body: {}}}}
+                    expect(result.to_elastic).to eq(expected.with_indifferent_access) 
+                end
+
+                it 'highlights_for ' do
+                    result = described_class.query_string("name: Soph*").highlight(name: {pre_tags: "__", post_tags: "__"}).first
+                    expect(result.highlights_for(:name)).to eq(["__Sophia__ Anderson"])
                 end
             end
 
