@@ -6,6 +6,9 @@ module Stretchy
             "#<#{self.class.name} #{attributes.map { |k,v| "#{k}: #{v.blank? ? 'nil' : v}" }.join(', ')}>"
         end
 
+        def [](attribute)
+            self.send(attribute)
+        end
 
         class_methods do
 

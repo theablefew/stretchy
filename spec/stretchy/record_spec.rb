@@ -73,7 +73,16 @@ describe Stretchy::Record do
             expect(described_class.default_size).to eq(100)
           end
 
+        end
+      end
 
+      context 'attributes' do
+
+        it 'accesses attributes' do
+          expect(described_class.new(title: "hello")[:title]).to eq("hello")
+        end
+        it 'plucks' do
+          expect(described_class.all.pluck(:title)).to be_a(Array)
         end
       end
 
