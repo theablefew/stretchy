@@ -1,6 +1,6 @@
 stretchy-model
 ===
-
+Stretchy provides Elasticsearch models in a Rails environment with an integrated ActiveRecord-like interface 
 <p>
     <a href="https://stretchy.io/" target="_blank"><img src="./stretchy.logo.png" alt="Gum Image" width="450" /></a>
     <br><br>
@@ -9,96 +9,29 @@ stretchy-model
 
 </p>
 
-Stretchy provides Elasticsearch models in a Rails environment with an integrated ActiveRecord-like interface and features. 
 
 ## Features
 Stretchy simplifies the process of querying, aggregating, and managing Elasticsearch-backed models, allowing Rails developers to work with search indices as comfortably as they would with traditional Rails models.
 
-[Read Documentation](https://theablefew.github.io/stretchy/#/)
+* Model fully back by Elasticsearch/Opensearch
+* Chain queries, scopes and aggregations
+* Reduce Elasticsearch query complexity
+* Support for time-based indices and aliases
+* Associations to both ActiveRecord models and Stretchy::Record
+* Bulk Operations made easy
+* Validations, custom attributes, and more...
 
-## Attributes
+Follow the guides to learn more about:
 
-```ruby
-class Post < Stretchy::Record
-
-    attribute :title,                   :keyword
-    attribute :body,                    :string
-    attribute :flagged,                 :boolean,  default: false  
-    attribute :author,                  :hash 
-    attribute :tags,                    :array, default: []
-
-end
-```
->[!NOTE]
->`created_at`, `:updated_at` and `:id` are automatically added to all `Stretchy::Records`
+* [Models](https://theablefew.github.io/stretchy/#/guides/models?id=models)
+* [Querying](https://theablefew.github.io/stretchy/#/guides/querying?id=querying)
+* [Aggregations](https://theablefew.github.io/stretchy/#/guides/aggregations?id=aggregations)
+* [Scopes](https://theablefew.github.io/stretchy/#/guides/scopes?id=scopes)
 
 
-## Query
-```ruby
-  Post.where('author.name': "Jadzia", flagged: true).first
-  #=> <Post id: aW02w3092, title: "Fun Cats", body: "...", flagged: true,
-  #         author: {name: "Jadzia", age: 20}, tags: ["cat", "amusing"]>
-```
-
-## Aggregations
-```ruby
-
-  result = Post.filter_query(:range, 'author.age': {gte: 18})
-    .aggregation(:post_frequency, date_histogram: {
-      field: :created_at,
-      calender_interval: :month
-    })
-
-  result.aggregations.post_frequency
-  #=> {buckets: [{key_as_string: "2024-01-01", doc_count: 20}, ...]}
-```
-
-## Scopes
-
-```ruby
-class Post < Stretchy::Record
-  # ...attributes
-
-  # Scopes
-  scope :flagged, -> { where(flagged: true) }
-  scope :top_links, lambda do |size=10, url=".com"| 
-    aggregation(:links, 
-      terms: {
-        field: :links, 
-        size: size, 
-        include: ".*#{url}.*"
-      })
-  end
-end
-
-# Returns flagged posts and includes the top 10 'youtube.com' 
-# links in results.aggregations.links
-result = Post.flagged.top_links(10, "youtube.com")
-
-```
-
-## Bulk Operations
+[Read the Documentation](https://theablefew.github.io/stretchy/#/) or walk through of a simple [Data Analysis](https://theablefew.github.io/stretchy/#/examples/data_analysis?id=data-analysis) example.
 
 
-```ruby
-Model.bulk(records_as_bulk_operations)
-```
-
-#### Bulk helper
-Generates structure for the bulk operation
-```ruby
-record.to_bulk # default to_bulk(:index)
-record.to_bulk(:delete)
-record.to_bulk(:update)
-```
-
-#### In batches
-Run bulk operations in batches specified by `size`
-```ruby
-Model.bulk_in_batches(records, size: 100) do |batch|
-    batch.map! { |record| Model.new(record).to_bulk }
-end
-```
 
 ## Installation
 
