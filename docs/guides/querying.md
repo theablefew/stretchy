@@ -69,13 +69,18 @@ The `.filter_query` method is used to add conditions to the filter clause of the
 
 This makes `.filter_query` useful for conditions that should exclude documents from the results, but should not affect how the remaining documents are ranked. For example, you might use `.filter_query` to exclude documents that are marked as 'deleted' or that fall outside a certain date range.
 
-Here's an example of how you might use the `.filter_query` method:
+In this example, the `.filter_query` method is used to exclude documents where the `deleted` field is `true` and where the `published_at` field is before '2022-01-01'. The remaining documents are ranked based on their relevance to the query, without considering the `deleted` and `published_at` fields.
 
 ```ruby
-Model.filter_query(deleted: false, color: 'green')
+Model.filter_query(:term, deleted: false, color: 'green')
 ```
 
-In this example, the `.filter_query` method is used to exclude documents where the `deleted` field is `true` and where the `published_at` field is before '2022-01-01'. The remaining documents are ranked based on their relevance to the query, without considering the `deleted` and `published_at` fields.
+
+In this example, the `.filter_query` is used to generate a `range` filter and include documents where `author.age` is between 18 and 30.
+```ruby
+Model.filter_query(:range, 'author.age': {gte: 18, lte: 30})
+```
+
 
 The `.filter_query` method returns a new `Stretchy::Relation` object, so you can chain other methods onto it to further refine your search.
 
