@@ -1,6 +1,5 @@
 stretchy-model
 ===
-Stretchy provides Elasticsearch models in a Rails environment with an integrated ActiveRecord-like interface 
 <p>
     <a href="https://stretchy.io/" target="_blank"><img src="./stretchy.logo.png" alt="Gum Image" width="450" /></a>
     <br><br>
