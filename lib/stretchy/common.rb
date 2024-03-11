@@ -10,6 +10,10 @@ module Stretchy
             self.send(attribute)
         end
 
+        def highlights_for(attribute)
+            highlights[attribute.to_s]
+        end
+
         class_methods do
 
             # Set the default sort key to be used in sort operations
