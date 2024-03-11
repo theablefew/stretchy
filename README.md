@@ -82,8 +82,6 @@ end
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
 >[!TIP]
->This library is built on top of the excellent [elasticsearch-persistence](https://github.com/elastic/elasticsearch-rails/tree/main/elasticsearch-persistence) gem. 
->
 > Full documentation on [Elasticsearch Query DSL and Aggregation options](https://github.com/elastic/elasticsearch-rails/tree/main/elasticsearch-persistence)
 
 ## Testing
