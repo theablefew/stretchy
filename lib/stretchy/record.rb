@@ -14,11 +14,6 @@ module Stretchy
                 include ActiveModel::Conversion
                 include ActiveModel::Serialization
                 include ActiveModel::Serializers::JSON
-                include ActiveModel::Validations
-                include ActiveModel::Validations::Callbacks
-                extend ActiveModel::Callbacks
-
-
 
                 include Stretchy::Model::Callbacks
                 include Stretchy::Indexing::Bulk
@@ -54,10 +49,10 @@ module Stretchy
 
             end
 
-            def initialize(attributes = {})
-                self.assign_attributes(attributes) if attributes
-                super()
-            end
+            # def initialize(attributes = {})
+            #     # self.assign_attributes(attributes) if attributes
+            #     # super()
+            # end
 
         end
 
