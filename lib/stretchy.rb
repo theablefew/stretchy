@@ -7,8 +7,6 @@ require 'elasticsearch/model'
 require 'elasticsearch/persistence'
 require 'active_model'
 require 'active_support/all'
-require 'active_model/type/array'
-require 'active_model/type/hash'
 
 require_relative "stretchy/version"
 require_relative "rails/instrumentation/railtie" if defined?(Rails)
