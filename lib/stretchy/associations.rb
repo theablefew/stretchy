@@ -52,6 +52,7 @@ module Stretchy
     def save_associations
       @_after_save_objects.each_pair do |association, collection|
         collection.each do |instance|
+          # TODO: bulk update 
           instance.send("#{@@_association_options[association.to_sym][:foreign_key]}=", self.id)
           instance.save
         end
@@ -163,6 +164,15 @@ module Stretchy
 
         define_method("#{association}=".to_sym) do |val|
           instance_variable_set("@#{association}", val)
+          save!
+        end
+
+        before_save do
+          associated_object = instance_variable_get("@#{association}")
+          if associated_object
+            associated_object.send("#{foreign_key}=", self.id)
+            associated_object.save!
+          end
         end
       end
 
@@ -174,19 +184,55 @@ module Stretchy
 
 
 
+      # The has_many method is used to set up a one-to-many connection with another model.
+      # This indicates that this model can be matched with zero or more instances of another model.
+      # For example, if your application includes authors and books, and each author can have many books,
+      # you'd declare the author model to have many books.
+      #
+      # association:: [Symbol] the name of the association
+      # options:: [Hash] a hash to set up options for the association
+      #           :foreign_key - the foreign key used for the association. Defaults to "#{self.name.downcase}_id"
+      #           :primary_key - the primary key used for the association. Defaults to "id"
+      #           :class_name - the name of the associated object's class. Defaults to the name of the association
+      #           :dependent - if set to :destroy, the associated object will be destroyed when this object is destroyed. This is the default behavior.
+      #           
+      #
+      # Example:
+      #   has_many :books
+      #
+      # This creates an author.books method that returns a collection of books for the author.
+      # It also creates a books= method that allows you to assign the books for the author.
+      #
+      def has_many(association, options = {})
+        @@_association_options[association] = {
+          foreign_key: "#{self.name.underscore}_id", 
+          primary_key: "id",
+          class_name: association.to_s.singularize.to_sym
+        }.merge(options)
 
-      def has_many(association, klass, options = {})
+        klass = @@_association_options[association][:class_name].to_s.classify.constantize
+        foreign_key = @@_association_options[association][:foreign_key]
+        primary_key = @@_association_options[association][:primary_key]
         @@_associations[association] = klass
-
-        opt_fk = options.delete(:foreign_key)
-        foreign_key = opt_fk ? opt_fk : "#{self.name.split("::").last.tableize.singularize}_id"
-
-        @@_association_options[association] = { foreign_key: foreign_key }
 
         define_method(association.to_sym) do
           args = {}
-          args[foreign_key] = self.id
+          args["_#{primary_key}"] = self.send("#{association.to_s.singularize}_ids")
           self.new_record? ? association_reflection(association) : klass.where(args)
+        end
+
+        define_method("#{association.to_s.singularize}_ids") do 
+          instance_variable_get("@#{association.to_s.singularize}_ids".to_sym)
+        end
+
+        define_method("#{association.to_s.singularize}_ids=") do |val|
+          instance_variable_set("@#{association.to_s.singularize}_ids".to_sym, val)
+        end
+
+        define_method("#{association}=".to_sym) do |val|
+          val.each { |v| after_save_objects(v.attributes, association)}
+          self.send("#{association.to_s.singularize}_ids=", val.map(&:id))
+          dirty
         end
 
         define_method("build_#{association}".to_sym) do |*args|
@@ -195,7 +241,16 @@ module Stretchy
           args.first.merge! opts
           klass.new *args
         end
+
+        after_save do
+          save_associations
+        end
       end
+
+
+
+
+
 
       def validates_associated(*attr_names)
         validates_with AssociatedValidator, _merge_attributes(attr_names)
