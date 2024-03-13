@@ -26,14 +26,13 @@ if backend == 'opensearch'
   require 'opensearch'
   Stretchy.configure do |config|
     config.client = OpenSearch::Client.new(
-      host: 'http://localhost:9200',
+      host: 'https://localhost:9200',
       user: 'admin',
       password: 'admin',
       transport_options: { ssl: { verify: false } }  # For testing only. Use certificate for validation.
     )
   end
 else
-
   # Configure for Elasticsearch
   Stretchy.configure do |config|
     config.client = Elasticsearch::Client.new url: 'http://localhost:9200'

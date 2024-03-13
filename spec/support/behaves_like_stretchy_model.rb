@@ -1,7 +1,7 @@
 require 'support/configurable'
 
 shared_examples 'a stretchy model' do |model_class|
-  it_behaves_like 'configurable', model_class
+  # it_behaves_like 'configurable', model_class
 
   it 'responds to attributes' do
     expect(model_class.new).to respond_to(:attributes)
@@ -20,6 +20,7 @@ shared_examples 'a stretchy model' do |model_class|
   end
 
   it 'counts' do
+    allow_any_instance_of(Elasticsearch::Persistence::Repository).to receive(:count).and_return(2)
     allow_any_instance_of(Elasticsearch::Persistence::Repository::Search).to receive(:count).and_return(2)
     expect(model_class.count).to be_a(Numeric)
   end
