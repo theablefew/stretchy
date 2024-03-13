@@ -2,14 +2,6 @@ module Stretchy
     module Common
         extend ActiveSupport::Concern
 
-        def inspect
-            "#<#{self.class.name} #{attributes.map { |k,v| "#{k}: #{v.blank? ? 'nil' : v}" }.join(', ')}>"
-        end
-
-        def [](attribute)
-            self.send(attribute)
-        end
-
         def highlights_for(attribute)
             highlights[attribute.to_s]
         end
