@@ -1,11 +1,14 @@
+require 'support/configurable'
+
 shared_examples 'a stretchy model' do |model_class|
+  it_behaves_like 'configurable', model_class
 
   it 'responds to attributes' do
     expect(model_class.new).to respond_to(:attributes)
   end
 
   it 'has an index name' do
-    expect(model_class.index_name).to eq(model_class.model_name.collection)
+    expect(model_class.index_name).to eq(model_class.model_name.collection.parameterize.underscore)
   end
 
   it 'includes Stretchy::Associations' do
@@ -198,7 +201,7 @@ shared_examples 'a stretchy model' do |model_class|
         it 'has correct id and data keys' do
           bulk = record.to_bulk(:update)
           expect(bulk[:update][:_id]).to eq(record.id)
-          expect(bulk[:update][:data].keys).to eq(record.attributes.keys)
+          expect(bulk[:update][:data][:doc].keys).to eq(record.attributes.keys)
         end
       end
     

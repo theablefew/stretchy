@@ -1,9 +1,6 @@
+require 'models/with_validations'
 describe Stretchy::Relations::AggregationMethods do
-    let(:model) do
-        class TestModel < Stretchy::Record
-        end
-        TestModel
-    end
+    let(:model) {ModelWithValidations}
 
 
     let(:relation) { Stretchy::Relation.new(model, {}) }  # create a real instance

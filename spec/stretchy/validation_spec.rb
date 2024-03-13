@@ -1,27 +1,11 @@
 require 'spec_helper' 
+require 'models/with_validations'
 
 describe "Validations" do
 
   context 'in model' do
-   before do
-      Object.send(:remove_const, :TestModel) if Object.constants.include?(:TestModel)
-      TestModel = Class.new(Stretchy::Record) do
-        attribute :name, :text
-        attribute :age, :integer
-        attribute :tags, :array
-        attribute :data, :hash
-        attribute :published_at, :datetime
-        attribute :agreed, :boolean
 
-        validates :name, presence: true
-        validates :age,  numericality: { only_integer: true, greater_than: 21}
-        validates :tags, length: { minimum: 1 }
-        validates :data, presence: true
-        validates :agreed, acceptance: true
-      end
-    end
-
-    let(:model) { TestModel }
+    let(:model) { ModelWithValidations }
 
     it 'validates presence' do
       record = model.new

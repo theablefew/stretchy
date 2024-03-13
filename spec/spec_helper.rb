@@ -33,7 +33,11 @@ if backend == 'opensearch'
     )
   end
 else
+
   # Configure for Elasticsearch
+  Stretchy.configure do |config|
+    config.client = Elasticsearch::Client.new url: 'http://localhost:9200'
+  end
 end
 
 
