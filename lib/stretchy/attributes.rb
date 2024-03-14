@@ -25,6 +25,8 @@ module Stretchy
       ActiveModel::Type.register(:hash, Stretchy::Attributes::Type::Hash)
       ActiveModel::Type.register(:keyword, Stretchy::Attributes::Type::Keyword)
       ActiveModel::Type.register(:text, Stretchy::Attributes::Type::Text)
+      ActiveModel::Type.register(:dense_vector, Stretchy::Attributes::Type::DenseVector)
+      ActiveModel::Type.register(:sparse_vector, Stretchy::Attributes::Type::SparseVector)
     end
   end
 end
