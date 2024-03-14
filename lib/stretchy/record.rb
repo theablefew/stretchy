@@ -24,6 +24,7 @@ module Stretchy
                 include Stretchy::Scoping
                 include Stretchy::Utils
                 include Stretchy::SharedScopes
+                include Stretchy::Attributes
 
                 extend Stretchy::Delegation::DelegateCache
                 extend Stretchy::Querying
@@ -48,11 +49,6 @@ module Stretchy
                 end
 
             end
-
-            # def initialize(attributes = {})
-            #     # self.assign_attributes(attributes) if attributes
-            #     # super()
-            # end
 
         end
 

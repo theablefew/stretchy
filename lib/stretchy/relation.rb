@@ -3,20 +3,16 @@ module Stretchy
     # It provides methods for querying and manipulating the documents.
     class Relation
 
-        # These methods can accept multiple values.
-        MULTI_VALUE_METHODS  = [:order, :where, :or_filter, :filter_query, :bind, :extending, :unscope, :skip_callbacks]
-
-        # These methods can accept a single value.
-        SINGLE_VALUE_METHODS = [:limit, :offset, :routing, :size]
-
         # These methods cannot be used with the `delete_all` method.
         INVALID_METHODS_FOR_DELETE_ALL = [:limit, :offset]
 
-        # All value methods.
-        VALUE_METHODS = MULTI_VALUE_METHODS + SINGLE_VALUE_METHODS
-
         # Include modules.
-        include Relations::FinderMethods, Relations::SpawnMethods, Relations::QueryMethods, Relations::AggregationMethods, Relations::SearchOptionMethods, Delegation
+        include Relations::FinderMethods, 
+                Relations::SpawnMethods, 
+                Relations::QueryMethods, 
+                Relations::AggregationMethods, 
+                Relations::SearchOptionMethods, 
+                Delegation
 
         # Getters.
         attr_reader :klass, :loaded
@@ -49,14 +45,13 @@ module Stretchy
         #
         # @return [Array] The results of the relation.
         def to_a
-
           load
           @records
         end
         alias :results :to_a
 
         def response
-          to_a.response
+          results.response
         end
 
         # Returns the results of the relation as a JSON object.
@@ -64,7 +59,7 @@ module Stretchy
         # @param options [Hash] The options to pass to the `as_json` method.
         # @return [Hash] The results of the relation as a JSON object.
         def as_json(options = nil)
-          to_a.as_json(options)
+          results.as_json(options)
         end
 
         # Returns the Elasticsearch query for the relation.
@@ -98,7 +93,6 @@ module Stretchy
         # @return [Relation] The relation object.
         def load
           exec_queries unless loaded?
-
           self
         end
         alias :fetch :load
@@ -146,8 +140,8 @@ module Stretchy
           begin
             entries = to_a.results.take([size_value.to_i + 1, 11].compact.min).map!(&:inspect)
             message = {}
-            message = {total: to_a.total, max: to_a.total}
-            message.merge!(aggregations: results.response.aggregations.keys) unless results.response.aggregations.nil?
+            message = {total: results.total, max: results.total}
+            message.merge!(aggregations: response.aggregations.keys) unless response.aggregations.nil?
             message = message.each_pair.collect { |k,v|  "#{k}: #{v}" }
             message.unshift entries.join(', ') unless entries.size.zero?
             "#<#{self.class.name} #{message.join(', ')}>"

@@ -28,11 +28,17 @@ module Stretchy
           if @index_name.respond_to?(:call)
             @index_name.call
           else
-            @index_name || base_class.model_name.collection
+            @index_name || base_class.model_name.collection.parameterize.underscore
           end
       end
 
+      def reload_gateway_configuration!
+        @gateway = nil
+      end
+
       def gateway(&block)
+          reload_gateway_configuration! if @gateway && @gateway.client != Stretchy.configuration.client
+            
           @gateway ||= Stretchy::Repository.create(client: Stretchy.configuration.client, index_name: index_name, klass: base_class)
           block.arity < 1 ? @gateway.instance_eval(&block) : block.call(@gateway) if block_given?
           @gateway

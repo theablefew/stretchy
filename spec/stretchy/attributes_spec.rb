@@ -19,34 +19,35 @@ describe Stretchy::Attributes do
   end
 
   context 'in model' do
-    before do
-      class TestModel < Stretchy::Record
+    let(:model) do
+      class AttributeModel < Stretchy::Record
         attribute :name, :text
         attribute :age, :integer
         attribute :tags, :array
         attribute :data, :hash
       end
+      AttributeModel
     end
 
     it 'array type is registered' do
-      expect(TestModel.attribute_types['tags'].type).to eq(:array)
+      expect(model.attribute_types['tags'].type).to eq(:array)
     end
 
     it 'hash type is registered' do
-      expect(TestModel.attribute_types['data'].type).to eq(:hash)
+      expect(model.attribute_types['data'].type).to eq(:hash)
     end
 
     it 'keyword type is registered' do
-      expect(TestModel.attribute_types['name'].type).to eq(:text)
+      expect(model.attribute_types['name'].type).to eq(:text)
     end
 
     it 'text type is registered' do
-      expect(TestModel.attribute_types['age'].type).to eq(:integer)
+      expect(model.attribute_types['age'].type).to eq(:integer)
     end
 
     context 'hash' do
       it 'cast_value' do
-        expect(TestModel.attribute_types['data'].cast({})).to be_a Elasticsearch::Model::HashWrapper
+        expect(model.attribute_types['data'].cast({})).to be_a Elasticsearch::Model::HashWrapper
       end
     end
   end
