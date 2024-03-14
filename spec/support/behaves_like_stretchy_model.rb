@@ -51,6 +51,18 @@ shared_examples 'a stretchy model' do |model_class|
         expect(model_class.default_sort_key).to eq(:updated_at)
       end
     end
+
+    context 'size' do
+      it 'defaults to 10000' do
+        expect(model_class.default_size).to eq(10000)
+      end
+  
+      it 'can be overridden' do
+        model_class.default_size 100
+        expect(model_class.default_size).to eq(100)
+      end
+    end
+
   end 
 
   context 'attributes' do
@@ -78,18 +90,6 @@ shared_examples 'a stretchy model' do |model_class|
 
   end
 
-  context 'size' do
-    it 'defaults to 10000' do
-      expect(model_class.default_size).to eq(10000)
-    end
-
-    it 'can be overridden' do
-      allow(model_class).to receive(:default_size).and_return(100)
-      expect(model_class.default_size).to eq(100)
-    end
-
-  end
-
   context 'named scopes' do
     it 'can receive a named scope' do
       expect(model_class).to respond_to(:scope)
@@ -111,14 +111,12 @@ shared_examples 'a stretchy model' do |model_class|
   end
 
   context 'relation' do
-    before do
-      allow(model_class).to receive(:fetch_results).and_return([])
-    end
     it 'builds queries' do
       expect(model_class.where(title: 'Across the Globe').to_elastic).to eq({"query"=>{"bool"=>{"must"=>{"term"=>{"title"=>"Across the Globe"}}}}})
     end
     
     it 'fetches results at end of chain' do
+      allow(model_class).to receive(:fetch_results).and_return([])
       model_class.all.size(10).inspect
       expect(model_class).to have_received(:fetch_results).once
     end
@@ -138,9 +136,19 @@ shared_examples 'a stretchy model' do |model_class|
       expect(model_class.all.build(test_title: 'neat')).to be_a(model_class)
     end
 
-    it 'counts' do
-      allow(model_class).to receive(:fetch_results).and_return(1)
-      expect(model_class.all.count).to be_a(Numeric)
+    context 'counting' do
+      it 'counts' do
+        expect_any_instance_of(Stretchy::Relation).to receive(:count!).and_return(1)
+        expect(model_class.where(name: 'hello').count).to be_a(Numeric)
+      end
+
+      it 'counts results with limit' do
+        allow_any_instance_of(Stretchy::Relation).to receive(:results).and_return([described_class.new(id: '1'), described_class.new(id: '2')]) 
+        expect_any_instance_of(Stretchy::Relation).not_to receive(:count!)
+        expect(model_class.where(name: 'hello').limit(2).count).to eq(2)
+      end
+
+
     end
   
     it 'plucks' do

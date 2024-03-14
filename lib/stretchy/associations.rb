@@ -38,7 +38,7 @@ module Stretchy
     end
 
     def association_reflection(association)
-      Stretchy::Relation.new @@_associations[association], (dirty[association.to_sym] || [])
+      Stretchy::Relation.new @@_associations[association], (dirty[association.to_sym] || {})
     end
 
     def _destroy=(bool)
