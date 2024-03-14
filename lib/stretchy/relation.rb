@@ -28,7 +28,7 @@ module Stretchy
         # @param values [Hash] The initial values for the relation.
         def initialize(klass, values={})
             @klass  = klass
-            @values = values
+            @values = values.merge(default_size: klass.default_size)
             @offsets = {}
             @loaded = false
         end
