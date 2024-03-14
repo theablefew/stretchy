@@ -15,8 +15,9 @@ module Stretchy
                 @default_sort_key
             end
 
-            def default_size(size = 10000)
-                @default_size = size
+            def default_size(size = nil)
+                @default_size = size unless size.nil?
+                @default_size
             end
 
             private
