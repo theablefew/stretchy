@@ -2,11 +2,12 @@ module Stretchy
   module Relations
     class QueryBuilder
 
-      attr_reader :structure, :values, :attribute_types
+      attr_reader :structure, :values, :attribute_types, :default_size
 
       def initialize(values, attribute_types = nil)
         @attribute_types = attribute_types
         @structure = Jbuilder.new ignore_nil: true
+        @default_size = values.delete(:default_size)
         @values = values
       end
 
@@ -208,6 +209,11 @@ module Stretchy
       end
 
       def extra_search_options
+        unless self.count?
+          values[:size] = size.present? ? size : values[:default_size]
+        else 
+          values[:size] = nil
+        end
         [:size].inject(Hash.new) { |h,k| h[k] = self.send(k) unless self.send(k).nil?; h}
       end
 

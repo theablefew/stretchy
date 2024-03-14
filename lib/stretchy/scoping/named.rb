@@ -8,7 +8,7 @@ module Stretchy
           if current_scope
             current_scope.clone
           else
-            default_scoped.size(default_size)
+            default_scoped
           end
         end
 

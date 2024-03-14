@@ -9,10 +9,10 @@ module Stretchy
     delegate :must, :must_not, :should, :where_not, :where, :filter_query, :query_string, :regexp, to: :all
 
     def fetch_results(es)
-      unless es.count?
-        base_class.search(es.to_elastic, es.search_options)
-      else
+      if es.count?
         base_class.count(es.to_elastic, es.search_options)
+      else
+        base_class.search(es.to_elastic, es.search_options)
       end
     end
 
