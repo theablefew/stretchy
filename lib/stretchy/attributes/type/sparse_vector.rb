@@ -16,7 +16,7 @@
 module Stretchy
   module Attributes
       module Type
-          class SparseVector < ActiveModel::Type::Value
+          class SparseVector < Stretchy::Attributes::Type::Base
 
               def type
                 :sparse_vector

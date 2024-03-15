@@ -28,7 +28,7 @@
 module Stretchy
   module Attributes
       module Type
-          class DenseVector < ActiveModel::Type::Value# :nodoc:
+          class DenseVector < Stretchy::Attributes::Type::Base
               OPTIONS = [:element_type, :dims, :index, :similarity, :index_options]
               attr_reader *OPTIONS 
 
@@ -52,7 +52,7 @@ module Stretchy
                     "#{name}.tokens": options
                   }
                 }.as_json
-            end
+              end
           end
       end
   end

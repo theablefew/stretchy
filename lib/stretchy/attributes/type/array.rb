@@ -1,15 +1,7 @@
-module Stretchy
-    module Attributes
-        module Type
-
-            class Array < ActiveModel::Type::Value # :nodoc:
-
-                def type
-                    :array
-                end
-
-            end
-
-        end
+module Stretchy::Attributes::Type
+  class Array < Stretchy::Attributes::Type::Base # :nodoc:
+    def type
+      :array
     end
+  end
 end
