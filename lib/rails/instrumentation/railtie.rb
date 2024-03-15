@@ -4,6 +4,8 @@ module Stretchy
     class Railtie < ::Rails::Railtie
 
       require 'rails/instrumentation/publishers'
+      Stretchy.instrument!
+
       ActiveSupport::Notifications.subscribe 'search.stretchy' do |name, start, finish, id, payload|
         message = [
            Rainbow("  #{payload[:klass]}").bright, 

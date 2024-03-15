@@ -14,6 +14,9 @@ print "\t    " * 7
 print Rainbow(" v#{Stretchy::VERSION}").white.faint
 print "\n\n"
 
+
+Stretchy.instrument!
+
 ActiveSupport::Notifications.subscribe 'search.stretchy' do |name, start, finish, id, payload|
    message = [
       Rainbow("  #{payload[:klass]}").bright, 
