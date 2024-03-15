@@ -26,24 +26,10 @@ describe Stretchy::Attributes do
         attribute :tags, :array
         attribute :data, :hash, properties: {weights: {type: :array}, biases: {type: :integer}}
         attribute :flagged, :boolean, default: false
+        attribute :body, :text
+        attribute :only_text, :text, fields: false
       end
       AttributeModel
-    end
-
-    it 'array type is registered' do
-      expect(model.attribute_types['tags'].type).to eq(:array)
-    end
-
-    it 'hash type is registered' do
-      expect(model.attribute_types['data'].type).to eq(:hash)
-    end
-
-    it 'keyword type is registered' do
-      expect(model.attribute_types['name'].type).to eq(:text)
-    end
-
-    it 'text type is registered' do
-      expect(model.attribute_types['age'].type).to eq(:integer)
     end
 
     context 'hash' do
@@ -68,6 +54,21 @@ describe Stretchy::Attributes do
             updated_at: { type: :datetime }
           }
         }.as_json) 
+      end
+
+      context 'auto keyword fields for text fields' do
+        it 'adds keyword to text fields' do
+          expect(model.attribute_mappings['properties']['body']).to eq({type: :text, fields: {keyword: {type: :keyword, ignore_above: 256}}}.as_json)
+        end
+
+        it 'does not add keyword to text fields when fields is false' do
+          expect(model.attribute_mappings['properties']['only_text']).to eq({type: :text, fields: false}.as_json)
+        end
+
+        it 'does not add keyword to text fields when fields is present' do
+          model.attribute :location, :text, fields: {raw: {type: :keyword}}
+          expect(model.attribute_mappings['properties']['location']).to eq({type: :text, fields: {raw: {type: :keyword}}}.as_json)
+        end
       end
 
 

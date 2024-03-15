@@ -20,9 +20,13 @@ module Stretchy
               end
       
               def mappings(name)
-                options = {type: type}
+                options = {type: type_for_database}
                 self.class::OPTIONS.each { |option| options[option] = send(option) unless send(option).nil? }
                 { name => options }.as_json
+              end
+
+              def type_for_database
+                type
               end
 
               private

@@ -6,7 +6,7 @@ module Stretchy::Attributes::Type
     #        :eager_global_ordinals - The Boolean indicating if global ordinals should be loaded eagerly on refresh. Defaults to false.
     #        :fielddata - The Boolean indicating if the field can use in-memory fielddata for sorting, aggregations, or scripting. Defaults to false.
     #        :fielddata_frequency_filter - The Hash of expert settings which allow to decide which values to load in memory when fielddata is enabled.
-    #        :fields - The Hash of multi-fields allow the same string value to be indexed in multiple ways for different purposes.
+    #        :fields - The Hash of multi-fields allow the same string value to be indexed in multiple ways for different purposes. By default, a 'keyword' field is added. Set to false to disable.
     #        :index - The Boolean indicating if the field should be searchable. Defaults to true.
     #        :index_options - The String indicating what information should be stored in the index, for search and highlighting purposes. Defaults to 'positions'.
     #        :index_prefixes - The Hash indicating if term prefixes of between 2 and 5 characters are indexed into a separate field.
@@ -19,6 +19,7 @@ module Stretchy::Attributes::Type
     #        :similarity - The String indicating which scoring algorithm or similarity should be used. Defaults to 'BM25'.
     #        :term_vector - The String indicating if term vectors should be stored for the field. Defaults to 'no'.
     #        :meta - The Hash of metadata about the field.
+    #
     #
     # Examples
     #
@@ -33,6 +34,17 @@ module Stretchy::Attributes::Type
   
       def type
         :text
+      end
+
+      def type_for_database
+        :text
+      end
+
+      def mappings(name)
+        options = {type: type_for_database}
+        OPTIONS.each { |option| options[option] = send(option) unless send(option).nil? }
+        options[:fields] = {keyword: {type: :keyword, ignore_above: 256}} if fields.nil?
+        { name => options }.as_json
       end
     end
   end

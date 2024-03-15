@@ -2,6 +2,7 @@ module Stretchy::Attributes::Type
     # Public: Defines a keyword attribute for the model.
     #
     # opts - The Hash options used to refine the attribute (default: {}):
+    #
     #        :doc_values - The Boolean indicating if the field should be stored on disk in a column-stride fashion. Defaults to true.
     #        :eager_global_ordinals - The Boolean indicating if global ordinals should be loaded eagerly on refresh. Defaults to false.
     #        :fields - The Hash of multi-fields for the same string value to be indexed in multiple ways.
@@ -20,7 +21,6 @@ module Stretchy::Attributes::Type
     #        :time_series_dimension - The Boolean indicating if the field is a time series dimension. Defaults to false.
     #
     # Examples
-    #
     #   class MyModel
     #     include StretchyModel
     #     attribute :tag, :keyword, ignore_above: 256, time_series_dimension: true
