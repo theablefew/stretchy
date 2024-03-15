@@ -4,10 +4,7 @@ This class represents a relation to Elasticsearch documents. It provides methods
  ## Constants
  | Name | Description |
  | ---- | ----------- |
- | **MULTI_VALUE_METHODS[](#MULTI_VALUE_METHODS)** | These methods can accept multiple values. |
- | **SINGLE_VALUE_METHODS[](#SINGLE_VALUE_METHODS)** | These methods can accept a single value. |
  | **INVALID_METHODS_FOR_DELETE_ALL[](#INVALID_METHODS_FOR_DELETE_ALL)** | These methods cannot be used with the ‘delete\_all` method. |
- | **VALUE_METHODS[](#VALUE_METHODS)** | All value methods. |
  ## Attributes
  ### klass[R] [](#attribute-i-klass)
  Getters.
@@ -29,7 +26,9 @@ This class represents a relation to Elasticsearch documents. It provides methods
 
  ## Public Instance Methods
  ### as_json(options = nil) [](#method-i-as_json)
- Returns the results of the relation as a JSON object.
+ ### Returns[¶](#method-i-as_json-label-Returns) [↑](#top)
+
+Returns the results of the relation as a JSON object.
 
 @param options [Hash] The options to pass to the ‘as\_json` method. @return [Hash] The results of the relation as a JSON object.
 
@@ -55,7 +54,9 @@ This class represents a relation to Elasticsearch documents. It provides methods
 
  ### fetch() [](#method-i-fetch)
  ### inspect() [](#method-i-inspect)
- Returns a string representation of the relation.
+ ### Returns[¶](#method-i-inspect-label-Returns) [↑](#top)
+
+Returns a string representation of the relation.
 
 @return [String] The string representation of the relation.
 
@@ -72,17 +73,23 @@ This class represents a relation to Elasticsearch documents. It provides methods
 @yield The block of code to execute.
 
  ### to_a() [](#method-i-to_a)
- Returns the results of the relation as an array.
+ ### Returns[¶](#method-i-to_a-label-Returns) [↑](#top)
+
+Returns the results of the relation as an array.
 
 @return [Array] The results of the relation.
 
  ### to_elastic() [](#method-i-to_elastic)
- Returns the Elasticsearch query for the relation.
+ ### Returns[¶](#method-i-to_elastic-label-Returns) [↑](#top)
+
+Returns the Elasticsearch query for the relation.
 
 @return [Hash] The Elasticsearch query for the relation.
 
  ### values() [](#method-i-values)
- Returns the values of the relation as a hash.
+ ### Returns[¶](#method-i-values-label-Returns) [↑](#top)
+
+Returns the values of the relation as a hash.
 
 @return [Hash] The values of the relation.
 

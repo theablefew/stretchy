@@ -1,9 +1,11 @@
 # class Stretchy::Relations::QueryBuilder [](#class-Stretchy::Relations::QueryBuilder) [](#top)
  ## Attributes
+ ### attribute_types[R] [](#attribute-i-attribute_types)
+ ### default_size[R] [](#attribute-i-default_size)
  ### structure[R] [](#attribute-i-structure)
  ### values[R] [](#attribute-i-values)
  ## Public Class Methods
- ### new(values) [](#method-c-new)
+ ### new(values, attribute_types = nil) [](#method-c-new)
  ## Public Instance Methods
  ### aggregations() [](#method-i-aggregations)
  ### count?() [](#method-i-count-3F)
@@ -16,6 +18,7 @@
  ### query_filters() [](#method-i-query_filters)
  ### query_string_options() [](#method-i-query_string_options)
  ### query_strings() [](#method-i-query_strings)
+ ### regexes() [](#method-i-regexes)
  ### search_options() [](#method-i-search_options)
  ### shoulds() [](#method-i-shoulds)
  ### size() [](#method-i-size)

@@ -1,7 +1,9 @@
 # module Stretchy::Scoping::Default::ClassMethods [](#module-Stretchy::Scoping::Default::ClassMethods) [](#top)
  ## Public Instance Methods
  ### unscoped() { || ... } [](#method-i-unscoped)
- Returns a scope for the model without the previously set scopes.
+ ### Returns[¶](#method-i-unscoped-label-Returns) [↑](#top)
+
+Returns a scope for the model without the previously set scopes.
 
 ```
 classPost\<ActiveRecord::Basedefself.default\_scopewherepublished:trueendendPost.all# Fires "SELECT \* FROM posts WHERE published = true"Post.unscoped.all# Fires "SELECT \* FROM posts"Post.where(published:false).unscoped.all# Fires "SELECT \* FROM posts"
