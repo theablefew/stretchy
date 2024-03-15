@@ -39,8 +39,8 @@ module Stretchy
       def gateway(&block)
           reload_gateway_configuration! if @gateway && @gateway.client != Stretchy.configuration.client
             
-          @gateway ||= Stretchy::Repository.create(client: Stretchy.configuration.client, index_name: index_name, klass: base_class)
-          block.arity < 1 ? @gateway.instance_eval(&block) : block.call(@gateway) if block_given?
+          @gateway ||= Stretchy::Repository.create(client: Stretchy.configuration.client, index_name: index_name, klass: base_class, mapping: base_class.attribute_mappings.merge(dynamic: true)) 
+          # block.arity < 1 ? @gateway.instance_eval(&block) : block.call(@gateway) if block_given?
           @gateway
       end
 

@@ -21,6 +21,16 @@ module Stretchy::Attributes::Type
       :hash
     end
 
+    def type_for_database
+      :object
+    end
+
+    def mappings(name)
+      options = {}
+      OPTIONS.each { |option| options[option] = send(option) unless send(option).nil? }
+      { name => options }.as_json
+    end
+
     private
 
     def cast_value(value)

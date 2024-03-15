@@ -27,5 +27,9 @@ module Stretchy::Attributes::Type
     def type
       :datetime
     end
+
+    def type_for_database
+      :date
+    end
   end
 end
