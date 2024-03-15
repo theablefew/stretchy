@@ -31,6 +31,7 @@ describe Stretchy::Relations::QueryBuilder do
       multi_terms = {where: [{status: 'active'}, {category: 'ruby'}]}
       expect(described_class.new(multi_terms, attribute_types).query).to eq(subject.send(:compact_where, multi_terms[:where]))
     end
+
   end
 
   describe '#build_query' do
@@ -84,17 +85,19 @@ describe Stretchy::Relations::QueryBuilder do
         context 'sorting' do
           it 'accepts array of hashes' do
             sorts = [{created_at: :desc}, {title: :asc}]
-            subject = described_class.new(order: sorts)
+            subject = described_class.new({order: sorts}, attribute_types)
             query = subject.to_elastic
             expect(query).to eq({sort: sorts}.with_indifferent_access)
           end
         
           it 'accepts options' do 
             sorts = [{price: { order: :desc, mode: :avg}}]
-            subject = described_class.new(order: sorts)
+            subject = described_class.new({order: sorts}, attribute_types)
             query = subject.to_elastic
             expect(query).to eq({sort: sorts}.with_indifferent_access)
           end
+
+
         end
 
         context 'search options' do

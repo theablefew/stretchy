@@ -2,11 +2,12 @@ module Stretchy
   module Relations
     class QueryBuilder
 
-      attr_reader :structure, :values, :attribute_types
+      attr_reader :structure, :values, :attribute_types, :default_size
 
       def initialize(values, attribute_types = nil)
         @attribute_types = attribute_types
         @structure = Jbuilder.new ignore_nil: true
+        @default_size = values.delete(:default_size)
         @values = values
       end
 
@@ -36,6 +37,10 @@ module Stretchy
 
       def shoulds
         @shoulds ||= compact_where(values[:should])
+      end
+
+      def regexes
+        @regexes ||= values[:regexp]
       end
 
       def fields
@@ -88,7 +93,7 @@ module Stretchy
       private
 
       def missing_bool_query?
-        query.nil? && must_nots.nil? && shoulds.nil?
+        query.nil? && must_nots.nil? && shoulds.nil? && regexes.nil?
       end
 
       def missing_query_string?
@@ -102,7 +107,12 @@ module Stretchy
       def build_query
         return if missing_bool_query? && missing_query_string? && missing_query_filter?
         structure.query do
+          structure.regexp do
+            build_regexp unless regexes.nil?
+          end
+
           structure.bool do
+
                 structure.must query unless missing_bool_query?
                 structure.must_not must_nots unless must_nots.nil?
                 structure.set! :should, shoulds unless shoulds.nil?
@@ -118,6 +128,14 @@ module Stretchy
             structure.query query_strings
           end unless query_strings.nil?
         end.with_indifferent_access
+      end
+
+      def build_regexp
+        regexes.each do |args|
+            target_field = args.first.keys.first
+            value_field = args.first.values.first
+            structure.set! target_field, args.last.merge(value: value_field)
+        end
       end
 
       def build_filtered_query
@@ -150,14 +168,20 @@ module Stretchy
       end
 
       def build_sort
-        structure.sort sort.flatten #.inject(Hash.new) { |h,v| h.merge(v) }
+        structure.sort sort.map { |arg| keyword_transformer.transform(arg) }.flatten
       end
 
       def build_highlights
         structure.highlight do
           structure.fields do
             highlights.each do |highlight|
-              structure.set! highlight, extract_highlighter(highlight)
+              if highlight.is_a?(String) || highlight.is_a?(Symbol)
+                structure.set! highlight, {}
+              elsif highlight.is_a?(Hash)
+                highlight.each_pair do |k,v|
+                  structure.set! k, v
+                end
+              end
             end
           end
         end
@@ -185,6 +209,11 @@ module Stretchy
       end
 
       def extra_search_options
+        unless self.count?
+          values[:size] = size.present? ? size : values[:default_size]
+        else 
+          values[:size] = nil
+        end
         [:size].inject(Hash.new) { |h,k| h[k] = self.send(k) unless self.send(k).nil?; h}
       end
 

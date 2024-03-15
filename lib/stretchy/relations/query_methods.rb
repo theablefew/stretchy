@@ -18,7 +18,8 @@ module Stretchy
         :filter_query, 
         :or_filter,
         :extending,
-        :skip_callbacks
+        :skip_callbacks,
+        :regexp
       ]
 
       SINGLE_VALUE_METHODS = [:size]
@@ -187,15 +188,46 @@ module Stretchy
       #          }
       #        }
       #
-      # Returns a new relation, which reflects the conditions, or a WhereChain if opts is :chain
-      # See: #must
+      # .where acts as a convienence method for adding conditions to the query. It can also be used to add
+      # range , regex, terms, and id queries through shorthand parameters.
+      #
+      # @example
+      #   Model.where(price: {gte: 10, lte: 20})
+      #   Model.where(age: 19..33)
+      #   Model.where(color: /gr(a|e)y/)
+      #   Model.where(id: [10, 22, 18])
+      #   Model.where(names: ['John', 'Jane'])
+      #
+      # @return [ActiveRecord::Relation, WhereChain] a new relation, which reflects the conditions, or a WhereChain if opts is :chain
+      # @see #must
       def where(opts = :chain, *rest)
         if opts == :chain
           WhereChain.new(spawn)
         elsif opts.blank?
           self
         else
-          spawn.where!(opts, *rest)
+          opts.each do |key, value|
+            case value
+            when Range
+              between(value, key)
+            when Hash
+              filter_query(:range, key => value) if value.keys.any? { |k| [:gte, :lte, :gt, :lt].include?(k) }
+            when Regexp
+              regexp(Hash[key, value])
+            when Array
+              # handle ID queries
+              # if [:id, :_id].include?(key)
+
+              # else
+                spawn.where!(opts, *rest)
+              # end
+            else
+              spawn.where!(opts, *rest)
+            end
+          end
+
+          self
+
         end
       end
 
@@ -213,6 +245,38 @@ module Stretchy
       # @see #where
       alias :must :where
 
+      # Adds a regexp condition to the query.
+      # 
+      # @param field [Hash] the field to filter by and the Regexp to match
+      # @param opts [Hash] additional options for the regexp query
+      #     - :flags [String] the flags to use for the regexp query (e.g. 'ALL')
+      #     - :use_keyword [Boolean] whether to use the .keyword field for the regexp query. Default: true
+      #     - :case_insensitive [Boolean] whether to use case insensitive matching. If the regexp has ignore case flag `/regex/i`, this is automatically set to true
+      #     - :max_determinized_states [Integer] the maximum number of states that the regexp query can produce
+      #     - :rewrite [String] the rewrite method to use for the regexp query
+      #     
+      # 
+      # @example
+      #  Model.regexp(:name, /john|jane/)
+      #  Model.regexp(:name, /john|jane/i)
+      #  Model.regexp(:name, /john|jane/i, flags: 'ALL')
+      #  
+      # @return [Stretchy::Relation] a new relation, which reflects the regexp condition
+      # @see #where
+      def regexp(args)
+        spawn.regexp!(args)
+      end
+
+      def regexp!(args) # :nodoc:
+        args = args.to_a
+        target_field, regex = args.shift
+        opts = args.to_h
+        opts.reverse_merge!(use_keyword: true)
+        target_field = "#{target_field}.keyword" if opts.delete(:use_keyword)
+        opts.merge!(case_insensitive: true) if regex.casefold?
+        self.regexp_values += [[Hash[target_field, regex.source], opts]]
+        self
+      end
 
 
 

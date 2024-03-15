@@ -1,6 +1,5 @@
 stretchy-model
 ===
-
 <p>
     <a href="https://stretchy.io/" target="_blank"><img src="./stretchy.logo.png" alt="Stretchy Image" width="450" /></a>
     <br><br>
@@ -9,7 +8,10 @@ stretchy-model
 
 </p>
 
+<<<<<<< HEAD
 Stretchy provides Elasticsearch/Opensearch models in Rails applications with an Rails-like model interface.
+=======
+>>>>>>> main
 
 ## Features
 Stretchy simplifies the process of querying, aggregating, and managing Elasticsearch-backed models, allowing Rails developers to work with search indices as comfortably as they would with traditional Rails models.
@@ -21,6 +23,7 @@ Stretchy simplifies the process of querying, aggregating, and managing Elasticse
 * Associations to both ActiveRecord models and Stretchy::Record
 * Bulk Operations made easy
 * Validations, custom attributes, and more...
+<<<<<<< HEAD
 
 ## Models
 
@@ -91,13 +94,17 @@ class Post < Stretchy::Record
       })
   end
 end
+=======
+>>>>>>> main
 
-# Returns flagged posts and includes the top 10 'youtube.com' 
-# links in results.aggregations.links
-result = Post.flagged.top_links(10, "youtube.com")
+Follow the guides to learn more about:
 
-```
+* [Models](https://theablefew.github.io/stretchy/#/guides/models?id=models)
+* [Querying](https://theablefew.github.io/stretchy/#/guides/querying?id=querying)
+* [Aggregations](https://theablefew.github.io/stretchy/#/guides/aggregations?id=aggregations)
+* [Scopes](https://theablefew.github.io/stretchy/#/guides/scopes?id=scopes)
 
+<<<<<<< HEAD
 #### Shared scopes
 
 ```ruby
@@ -111,37 +118,25 @@ Post.between(12.days.ago...1.day.ago.end_of_day).where('author.name': "candy")
 ```
 
 ### Bulk Operations
+=======
+>>>>>>> main
+
+[Read the Documentation](https://theablefew.github.io/stretchy/#/) or walk through of a simple [Data Analysis](https://theablefew.github.io/stretchy/#/examples/data_analysis?id=data-analysis) example.
 
 
-```ruby
-Model.bulk(records_as_bulk_operations)
-```
-
-#### Bulk helper
-Generates structure for the bulk operation
-```ruby
-record.to_bulk # default to_bulk(:index)
-record.to_bulk(:delete)
-record.to_bulk(:update)
-```
-
-#### In batches
-Run bulk operations in batches specified by `size`
-```ruby
-Model.bulk_in_batches(records, size: 100) do |batch|
-    batch.map! { |record| Model.new(record).to_bulk }
-end
-```
 
 ## Installation
 
 Install the gem and add to the application's Gemfile by executing:
 
-    $ bundle add stretchy-model
+```sh
+ bundle add stretchy-model
+```
 
 If bundler is not being used to manage dependencies, install the gem by executing:
-
-    $ gem install stretchy-model
+```sh
+  gem install stretchy-model
+```
 
 <details>
 <summary>Rails Configuration</summary>
@@ -180,8 +175,6 @@ end
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
 >[!TIP]
->This library is built on top of the excellent [elasticsearch-persistence](https://github.com/elastic/elasticsearch-rails/tree/main/elasticsearch-persistence) gem. 
->
 > Full documentation on [Elasticsearch Query DSL and Aggregation options](https://github.com/elastic/elasticsearch-rails/tree/main/elasticsearch-persistence)
 
 ## Testing

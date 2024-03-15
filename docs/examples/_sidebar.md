@@ -10,3 +10,4 @@
 
 * __Examples__
     * [Data Analysis](examples/data_analysis)
+    * [Semantic Search with LLMs](examples/semantic_search_with_llm)

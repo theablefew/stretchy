@@ -1,17 +1,20 @@
 require 'spec_helper'
 
-describe Stretchy::Configuration do
+shared_examples 'configurable' do |model|
+    before(:all) do
+        @original_config = Stretchy.configuration.client.dup
+    end
+
+    after(:all) do
+        Stretchy.configure do |config|
+             config.client = @original_config
+        end
+    end
 
     it 'has a default host' do
         client = Stretchy.configuration.client.transport.transport.hosts.first
         expect(client[:host]).to eq('localhost')
         expect(client[:port]).to eq(9200)
-    end
-
-    let(:model) do
-        class TestModel < Stretchy::Record
-        end
-        TestModel
     end
 
     it 'can configure client' do
@@ -24,5 +27,4 @@ describe Stretchy::Configuration do
         expect(model.gateway.client.transport.transport.hosts.first[:port]).to eq(92929)
 
     end
-
 end

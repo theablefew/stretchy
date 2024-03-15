@@ -14,11 +14,6 @@ module Stretchy
                 include ActiveModel::Conversion
                 include ActiveModel::Serialization
                 include ActiveModel::Serializers::JSON
-                include ActiveModel::Validations
-                include ActiveModel::Validations::Callbacks
-                extend ActiveModel::Callbacks
-
-
 
                 include Stretchy::Model::Callbacks
                 include Stretchy::Indexing::Bulk
@@ -28,12 +23,14 @@ module Stretchy
                 include Stretchy::Common
                 include Stretchy::Scoping
                 include Stretchy::Utils
+                include Stretchy::SharedScopes
+                include Stretchy::Attributes
 
                 extend Stretchy::Delegation::DelegateCache
                 extend Stretchy::Querying
 
                 # Set up common attributes
-                attribute :id, :string #, default: lambda { SecureRandom.uuid }
+                attribute :id, :keyword #, default: lambda { SecureRandom.uuid }
                 attribute :created_at, :datetime, default: lambda {  Time.now.utc }
                 attribute :updated_at, :datetime, default: lambda { Time.now.utc }
 
@@ -44,11 +41,13 @@ module Stretchy
                 # overriden by #size
                 default_size 10000
 
-            end
+                attr_accessor :highlights
 
-            def initialize(attributes = {})
-                self.assign_attributes(attributes) if attributes
-                super()
+                def initialize(attributes = {})
+                    @highlights = attributes.delete(:_highlights) 
+                    super(attributes)
+                end
+
             end
 
         end

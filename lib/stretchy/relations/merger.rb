@@ -7,8 +7,12 @@ module Stretchy
       class HashMerger # :nodoc:
         attr_reader :relation, :hash
 
+        VALUE_METHODS = Stretchy::Relations::QueryMethods::MULTI_VALUE_METHODS.concat( 
+                          Stretchy::Relations::QueryMethods::SINGLE_VALUE_METHODS
+                        )
+
         def initialize(relation, hash)
-          hash.assert_valid_keys(*Relation::VALUE_METHODS)
+          hash.assert_valid_keys(*VALUE_METHODS)
 
           @relation = relation
           @hash     = hash

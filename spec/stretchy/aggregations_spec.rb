@@ -294,6 +294,11 @@ describe "Aggregations" do
                         query_builder = described_class.size(0).aggregation(:time, date_histogram: { field: :created_at, interval: 'month' }).to_elastic
                         expect(query_builder[:aggregations][:time][:date_histogram][:field].to_s).to eq('created_at')
                     end
+
+                    it 'assumes keyword field in nested hashes' do
+                        query_builder = described_class.size(0).terms(:positions, field: 'position.name').to_elastic 
+                        expect(query_builder[:aggregations][:positions][:terms][:field].to_s).to eq('position.name.keyword')
+                    end
                 end
             end
 
