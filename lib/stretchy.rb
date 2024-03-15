@@ -12,7 +12,6 @@ require_relative "stretchy/version"
 require_relative "rails/instrumentation/railtie" if defined?(Rails)
 
 
-
 module Stretchy
 
   def self.loader
@@ -21,6 +20,7 @@ module Stretchy
       loader.tag = File.basename(__FILE__, ".rb")
       loader.inflector = Zeitwerk::GemInflector.new(__FILE__)
       loader.push_dir(__dir__)
+      loader.inflector.inflect("ip" => "IP")
       loader
     end
   end

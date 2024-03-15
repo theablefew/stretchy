@@ -30,7 +30,7 @@ module Stretchy
                 extend Stretchy::Querying
 
                 # Set up common attributes
-                attribute :id, :string #, default: lambda { SecureRandom.uuid }
+                attribute :id, :keyword #, default: lambda { SecureRandom.uuid }
                 attribute :created_at, :datetime, default: lambda {  Time.now.utc }
                 attribute :updated_at, :datetime, default: lambda { Time.now.utc }
 
