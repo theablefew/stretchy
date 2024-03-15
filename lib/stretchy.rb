@@ -30,6 +30,10 @@ module Stretchy
     Stretchy::Attributes.register!
   end
 
+  def self.instrument!
+    Stretchy::Delegation::GatewayDelegation.send(:include, Rails::Instrumentation::Publishers::Record)
+  end
+
   module Errors
     class QueryOptionMissing < StandardError; end
   end
