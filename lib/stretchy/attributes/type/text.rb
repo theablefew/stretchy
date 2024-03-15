@@ -43,6 +43,7 @@ module Stretchy::Attributes::Type
       def mappings(name)
         options = {type: type_for_database}
         OPTIONS.each { |option| options[option] = send(option) unless send(option).nil? }
+        options.delete(:fields) if fields == false
         options[:fields] = {keyword: {type: :keyword, ignore_above: 256}} if fields.nil?
         { name => options }.as_json
       end

@@ -19,7 +19,7 @@ describe Stretchy::Associations do
           
           attribute :title, :keyword
           attribute :description, :string
-          attribute :published_at, :date
+          attribute :published_at, :datetime
           attribute :publisher_id, :keyword
     
           belongs_to :publisher
