@@ -23,12 +23,52 @@ module Stretchy
       end
 
       def all
-        client.get_pipeline
+        begin
+          client.get_pipeline
+        rescue not_found => e
+          return {}
+        end
       end
     
       def find(id)
         client.get_pipeline(id: id)
       end
+
+      def simulate(docs, verbose: true)
+        client.simulate(id: self.pipeline_name, body: {docs: docs}, verbose: verbose)
+      end
+
+      # PUT _ingest/pipeline/<pipeline-name>
+      def create!
+        client.put_pipeline(id: self.pipeline_name, body: self.to_hash)
+      end
+
+      # DELETE _ingest/pipeline/<pipeline-name>
+      def delete!
+        client.delete_pipeline(id: self.pipeline_name)
+      end
+
+      def exists?
+        begin
+          self.find(self.pipeline_name).present?
+        rescue not_found => e
+          return false
+        end
+      end
+
+
+      def to_hash
+        {
+          description: self.description,
+          processors: self.processors.map(&:to_hash)
+        }.as_json
+      end
+
+      protected 
+      def not_found
+        @not_found ||= Object.const_get("#{client.class.name.split('::').first}::Transport::Transport::Errors::NotFound") 
+      end
+
     end
 
     attr_accessor :description, :pipeline_name, :processors
@@ -39,19 +79,9 @@ module Stretchy
       @processors = self.class.processors
     end
 
-    # PUT _ingest/pipeline/<pipeline-name>
-    def create
-      client.put_pipeline(id: self.pipeline_name, body: self.to_hash)
-    end
-
     # GET _ingest/pipeline/<pipeline-name>
     def find
       self.class.find(self.pipeline_name)
-    end
-
-    # DELETE _ingest/pipeline/<pipeline-name>
-    def delete
-      client.delete_pipeline(id: self.pipeline_name)
     end
 
     # Simulates the pipeline.
@@ -70,19 +100,11 @@ module Stretchy
     # id	Optional	String	A unique document identifier. The identifier cannot be used elsewhere in the index.
     # index	Optional	String	The index where the document’s transformed data appears.
     def simulate(docs, verbose: true)
-      client.simulate(id: self.pipeline_name, body: {docs: docs}, verbose: verbose)
+      self.class.simulate(docs, verbose: verbose)
     end
     
     def exists?
-      begin
-        self.find.present?
-      rescue not_found => e
-        return false
-      end
-    end
-
-    def client
-      @client ||= Stretchy.configuration.client.ingest
+      self.class.exists?
     end
 
     def to_hash
@@ -92,12 +114,10 @@ module Stretchy
       }.as_json
     end
 
-    protected
-
-
-
-    def not_found
-      @not_found ||= Object.const_get("#{client.class.name.split('::').first}::Transport::Transport::Errors::NotFound") 
+    def client
+      @client ||= Stretchy.configuration.client.ingest
     end
+
+
   end
 end

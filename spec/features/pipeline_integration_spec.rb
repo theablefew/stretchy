@@ -47,6 +47,7 @@ describe 'Ingest Pipeline' do
       attribute :heart_rate, :integer
       attribute :systolic, :integer
       attribute :diastolic, :integer
+      attribute :age, :integer
     
       default_pipeline :intake_form_pipeline
     end
@@ -56,8 +57,9 @@ describe 'Ingest Pipeline' do
     10.times.map do
       {
         "id" => Faker::Alphanumeric.alphanumeric(number: 7),
-        "vitals" => [Faker::Number.number(digits: 3), Faker::Number.number(digits: 2), Faker::Number.number(digits: 2)].join(","),
+        "vitals" => [Faker::Number.between(from: 54, to: 120), Faker::Number.between(from: 60, to: 140), Faker::Number.between(from: 40, to: 100)].join(","),
         "name" => Faker::Name.name,
+        "age" => Faker::Number.between(from: 19, to: 84),
         "ssn" => "<b>#{Faker::IDNumber.valid}</b>"
       }
     end
@@ -76,7 +78,7 @@ describe 'Ingest Pipeline' do
   end
 
   before do
-    intake_pipeline.new.create
+    intake_pipeline.create!
     intake_form.create_index!
 
     IntakeForm.bulk(bulk_records)
@@ -84,19 +86,18 @@ describe 'Ingest Pipeline' do
   end
 
   after do
-    IntakeForm.all.pluck(:first_name)
-    intake_pipeline.new.delete
     intake_form.delete_index!
+    intake_pipeline.delete!
   end
 
   it 'simulates the pipeline' do
-    response = intake_pipeline.new.simulate(source_records)
+    response = intake_pipeline.simulate(source_records)
     statuses = response["docs"].map {|d| d["processor_results"].map {|pr| pr["status"]}}.flatten
     expect(statuses).to all(eq("success"))
   end
 
   it 'processes data correctly' do
-    expect(intake_pipeline.new.exists?).to be_truthy
+    expect(intake_pipeline.exists?).to be_truthy
     expect(intake_form.default_pipeline).to eq('intake_form_pipeline')
     expect(IntakeForm.count).to eq(initial_data.size)
     IntakeForm.all.each_with_index do |form, index|
@@ -108,6 +109,16 @@ describe 'Ingest Pipeline' do
       expect(form.heart_rate).to eq(initial_data[index]["vitals"].split(',')[0].to_i) 
       expect(form.systolic).to eq(initial_data[index]["vitals"].split(',')[1].to_i)
       expect(form.diastolic).to eq(initial_data[index]["vitals"].split(',')[2].to_i)
+      expect(form.age).to eq(initial_data[index]["age"])
     end
+  end
+
+  it 'appears in the pipeline list' do
+    expect(intake_pipeline.all).to be_a(Hash)
+    expect(intake_pipeline.all).to have_key('intake_form_pipeline')
+  end
+
+  it 'exists' do
+    expect(intake_pipeline.exists?).to be_truthy
   end
 end

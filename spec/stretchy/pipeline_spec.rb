@@ -51,7 +51,7 @@ describe Stretchy::Pipeline do
 
     context 'api client' do
       it 'appears as a hash' do
-        expect(pipeline.to_hash).to eq({
+        expect(pipeline_class.to_hash).to eq({
           description: 'A test pipeline', 
           processors: [
             {
@@ -68,12 +68,12 @@ describe Stretchy::Pipeline do
 
       it 'should create a new pipeline' do
         allow(pipeline.client).to receive(:put_pipeline).and_return({"acknowledged"=>true})
-        expect(pipeline.create).to eq({"acknowledged"=>true})
+        expect(pipeline_class.create!).to eq({"acknowledged"=>true})
       end
 
       it 'should intercept NotFound in exists?' do
-        allow(pipeline_class).to receive(:find).and_raise(pipeline.send(:not_found))
-        expect(pipeline.exists?).to be_falsey
+        allow(pipeline_class).to receive(:find).and_raise(pipeline_class.send(:not_found))
+        expect(pipeline_class.exists?).to be_falsey
       end
 
       let(:simulation_response) do
@@ -107,13 +107,13 @@ describe Stretchy::Pipeline do
           pipeline_name 'uppercase-pipeline'
           description 'Uppercase'
           processor :uppercase, field: :name
-        end.new
+        end
 
         allow(uppercase.client).to receive(:simulate).and_return(simulation_response)
         allow(uppercase.client).to receive(:put_pipeline).and_return({"acknowledged"=>true})
         expect(uppercase.pipeline_name).to eq('uppercase-pipeline')
         expect(uppercase.description).to eq('Uppercase')
-        expect(uppercase.create).to eq({"acknowledged"=>true})
+        expect(uppercase.create!).to eq({"acknowledged"=>true})
         expect(uppercase.simulate([{_source: {name: 'test'}}])).to eq(simulation_response)
       end
 
@@ -123,8 +123,8 @@ describe Stretchy::Pipeline do
       end
 
       it 'should delete a pipeline' do
-        allow(pipeline.client).to receive(:delete_pipeline).and_return({"acknowledged"=>true})
-        expect(pipeline.delete).to eq({"acknowledged"=>true})
+        allow(pipeline_class.client).to receive(:delete_pipeline).and_return({"acknowledged"=>true})
+        expect(pipeline_class.delete!).to eq({"acknowledged"=>true})
       end
     end
 end
