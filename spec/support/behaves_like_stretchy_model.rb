@@ -25,6 +25,18 @@ shared_examples 'a stretchy model' do |model_class|
     expect(model_class.count).to be_a(Numeric)
   end
 
+  context 'pipelins' do
+    it 'responds to default_pipeline' do
+      expect(model_class).to respond_to(:default_pipeline)
+    end
+
+    it 'can set a default_pipeline' do
+      model_class.default_pipeline :test_pipeline
+      expect(model_class.default_pipeline).to eq('test_pipeline')
+    end
+
+  end
+
   context 'defaults' do
     context 'attributes' do
       it 'includes an id' do

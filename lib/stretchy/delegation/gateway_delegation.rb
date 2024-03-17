@@ -30,14 +30,20 @@ module Stretchy
           end
       end
 
+      def index_settings(settings={})
+        @index_settings ||= settings
+        @index_settings.merge!(default_pipeline: default_pipeline.to_s) if default_pipeline
+        @index_settings.with_indifferent_access
+      end
+
       def reload_gateway_configuration!
         @gateway = nil
       end
 
       def gateway(&block)
           reload_gateway_configuration! if @gateway && @gateway.client != Stretchy.configuration.client
-            
-          @gateway ||= Stretchy::Repository.create(client: Stretchy.configuration.client, index_name: index_name, klass: base_class, mapping: base_class.attribute_mappings.merge(dynamic: true)) 
+
+          @gateway ||= Stretchy::Repository.create(client: Stretchy.configuration.client, index_name: index_name, klass: base_class, mapping: base_class.attribute_mappings.merge(dynamic: true), settings: index_settings) 
           # block.arity < 1 ? @gateway.instance_eval(&block) : block.call(@gateway) if block_given?
           @gateway
       end
