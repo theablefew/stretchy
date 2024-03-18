@@ -43,6 +43,7 @@ module Stretchy
       ActiveModel::Type.register(:percolator, Stretchy::Attributes::Type::Percolator)
       ActiveModel::Type.register(:point, Stretchy::Attributes::Type::Point)
       ActiveModel::Type.register(:rank_feature, Stretchy::Attributes::Type::RankFeature)
+      ActiveModel::Type.register(:rank_features, Stretchy::Attributes::Type::RankFeatures)
 
       ActiveModel::Type.register(:text, Stretchy::Attributes::Type::Text)
       ActiveModel::Type.register(:token_count, Stretchy::Attributes::Type::TokenCount)

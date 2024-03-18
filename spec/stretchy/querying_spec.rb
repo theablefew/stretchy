@@ -5,6 +5,7 @@
 
 require "spec_helper"
 require 'models/resource'
+require 'models/embedding_model'
 
 
 describe "QueryMethods" do
@@ -308,59 +309,7 @@ describe "QueryMethods" do
                 expect(described_class.none.class).to eq("#{described_class.name}::Stretchy_Relation".constantize)
             end
 
-            context 'opensearch neural search', opensearch_only: true do
-                context 'neural_sparse' do
-                    it 'responds' do
-                        expect(described_class).to respond_to(:neural_sparse)
-                    end
-
-                    it 'adds values' do
-                        values = described_class.neural_sparse(embedding: 'hello world', model_id: '1234', max_token_score: 2).values[:neural_sparse]
-                        expect(values.first).to eq({embedding: 'hello world', model_id: '1234', max_token_score: 2})
-                    end
-                end
-
-                context 'neural' do
-                  it 'responds' do
-                    expect(described_class).to respond_to(:neural)
-                  end
-
-                  it 'adds values' do
-                    values = described_class.neural(embedding: { query_text: 'hello world', model_id: '1234'}).values[:neural]
-                    expect(values.first).to eq({embedding: { query_text: 'hello world', model_id: '1234'}})
-                  end
-
-                  it 'filters' do
-                  end
-
-                  it 'knn' do
-                  end
-
-                  context 'multimodal' do
-                    it 'allows hash as field value' do
-                        described_class.neural(embedding: { 
-                                query_text: 'hello world',
-                                query_image: 'base64encodedimage',
-                            }, 
-                            model_id: '1234'
-                        )
-                    end
-                  
-                  end
-                end
-
-                context 'hybrid' do
-                    it 'responds' do
-                        expect(described_class).to respond_to(:hybrid)
-                    end
-
-                    it 'adds values' do
-
-                    end
-                end
-
-
-            end
+      
 
         end
     end

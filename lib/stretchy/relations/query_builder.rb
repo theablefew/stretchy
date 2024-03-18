@@ -35,6 +35,10 @@ module Stretchy
         @neural_sparse ||= values[:neural_sparse]
       end
 
+      def neural
+        @neural ||= values[:neural]
+      end
+
       def must_nots
         @must_nots ||= compact_where(values[:must_not])
       end
@@ -109,7 +113,7 @@ module Stretchy
       end
 
       def missing_neural?
-        neural_sparse.nil?
+        neural_sparse.nil? && neural.nil?
       end
 
       def no_query?
@@ -129,8 +133,22 @@ module Stretchy
                 structure.extract! params, *params.keys
               end
             end
-          end 
-          # unless neural_sparse.blank?
+          end unless neural_sparse.blank?
+
+          structure.neural do
+            neural.each do |args|
+              params = args.dup
+              field_name, query = params.shift
+              structure.set! field_name do
+                if query.is_a?(Hash)
+                  structure.extract! query, *query.keys
+                else
+                  structure.query_text query
+                end
+                structure.extract! params, *params.keys
+              end
+            end
+          end unless neural.blank?
 
           structure.regexp do
             build_regexp unless regexes.nil?

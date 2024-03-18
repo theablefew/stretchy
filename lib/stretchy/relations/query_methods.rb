@@ -20,6 +20,7 @@ module Stretchy
         :extending,
         :skip_callbacks,
         :neural_sparse,
+        :neural,
         :regexp
       ]
 
@@ -239,6 +240,15 @@ module Stretchy
 
       def neural_sparse!(opts) # :nodoc:
         self.neural_sparse_values += [opts]
+        self
+      end
+
+      def neural(opts)
+        spawn.neural!(opts)
+      end
+
+      def neural!(opts) # :nodoc:
+        self.neural_values += [opts]
         self
       end
 
