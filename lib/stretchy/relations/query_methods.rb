@@ -19,6 +19,7 @@ module Stretchy
         :or_filter,
         :extending,
         :skip_callbacks,
+        :neural_sparse,
         :regexp
       ]
 
@@ -230,6 +231,16 @@ module Stretchy
       # Alias for {#where}
       # @see #where
       alias :must :where
+
+
+      def neural_sparse(opts)
+        spawn.neural_sparse!(opts)
+      end
+
+      def neural_sparse!(opts) # :nodoc:
+        self.neural_sparse_values += [opts]
+        self
+      end
 
       # Adds a regexp condition to the query.
       # 
