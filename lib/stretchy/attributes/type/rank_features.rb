@@ -18,12 +18,16 @@ module Stretchy::Attributes::Type
     OPTIONS = [:positive_score_impact]
 
     def mappings(name)
-      options = {}
+      options = {type: type}
       OPTIONS.each { |option| options[option] = send(option) unless send(option).nil? }
       { name =>  options }.as_json 
     end
 
     def type
+      :rank_features
+    end
+
+    def type_for_database
       :rank_features
     end
   end
