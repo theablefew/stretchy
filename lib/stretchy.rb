@@ -27,6 +27,7 @@ module Stretchy
 
   def self.boot!
     loader.setup
+    Elasticsearch::API.send(:include, Elasticsearch::API::MachineLearning::Models)
     Stretchy::Attributes.register!
   end
 
@@ -59,11 +60,7 @@ module Stretchy
 
     def opensearch=(bool)
         @opensearch = bool
-        if bool
-          OpenSearchCompatibility.opensearch_patch!
-        else
-          Elasticsearch::API.send(:include, Elasticsearch::API::MachineLearning::Models)
-        end
+        OpenSearchCompatibility.opensearch_patch! if bool
     end
 
     def opensearch?

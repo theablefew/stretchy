@@ -50,7 +50,7 @@ describe Stretchy::MachineLearning::Model do
       }.with_indifferent_access
     }
 
-    context 'settings' do
+    context 'settings', opensearch_only: true do
       it 'runs ml on all nodes' do
         expect(described_class.ml_on_all_nodes!).to eq({"acknowledged"=>true, "persistent"=>{"plugins"=>{"ml_commons"=>{"only_run_on_ml_node"=>"false", "model_access_control_enabled"=>"true", "native_memory_threshold"=>"99"}}}, "transient"=>{}}.with_indifferent_access)
       end
