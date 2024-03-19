@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'faker'
 
-describe 'Ingest Pipeline' do
+describe 'Ingest Pipeline', type: :integration do
   let(:intake_pipeline) do
     IntakeFormPipeline ||= Class.new(Stretchy::Pipeline) do
 

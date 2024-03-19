@@ -9,7 +9,6 @@ describe 'API' do
   end
 
   it 'should have a client' do
-    puts Stretchy::MachineLearning::Model.client
     expect(Stretchy::MachineLearning::Model.client).to be_a("#{backend}::API::MachineLearning::Models::MachineLearningClient".constantize)
   end
 

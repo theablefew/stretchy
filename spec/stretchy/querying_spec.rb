@@ -5,8 +5,6 @@
 
 require "spec_helper"
 require 'models/resource'
-require 'models/embedding_model'
-
 
 describe "QueryMethods" do
 

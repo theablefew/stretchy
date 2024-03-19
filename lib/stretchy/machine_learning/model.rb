@@ -136,8 +136,9 @@ module Stretchy
 
       def undeploy
         @deployed = nil
-        client.undeploy(id: self.model_id)
+        response = client.undeploy(id: self.model_id)
         yield self if block_given? 
+        response
       end
 
       def deployed?

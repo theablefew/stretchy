@@ -67,13 +67,13 @@ describe 'opensearch neural search', opensearch_only: true do
           end
 
           it 'adds values' do
-              values = described_class.neural_sparse(embedding: 'hello world', model_id: '1234', max_token_score: 2).values[:neural_sparse]
-              expect(values.first).to eq({embedding: 'hello world', model_id: '1234', max_token_score: 2})
+              values = described_class.neural_sparse(passage_embedding: 'hello world', model_id: '1234', max_token_score: 2).values[:neural_sparse]
+              expect(values.first).to eq({passage_embedding: 'hello world', model_id: '1234', max_token_score: 2})
           end
 
           it 'has rank_features' do
               allow_any_instance_of(Elasticsearch::Persistence::Repository).to receive(:search).and_return(results)
-              expect(described_class.neural_sparse(embedding: 'hello world', model_id: '1234', max_token_score: 2).map(&:passage_embedding)).to all(be_a(Hash))
+              expect(described_class.neural_sparse(passage_embedding: 'hello world', model_id: '1234', max_token_score: 2).map(&:passage_embedding)).to all(be_a(Hash))
           end
       end
 
@@ -124,25 +124,25 @@ describe 'opensearch neural search', opensearch_only: true do
         end
 
         it 'adds values' do
-            values = described_class.neural(embedding: { query_text: 'hello world', model_id: '1234'}).values[:neural]
-            expect(values.first).to eq({embedding: { query_text: 'hello world', model_id: '1234'}})
+            values = described_class.neural(passage_embedding: { query_text: 'hello world', model_id: '1234'}).values[:neural]
+            expect(values.first).to eq({passage_embedding: { query_text: 'hello world', model_id: '1234'}})
         end
 
         it 'returns results' do
             allow_any_instance_of(Elasticsearch::Persistence::Repository).to receive(:search).and_return(results)
-            expect(described_class.neural(embedding: 'hello world', model_id: '1234', k:2).total).to eq(2)
+            expect(described_class.neural(passage_embedding: 'hello world', model_id: '1234', k:2).total).to eq(2)
         end
 
         context 'multimodal' do
             it 'allows hash as field value' do
-                elastic_hash = described_class.neural(body_embedding: { 
+                elastic_hash = described_class.neural(passage_embedding: { 
                         query_text: 'hello world',
                         query_image: 'base64encodedimage',
                     }, 
                     model_id: '1234'
                 ).to_elastic
 
-                expect(elastic_hash.dig(:query, :neural)).to eq({body_embedding: { query_text: 'hello world', query_image: 'base64encodedimage', model_id: '1234'}}.with_indifferent_access)
+                expect(elastic_hash.dig(:query, :neural)).to eq({passage_embedding: { query_text: 'hello world', query_image: 'base64encodedimage', model_id: '1234'}}.with_indifferent_access)
             end
         end
       end
@@ -153,8 +153,8 @@ describe 'opensearch neural search', opensearch_only: true do
           end
 
           it 'adds values' do
-              values = described_class.hybrid(neural: [{body_embedding: 'hello world', model_id: '1234', k: 2}], query: [{term: {status: :active}}]).values[:hybrid]
-              expect(values).to eq([{neural: [{body_embedding: 'hello world', model_id: '1234', k: 2}], query: [{term: {status: :active}}]}])
+              values = described_class.hybrid(neural: [{passage_embedding: 'hello world', model_id: '1234', k: 2}], query: [{term: {status: :active}}]).values[:hybrid]
+              expect(values).to eq([{neural: [{passage_embedding: 'hello world', model_id: '1234', k: 2}], query: [{term: {status: :active}}]}])
           end
       end
 
