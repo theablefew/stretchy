@@ -1,3 +1,5 @@
+require 'opensearch/api/namespace/machine_learning/model'
+
 module Stretchy
     module OpenSearchCompatibility
     extend ActiveSupport::Concern
@@ -79,6 +81,8 @@ module Stretchy
 
             ::Elasticsearch::Persistence::Repository.send(:include, patch)
             ::Elasticsearch::Persistence::Repository.send(:include, store)
+            OpenSearch::API.send(:include, OpenSearch::API::MachineLearning::Models)
+
         end
 
 

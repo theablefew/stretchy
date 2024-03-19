@@ -147,6 +147,7 @@ module Stretchy
             "#<#{self.class.name} #{message.join(', ')}>"
           rescue StandardError => e
             e
+            raise e
           end
         end
 

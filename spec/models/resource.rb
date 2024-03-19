@@ -9,6 +9,7 @@ class Resource < Stretchy::Record
     attribute :age,                 :integer
     attribute :income,              :integer
     attribute :income_after_raise,  :integer
+    attribute :description,         :text
 
 
  end

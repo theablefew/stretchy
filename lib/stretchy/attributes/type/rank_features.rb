@@ -14,10 +14,20 @@ module Stretchy::Attributes::Type
   #   end
   #
   # Returns nothing.
-  class RankFeatures < Stretchy::Attributes::Type::Base
+  class RankFeatures < Stretchy::Attributes::Type::Hash
     OPTIONS = [:positive_score_impact]
 
+    def mappings(name)
+      options = {type: type}
+      OPTIONS.each { |option| options[option] = send(option) unless send(option).nil? }
+      { name =>  options }.as_json 
+    end
+
     def type
+      :rank_features
+    end
+
+    def type_for_database
       :rank_features
     end
   end

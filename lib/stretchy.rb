@@ -10,7 +10,7 @@ require 'active_support/all'
 
 require_relative "stretchy/version"
 require_relative "rails/instrumentation/railtie" if defined?(Rails)
-
+require_relative 'elasticsearch/api/namespace/machine_learning/model'
 
 module Stretchy
 
@@ -27,6 +27,7 @@ module Stretchy
 
   def self.boot!
     loader.setup
+    Elasticsearch::API.send(:include, Elasticsearch::API::MachineLearning::Models)
     Stretchy::Attributes.register!
   end
 
@@ -51,6 +52,10 @@ module Stretchy
     def client=(client)
         @client = client
         self.opensearch = true if @client.class.name =~ /OpenSearch/
+    end
+
+    def search_backend_const
+        @opensearch ? OpenSearch : Elasticsearch
     end
 
     def opensearch=(bool)

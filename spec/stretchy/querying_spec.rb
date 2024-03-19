@@ -6,7 +6,6 @@
 require "spec_helper"
 require 'models/resource'
 
-
 describe "QueryMethods" do
 
     describe Resource do 
@@ -307,6 +306,8 @@ describe "QueryMethods" do
             it 'returns a null relation' do
                 expect(described_class.none.class).to eq("#{described_class.name}::Stretchy_Relation".constantize)
             end
+
+      
 
         end
     end

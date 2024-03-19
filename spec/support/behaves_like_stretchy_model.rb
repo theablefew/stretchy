@@ -128,7 +128,22 @@ shared_examples 'a stretchy model' do |model_class|
     end
     
     it 'fetches results at end of chain' do
-      allow(model_class).to receive(:fetch_results).and_return([])
+      allow_any_instance_of(Elasticsearch::Persistence::Repository).to receive(:search).and_return(
+      Elasticsearch::Persistence::Repository::Response::Results.new(described_class.gateway, {
+        "took": 688,
+        "timed_out": false,
+        "_shards": {
+          "total": 1,
+          "successful": 1,
+          "skipped": 0,
+          "failed": 0
+        },
+        "hits" => {
+          "hits" => [
+          ]
+        }
+      }))
+      allow(model_class).to receive(:fetch_results).and_call_original
       model_class.all.size(10).inspect
       expect(model_class).to have_received(:fetch_results).once
     end

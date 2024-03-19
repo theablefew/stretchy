@@ -31,7 +31,13 @@ describe Stretchy::Relations::QueryBuilder do
       multi_terms = {where: [{status: 'active'}, {category: 'ruby'}]}
       expect(described_class.new(multi_terms, attribute_types).query).to eq(subject.send(:compact_where, multi_terms[:where]))
     end
+  end
 
+  describe '#neural_sparse' do
+    it 'returns the neural_query value' do
+      subject = described_class.new(neural_sparse: {embedding: { query_text: 'hello world', model_id: '1234'}})
+      expect(subject.neural_sparse).to eq({embedding: { query_text: 'hello world', model_id: '1234'}})
+    end
   end
 
   describe '#build_query' do
@@ -70,6 +76,44 @@ describe Stretchy::Relations::QueryBuilder do
                     expect(subject.send(:build_query)[:bool][:should]).to eq({term: {status: :active}}.with_indifferent_access)
                 end
             end
+
+
+        end
+
+        context 'neural search' do
+          context 'neural_sparse' do
+            it 'builds' do
+                subject = described_class.new(neural_sparse: [{embedding: 'hello world', model_id: '1234', max_token_score: 2}])
+                expect(subject.to_elastic.dig(:query)).to have_key(:neural_sparse)
+                expect(subject.to_elastic.dig(:query, :neural_sparse)).to eq({embedding: { query_text: 'hello world', model_id: '1234', max_token_score: 2}}.with_indifferent_access)
+            end
+          end
+        
+          context 'neural' do
+            it 'builds' do
+                subject = described_class.new(neural: [{body_embedding: 'hello world', model_id: '1234', k: 2}])
+                expect(subject.to_elastic.dig(:query)).to have_key(:neural)
+                expect(subject.to_elastic.dig(:query, :neural)).to eq({body_embedding: { query_text: 'hello world', model_id: '1234', k: 2}}.with_indifferent_access)
+            end
+
+            context 'multimodal' do
+              it 'builds' do
+                subject = described_class.new(neural: [{body_embedding: {query_text: 'hello world', query_image: 'base64encodedimage'}, model_id: '1234', k: 2}])
+                expect(subject.to_elastic.dig(:query, :neural)).to eq({body_embedding: { query_text: 'hello world', query_image: 'base64encodedimage', model_id: '1234', k: 2}}.with_indifferent_access)
+              end
+
+            end
+          end
+
+          context 'hybrid' do
+            it 'builds' do
+              subject = described_class.new(hybrid: {neural: [{body_embedding: 'hello world', model_id: '1234', k: 2}], query: [{term: {status: :active}}]})
+              elastic_hash = subject.to_elastic
+              expect(elastic_hash.dig(:query)).to have_key(:hybrid)
+              expect(elastic_hash.dig(:query, :hybrid)).to have_key(:queries)
+              expect(elastic_hash.dig(:query, :hybrid, :queries)).to eq([{"neural" => {"body_embedding"=>{"k"=>2, "model_id"=>"1234", "query_text"=>"hello world"}}}, {"term"=>{"status"=>:active}}.with_indifferent_access])
+            end
+          end
         end
 
         context 'when using filters' do
