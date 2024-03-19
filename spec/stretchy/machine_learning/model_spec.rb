@@ -50,18 +50,36 @@ describe Stretchy::MachineLearning::Model do
       }.with_indifferent_access
     }
 
+    context 'settings' do
+      it 'runs ml on all nodes' do
+        expect(described_class.ml_on_all_nodes!).to eq({"acknowledged"=>true, "persistent"=>{"plugins"=>{"ml_commons"=>{"only_run_on_ml_node"=>"false", "model_access_control_enabled"=>"true", "native_memory_threshold"=>"99"}}}, "transient"=>{}}.with_indifferent_access)
+      end
+
+      it 'runs ml on ml nodes' do
+        expect(described_class.ml_on_ml_nodes!).to eq({"acknowledged"=>true, "persistent"=>{"plugins"=>{"ml_commons"=>{"only_run_on_ml_node"=>"true", "model_access_control_enabled"=>"true", "native_memory_threshold"=>"99"}}}, "transient"=>{}}.with_indifferent_access)
+      end
+    end
+
+
     context 'register' do
       before(:each) do
         allow(model.client).to receive(:register).and_return({task_id: '123456', status: "CREATED"}.with_indifferent_access)
         allow(model.client).to receive(:get_status).and_return(status_complete)
       end
 
-      it 'should register' do
+      it 'should register and return the task id' do
         expect(model.register).to be_truthy
+        expect(model.task_id).to eq('123456')
       end
 
-      it 'should register and return the task id' do
-        model.register
+      it 'should register and wait until complete' do
+        model.register do |model|
+          model.wait_until_complete do
+            response = model.status
+            model.instance_variable_set(:@model_id, response['model_id'])
+            response['state'] == 'COMPLETED'
+          end
+        end
         expect(model.task_id).to eq('123456')
         expect(model.model_id).to eq('Qr1YbogBYOqeeqR7sI9L')
       end
@@ -83,6 +101,9 @@ describe Stretchy::MachineLearning::Model do
     end
 
     context 'deploy' do
+      let(:status_deploying) {{"model_state": "DEPLOYING"}.with_indifferent_access }
+      let(:status_deployed) { {"model_state": "DEPLOYED"}.with_indifferent_access }
+
       before(:each) do
         allow(model).to receive(:model_id).and_return('Qr1YbogBYOqeeqR7sI9L')
         allow(model.client).to receive(:deploy).with(id: 'Qr1YbogBYOqeeqR7sI9L')
@@ -95,15 +116,15 @@ describe Stretchy::MachineLearning::Model do
       end
 
       it 'should check if deployed' do
-        allow(model).to receive(:deploy_id).and_return('78910')
-        allow(model.client).to receive(:get_status).with(task_id: '78910').and_return(status_complete)
+        allow(model).to receive(:model_id).and_return('78910')
+        allow(model.client).to receive(:get_model).with(id: '78910').and_return(status_deployed)
         expect(model.deployed?).to be_truthy
       end
 
       context 'not deployed' do
         it 'should check if deployed' do
-          allow(model).to receive(:deploy_id).and_return('78910')
-          allow(model.client).to receive(:get_status).with(task_id: '78910').and_return({state: 'DEPLOYING'}.with_indifferent_access)
+          allow(model).to receive(:model_id).and_return('78910')
+          allow(model.client).to receive(:get_model).with(id: '78910').and_return(status_deploying)
           expect(model.deployed?).to be_falsey
         end
       end

@@ -37,6 +37,36 @@ module Stretchy
           client.get_model
         end
 
+        def ml_on_all_nodes!
+          settings = {
+            "persistent": {
+              "plugins": {
+                "ml_commons": {
+                  "only_run_on_ml_node": "false",
+                  "model_access_control_enabled": "true",
+                  "native_memory_threshold": "99"
+                }
+              }
+            }
+          }
+          Stretchy.configuration.client.cluster.put_settings body: settings
+        end
+
+        def ml_on_ml_nodes!
+          settings = {
+            "persistent": {
+              "plugins": {
+                "ml_commons": {
+                  "only_run_on_ml_node": "true",
+                  "model_access_control_enabled": "true",
+                  "native_memory_threshold": "99"
+                }
+              }
+            }
+          }
+          Stretchy.configuration.client.cluster.put_settings body: settings
+        end
+
         def model_lookup(model)
           @flattened_models ||= PRETRAINED_MODELS.flat_map do |key, value|
             value.map do |sub_key, sub_value|
@@ -71,6 +101,8 @@ module Stretchy
         @model = self.class.model_lookup model_name
       end
 
+
+
       def register
         begin
           response = client.register(body: self.to_hash, deploy: true)
@@ -97,6 +129,7 @@ module Stretchy
         @deployed = nil
         @deploy_id = client.deploy(id: self.model_id)['task_id']
         yield self if block_given? 
+        @deploy_id
       end
 
       def undeploy
