@@ -40,7 +40,20 @@ describe Stretchy::Attributes do
 
 
     context 'mappings' do
+      context 'pipeline' do
+        context 'with pipeline' do
+          it 'includes pipeline' do
+            model.default_pipeline :test_pipeline
+            expect(model.settings[:default_pipeline]).to eq('test_pipeline')
+          end
+        end
 
+        context 'without pipeline' do
+          it 'does not include pipeline' do
+            expect(model.settings).not_to have_key(:default_pipeline)
+          end
+        end
+      end
 
       context 'auto keyword fields for text fields' do
         it 'adds keyword to text fields' do

@@ -20,6 +20,11 @@ module Stretchy
                 @default_size
             end
 
+            def default_pipeline(pipeline = nil)
+                @default_pipeline = pipeline.to_s unless pipeline.nil?
+                @default_pipeline
+            end
+
             private
 
             # Return a Relation instance to chain queries

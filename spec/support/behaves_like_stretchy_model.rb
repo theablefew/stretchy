@@ -25,6 +25,18 @@ shared_examples 'a stretchy model' do |model_class|
     expect(model_class.count).to be_a(Numeric)
   end
 
+  context 'pipelins' do
+    it 'responds to default_pipeline' do
+      expect(model_class).to respond_to(:default_pipeline)
+    end
+
+    it 'can set a default_pipeline' do
+      model_class.default_pipeline :test_pipeline
+      expect(model_class.default_pipeline).to eq('test_pipeline')
+    end
+
+  end
+
   context 'defaults' do
     context 'attributes' do
       it 'includes an id' do
@@ -116,7 +128,22 @@ shared_examples 'a stretchy model' do |model_class|
     end
     
     it 'fetches results at end of chain' do
-      allow(model_class).to receive(:fetch_results).and_return([])
+      allow_any_instance_of(Elasticsearch::Persistence::Repository).to receive(:search).and_return(
+      Elasticsearch::Persistence::Repository::Response::Results.new(described_class.gateway, {
+        "took": 688,
+        "timed_out": false,
+        "_shards": {
+          "total": 1,
+          "successful": 1,
+          "skipped": 0,
+          "failed": 0
+        },
+        "hits" => {
+          "hits" => [
+          ]
+        }
+      }))
+      allow(model_class).to receive(:fetch_results).and_call_original
       model_class.all.size(10).inspect
       expect(model_class).to have_received(:fetch_results).once
     end

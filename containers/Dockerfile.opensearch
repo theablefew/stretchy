@@ -2,7 +2,6 @@
 
 # Base image
 FROM opensearchproject/opensearch:2.12.0
-
 # Environment variables
 # disables bootstrap checks that are enabled when network.host is set to a non-loopback address
 ENV discovery.type=single-node
@@ -12,8 +11,10 @@ ENV plugins.security.disabled=true
 # along with the memlock settings below, disables swapping
 ENV bootstrap.memory_lock=true
 # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
-ENV OPENSEARCH_JAVA_OPTS="-Xms512m -Xmx512m"
+ENV OPENSEARCH_JAVA_OPTS="-Xms3078m -Xmx3078m"
 # disables execution of install_demo_configuration.sh bundled with security plugin, which installs demo certificates and security configurations to OpenSearch
 ENV DISABLE_INSTALL_DEMO_CONFIG=true
 # disables security plugin entirely in OpenSearch by setting plugins.security.disabled: true in opensearch.yml
-ENV DISABLE_SECURITY_PLUGIN=true
+# ENV DISABLE_SECURITY_PLUGIN=true
+
+

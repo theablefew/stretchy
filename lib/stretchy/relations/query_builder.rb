@@ -31,6 +31,18 @@ module Stretchy
         @query_string ||= compact_where(values[:query_string], bool: false)
       end
 
+      def neural_sparse
+        @neural_sparse ||= values[:neural_sparse]
+      end
+
+      def neural
+        @neural ||= values[:neural]
+      end
+
+      def hybrid
+        @hybrid ||= values[:hybrid]
+      end
+
       def must_nots
         @must_nots ||= compact_where(values[:must_not])
       end
@@ -104,9 +116,68 @@ module Stretchy
         query_filters.nil? && or_filters.nil?
       end
 
+      def missing_neural?
+        neural_sparse.nil? && neural.nil? && hybrid.nil?
+      end
+
+      def no_query?
+        missing_bool_query? && missing_query_string? && missing_query_filter? && missing_neural?
+      end
+
       def build_query
-        return if missing_bool_query? && missing_query_string? && missing_query_filter?
+        return if no_query?
         structure.query do
+
+          structure.hybrid do
+            structure.queries do
+                hybrid[:neural].each do |n|
+                  structure.child! do
+                    params = n.dup
+                    field_name, query_text = params.shift
+                    structure.neural do
+                      structure.set! field_name do
+                        structure.query_text query_text
+                        structure.extract! params, *params.keys
+                      end
+                    end
+                  end
+                end
+
+                hybrid[:query].each do |query|
+                  structure.child! do
+                    structure.extract! query, *query.keys
+                  end
+                end
+
+            end
+          end unless hybrid.nil?
+
+          structure.neural_sparse do
+            neural_sparse.each do |args|
+              params = args.dup
+              field_name, query_text = params.shift
+              structure.set! field_name do
+                structure.query_text query_text
+                structure.extract! params, *params.keys
+              end
+            end
+          end unless neural_sparse.blank?
+
+          structure.neural do
+            neural.each do |args|
+              params = args.dup
+              field_name, query = params.shift
+              structure.set! field_name do
+                if query.is_a?(Hash)
+                  structure.extract! query, *query.keys
+                else
+                  structure.query_text query
+                end
+                structure.extract! params, *params.keys
+              end
+            end
+          end unless neural.blank?
+
           structure.regexp do
             build_regexp unless regexes.nil?
           end
@@ -121,12 +192,11 @@ module Stretchy
 
           end unless missing_bool_query? && missing_query_filter?
 
-
-
           structure.query_string do
             structure.extract! query_string_options, *query_string_options.keys
             structure.query query_strings
           end unless query_strings.nil?
+
         end.with_indifferent_access
       end
 

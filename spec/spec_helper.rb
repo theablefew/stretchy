@@ -19,9 +19,11 @@ SimpleCov.start do
 end
 require 'stretchy'
 require 'active_support/core_ext'
+require 'faker'
 
 backend = ENV['BACKEND'] || 'elasticsearch'
 
+puts "Using #{backend}"
 if backend == 'opensearch'
   require 'opensearch'
   Stretchy.configure do |config|
@@ -43,7 +45,9 @@ end
 
 RSpec.configure do |config|
   if ENV['BACKEND'] == 'opensearch'
-    config.filter_run_excluding opensearch_incompatible: true
+    config.filter_run_excluding elasticsearch_only: true
+  else
+    config.filter_run_excluding opensearch_only: true
   end
 
   # rspec-expectations config goes here. You can use an alternate
