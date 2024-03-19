@@ -104,6 +104,16 @@ describe Stretchy::Relations::QueryBuilder do
 
             end
           end
+
+          context 'hybrid' do
+            it 'builds' do
+              subject = described_class.new(hybrid: {neural: [{body_embedding: 'hello world', model_id: '1234', k: 2}], query: [{term: {status: :active}}]})
+              elastic_hash = subject.to_elastic
+              expect(elastic_hash.dig(:query)).to have_key(:hybrid)
+              expect(elastic_hash.dig(:query, :hybrid)).to have_key(:queries)
+              expect(elastic_hash.dig(:query, :hybrid, :queries)).to eq([{"neural" => {"body_embedding"=>{"k"=>2, "model_id"=>"1234", "query_text"=>"hello world"}}}, {"term"=>{"status"=>:active}}.with_indifferent_access])
+            end
+          end
         end
 
         context 'when using filters' do

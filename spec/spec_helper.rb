@@ -19,9 +19,11 @@ SimpleCov.start do
 end
 require 'stretchy'
 require 'active_support/core_ext'
+require 'faker'
 
 backend = ENV['BACKEND'] || 'elasticsearch'
 
+puts "Using #{backend}"
 if backend == 'opensearch'
   require 'opensearch'
   Stretchy.configure do |config|

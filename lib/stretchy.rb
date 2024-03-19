@@ -10,7 +10,7 @@ require 'active_support/all'
 
 require_relative "stretchy/version"
 require_relative "rails/instrumentation/railtie" if defined?(Rails)
-
+require_relative 'elasticsearch/api/namespace/machine_learning/model'
 
 module Stretchy
 
@@ -53,9 +53,17 @@ module Stretchy
         self.opensearch = true if @client.class.name =~ /OpenSearch/
     end
 
+    def search_backend_const
+        @opensearch ? OpenSearch : Elasticsearch
+    end
+
     def opensearch=(bool)
         @opensearch = bool
-        OpenSearchCompatibility.opensearch_patch! if bool
+        if bool
+          OpenSearchCompatibility.opensearch_patch!
+        else
+          Elasticsearch::API.send(:include, Elasticsearch::API::MachineLearning::Models)
+        end
     end
 
     def opensearch?

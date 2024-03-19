@@ -81,8 +81,8 @@ describe 'Ingest Pipeline' do
     intake_pipeline.create!
     intake_form.create_index!
 
-    IntakeForm.bulk(bulk_records)
-    IntakeForm.refresh_index!
+    intake_form.bulk(bulk_records)
+    intake_form.refresh_index!
   end
 
   after do
@@ -99,8 +99,8 @@ describe 'Ingest Pipeline' do
   it 'processes data correctly' do
     expect(intake_pipeline.exists?).to be_truthy
     expect(intake_form.default_pipeline).to eq('intake_form_pipeline')
-    expect(IntakeForm.count).to eq(initial_data.size)
-    IntakeForm.all.each_with_index do |form, index|
+    expect(intake_form.count).to eq(initial_data.size)
+    intake_form.all.each_with_index do |form, index|
       name = initial_data[index]["name"].gsub(/^\w+\.\s/, '')
       expect(form.first_name).to eq(name.split(' ')[0])
       expect(form.last_name).to eq(name.split(' ')[1])
