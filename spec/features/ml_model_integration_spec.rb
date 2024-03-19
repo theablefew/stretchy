@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'ML Model', opensearch_only: true do
+describe 'ML Model', opensearch_only: true, type: :integration do
   before(:all) do
     @sparse_model = Stretchy::MachineLearning::Model.new(
       model: :neural_sparse_encoding,
@@ -8,22 +8,27 @@ describe 'ML Model', opensearch_only: true do
       model_format: 'TORCH_SCRIPT',
       description: 'Creates sparse embedding for onboarding docs'
     )
+    Stretchy::MachineLearning::Model.ml_on_all_nodes!
+
     @sparse_model.register do |model|
       model.wait_until_complete do
-        response = model.status
-        Stretchy.logger.debug response
-        model.instance_variable_set(:@model_id, response['model_id'])
-        response['state'] == 'COMPLETED'
+        Stretchy.logger.debug "Registering model #{model.model}"
+        model.registered?
       end
     end
 
     @model_id = @sparse_model.model_id
     @sparse_model.deploy do |model|
       model.wait_until_complete(sleep_time: 5) do
-        Stretchy.logger.debug "Deploying model #{model}"
+        Stretchy.logger.debug "Deploying model #{model.model}"
         model.deployed?
       end
     end
+  end
+
+  after(:all) do
+    @sparse_model.undeploy
+    @sparse_model.delete
   end
 
   let!(:sparse_model) { @sparse_model }
@@ -59,14 +64,14 @@ describe 'ML Model', opensearch_only: true do
     10.times.map do
       {
         "id" => Faker::Alphanumeric.alphanumeric(number: 7),
-        "body" => Faker::Lorem.paragraph(sentence_count: 2),
+        "body" => Faker::Lorem.paragraph(sentence_count: 1),
         "status" => "active",
         "filename" => Faker::File.file_name,
         "path" => "/path/to/file",
         "owner" => Faker::Name.name,
         "client" => Faker::Company.name
       }
-    end
+    end << {id: "1234567", body: "This is a test", status: "active", filename: "test.txt", path: "/path/to/file", owner: "John Doe", client: "Acme Inc"}
   end
 
   let(:bulk_records) do
@@ -82,19 +87,16 @@ describe 'ML Model', opensearch_only: true do
   end
 
   before do
-    # sparse_model.register
-    # sparse_model.model_id
     sparse_pipeline.create!
     onboarding_doc.create_index!
     onboarding_doc.bulk(bulk_records)
     sleep(10)
+    onboarding_doc.refresh_index!
   end
 
   after do
     onboarding_doc.delete_index! if onboarding_doc.index_exists?
     sparse_pipeline.delete!
-    sparse_model.undeploy
-    sparse_model.delete
   end
 
   it 'simulates a pipeline' do
@@ -103,10 +105,11 @@ describe 'ML Model', opensearch_only: true do
     expect(statuses).to all(eq("success"))
   end
 
-  it 'performs a neural search' do
+  it 'performs a neural_sparse search' do
     expect(onboarding_doc.default_pipeline).to eq('nlp_sparse_pipeline')
     expect(onboarding_doc.count).to eq(initial_data.size)
-    expect(onboarding_doc.neural_search('test')).to not_be_empty
+    result = onboarding_doc.neural_sparse(embedding: 'test', model_id: sparse_model.model_id) 
+    expect(result.pluck(:embedding)).to all(be_a(Hash))
   end
 
 end

@@ -101,8 +101,6 @@ module Stretchy
         @model = self.class.model_lookup model_name
       end
 
-
-
       def register
         begin
           response = client.register(body: self.to_hash, deploy: true)
@@ -113,16 +111,20 @@ module Stretchy
 
           @model_id
         rescue => e
-          puts e
+          Stretchy.logger.error "Error registering model: #{e.message}"
           false
         end
         true
       end
 
+      def registered?
+        response = status
+        @model_id = response['model_id'] if response['model_id']
+        response['state'] == 'COMPLETED' && @model_id.present?
+      end
+
       def status
-        response = client.get_status(task_id: self.task_id)
-        
-        response
+        client.get_status(task_id: self.task_id)
       end
 
       def deploy
@@ -135,12 +137,12 @@ module Stretchy
       def undeploy
         @deployed = nil
         client.undeploy(id: self.model_id)
+        yield self if block_given? 
       end
 
       def deployed?
         return @deployed if @deployed
         response = client.get_model(id: self.model_id)
-        Stretchy.logger.debug "Deployed? #{self.model_id} #{response}"
         # raise "Model not deployed" if response['model_state'] == 'FAILED'
         @deployed = response['model_state'] == 'DEPLOYED'
       end
