@@ -24,6 +24,17 @@ module Stretchy::Attributes::Type
   class DateTime < Stretchy::Attributes::Type::Base
     OPTIONS = [:doc_values, :format, :locale, :ignore_malformed, :index, :null_value, :on_script_error, :script, :store, :meta]
     attr_reader *OPTIONS
+    include ActiveModel::Type::Helpers::Timezone
+    include ActiveModel::Type::Helpers::AcceptsMultiparameterTime.new(
+      defaults: { 4 => 0, 5 => 0 }
+    )
+    include ActiveModel::Type::Helpers::TimeValue
+
+    def initialize(**args)
+      @model_format = args.delete(:model_format)
+      super
+    end
+
     def type
       :datetime
     end
@@ -31,5 +42,44 @@ module Stretchy::Attributes::Type
     def type_for_database
       :date
     end
+
+    private
+    def cast_value(value)
+      return apply_seconds_precision(value) unless value.is_a?(::String)
+      return if value.empty?
+
+      fast_string_to_time(value) || fallback_string_to_time(value) || custom_string_to_time(value)
+    end
+
+    # '0.123456' -> 123456
+    # '1.123456' -> 123456
+    def microseconds(time)
+      time[:sec_fraction] ? (time[:sec_fraction] * 1_000_000).to_i : 0
+    end
+
+    def custom_string_to_time(string)
+      ::Date.strptime(string, @model_format)
+    end
+
+    def fallback_string_to_time(string)
+      time_hash = begin
+        ::Date._parse(string)
+      rescue ArgumentError => e
+      end
+      return unless time_hash
+
+      time_hash[:sec_fraction] = microseconds(time_hash)
+
+      new_time(*time_hash.values_at(:year, :mon, :mday, :hour, :min, :sec, :sec_fraction, :offset))
+    end
+
+    def value_from_multiparameter_assignment(values_hash)
+      missing_parameters = [1, 2, 3].delete_if { |key| values_hash.key?(key) }
+      unless missing_parameters.empty?
+        raise ArgumentError, "Provided hash #{values_hash} doesn't contain necessary keys: #{missing_parameters}"
+      end
+      super
+    end
+
   end
 end
