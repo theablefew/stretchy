@@ -160,6 +160,8 @@ describe 'opensearch neural search', opensearch_only: true do
           end
 
           it 'adds values' do
+              values = described_class.hybrid(neural: [{body_embedding: 'hello world', model_id: '1234', k: 2}], query: [{term: {status: :active}}]).values[:hybrid]
+              expect(values).to eq([{neural: [{body_embedding: 'hello world', model_id: '1234', k: 2}], query: [{term: {status: :active}}]}])
 
           end
       end

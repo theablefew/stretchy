@@ -21,6 +21,7 @@ module Stretchy
         :skip_callbacks,
         :neural_sparse,
         :neural,
+        :hybrid,
         :regexp
       ]
 
@@ -234,24 +235,34 @@ module Stretchy
       alias :must :where
 
 
-      def neural_sparse(opts)
-        spawn.neural_sparse!(opts)
-      end
+      concerning :Neural do
+        def neural_sparse(opts)
+          spawn.neural_sparse!(opts)
+        end
 
-      def neural_sparse!(opts) # :nodoc:
-        self.neural_sparse_values += [opts]
-        self
-      end
+        def neural_sparse!(opts) # :nodoc:
+          self.neural_sparse_values += [opts]
+          self
+        end
 
-      def neural(opts)
-        spawn.neural!(opts)
-      end
+        def neural(opts)
+          spawn.neural!(opts)
+        end
 
-      def neural!(opts) # :nodoc:
-        self.neural_values += [opts]
-        self
-      end
+        def neural!(opts) # :nodoc:
+          self.neural_values += [opts]
+          self
+        end
 
+        def hybrid(opts)
+          spawn.hybrid!(opts)
+        end
+
+        def hybrid!(opts) # :nodoc:
+          self.hybrid_values += [opts]
+          self
+        end
+      end
       # Adds a regexp condition to the query.
       # 
       # @param field [Hash] the field to filter by and the Regexp to match

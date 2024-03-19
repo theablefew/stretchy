@@ -39,6 +39,10 @@ module Stretchy
         @neural ||= values[:neural]
       end
 
+      def hybrid
+        @hybrid ||= values[:hybrid]
+      end
+
       def must_nots
         @must_nots ||= compact_where(values[:must_not])
       end
@@ -113,7 +117,7 @@ module Stretchy
       end
 
       def missing_neural?
-        neural_sparse.nil? && neural.nil?
+        neural_sparse.nil? && neural.nil? && hybrid.nil?
       end
 
       def no_query?
@@ -123,6 +127,30 @@ module Stretchy
       def build_query
         return if no_query?
         structure.query do
+
+          structure.hybrid do
+            structure.queries do
+                hybrid[:neural].each do |n|
+                  structure.child! do
+                    params = n.dup
+                    field_name, query_text = params.shift
+                    structure.neural do
+                      structure.set! field_name do
+                        structure.query_text query_text
+                        structure.extract! params, *params.keys
+                      end
+                    end
+                  end
+                end
+
+                hybrid[:query].each do |query|
+                  structure.child! do
+                    structure.extract! query, *query.keys
+                  end
+                end
+
+            end
+          end unless hybrid.nil?
 
           structure.neural_sparse do
             neural_sparse.each do |args|

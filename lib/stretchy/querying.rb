@@ -3,7 +3,7 @@ module Stretchy
     delegate :first, :first!, :last, :last!, :exists?, :has_field, :any?, :many?, to: :all
     delegate :order, :limit, :size, :sort, :rewhere, :eager_load, :includes,  :create_with, :none, :unscope, to: :all
     delegate :or_filter, :fields, :source, :highlight, to: :all
-    delegate :neural_sparse, to: :all
+    delegate :neural_sparse, :neural, :hybrid, to: :all
     delegate *Stretchy::Relations::AggregationMethods::AGGREGATION_METHODS, to: :all
 
     delegate :skip_callbacks, :routing, :search_options, to: :all
