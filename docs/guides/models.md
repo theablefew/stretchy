@@ -56,7 +56,8 @@ Attributes are defined using `Stretchy::Attributes::Type` attributes.
 * `:nested` - Used to index arrays of objects as separate documents.
 * `:percolator` - Used to store queries for matching documents.
 * `:point` - Used to store points in space.
-* `:rank_feature` - Used to boost relevance scores to rank features.
+* `:rank_feature` - Used to record a numeric feature to boost hits at query time.
+* `:rank_features` - Used to record many numeric features to boost hits at query time.
 * `:text` - Used to store text. This field is analyzed, which means that its value is broken down into separate searchable terms.
 * `:token_count` - Used to count the number of tokens in a string.
 * `:dense_vector` - Used to store dense vectors of float values.
@@ -85,7 +86,7 @@ Attributes are defined using `Stretchy::Attributes::Type` attributes.
 * `:date_range` - Used to store ranges of dates.
 * `:ip_range` - Used to store ranges of IP addresses.
 
-In Elasticsearch, :string and :keyword are two different data types that are used for different purposes.
+In Elasticsearch, `:string` and `:keyword` are two seemlingly similar data types that are used for different purposes.
 
 A `:string` field is analyzed, which means that its value is broken down into separate searchable terms. For example, the string "quick brown fox" might be broken down into the terms "quick", "brown", and "fox". This makes `:string` fields suitable for full-text search where you want to find partial matches or search for individual words within a field.
 
@@ -93,7 +94,7 @@ On the other hand, a `:keyword` field is not analyzed and is used for exact matc
 
 In Stretchy, when you define a field as `:keyword`, it's like defining a `:string` or `:text` field but with the `.keyword` notation automatically added to the field in queries, aggregations, and filters. This tells Elasticsearch to treat the field as a `:keyword` field and use the entire field value as a single term.
 
-Avoid using `:keyword` fields for full-text search. Use the `:text` type instead.
+Avoid using `:keyword` fields for full-text search. Use the `:text` or `:string` type instead.
 
 
 ```ruby
@@ -102,7 +103,7 @@ class Profile < StretchyModel
     attribute :first_name,  :keyword
     attribute :last_name,   :keyword
     attribute :geo,         :hash
-    attribute :bio,         :string
+    attribute :bio,         :text
     attribute :age,         :integer
     attribute :score,       :float
     attribute :joined,      :datetime
@@ -216,7 +217,7 @@ profile.update(first_name: "Lilly")
 
 ```ruby
 profile = Profile.where(first_name: "Lori")
-profile.destory
+profile.destroy
 ```
 
 ### Bulk Operations
@@ -319,83 +320,53 @@ Associations largely work the same as their Rails counterparts. The following as
 
 ## Mappings
 
+In Elasticsearch, mappings define how documents and their fields are stored and indexed. When using the attribute method you can specify additional mapping options as parameters.
+
 ```ruby
 class Report < StretchyModel
-    attribute :title, :text, fields: false
+    attribute :title, :text
     attribute :created_by, :keyword
     attribute :body, :text, term_vector: :with_positions_offsets
-
-    index_name 'test_reports'
-
-    mapping dynamic: 'strict' do
-        attribute_mappings[:properties].each_pair do |attr, options|
-            indexes attr, *options
-        end
-    end
 end
 ```
+The attribute method is used to define the fields of the Report model. The first argument is the field name, the second argument is the field type, and any subsequent arguments are additional mapping options for the field.
 
+In the case of the body field, `term_vector: :with_positions_offsets` is an additional mapping option. This option configures Elasticsearch to store term vectors for the body field, including position and character offset information. Term vectors are used to speed up full-text search operations.
+
+So, when you're defining mappings for your Elasticsearch models, you can use the attribute method to specify not only the field names and types, but also any additional mapping options that you need.
+
+If you're curious and want to dive deeper, check out the [Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html). It's a treasure trove of information on all the supported options for each field type.
 
 ```ruby
-Report.attribute_mappings
+Report.mappings
 => {
-  "properties" => {
-    "id"         => {
-      "type" => "keyword"
-    },
-    "created_at" => {
-      "type" => "datetime"
-    },
-    "updated_at" => {
-      "type" => "datetime"
-    },
-    "title"      => {
-      "type" => "string"
-    },
-    "created_by" => {
-      "type" => "keyword"
-    },
-    "body"       => {
-      "type"        => "text",
-      "term_vector" => "with_positions_offsets"
-    }
-  }
-}
-```
-
-{"properties": {  
-        "body": { 
-          "type": "text",
-          "fields": { 
-            "keyword": { 
-              "type": "keyword",
-              "ignore_above": 256
-            }
+    "properties" => {
+      "id"         => {
+        "type" => "keyword"
+      },
+      "created_at" => {
+        "type" => "date"
+      },
+      "updated_at" => {
+        "type" => "date"
+      },
+      "title"      => {
+        "type" => "text"
+      },
+      "created_by" => {
+        "type" => "keyword"
+      },
+      "body"       => {
+        "type"        => "text",
+        "term_vector" => "with_positions_offsets",
+        "fields"      => {
+          "keyword" => {
+            "type"         => "keyword",
+            "ignore_above" => 256
           }
-        },
-        "created_at": { 
-          "type": "date"
-        },
-        "created_by": { 
-          "type": "text",
-          "fields": { 
-            "keyword": {  
-              "type": "keyword",
-              "ignore_above": 256
-            }
-          }
-        },
-        "title": { 
-          "type": "text",
-          "fields": { 
-            "keyword": { 
-              "type": "keyword",
-              "ignore_above": 256
-            }
-          }
-        },
-        "updated_at": { 
-          "type": "date"
         }
       }
-    }
+    },
+    :dynamic     => true
+  } 
+```

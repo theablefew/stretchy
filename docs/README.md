@@ -16,6 +16,9 @@ Stretchy simplifies the process of querying, aggregating, and managing Elasticse
 * Support for time-based indices and aliases
 * Associations to both ActiveRecord models and `StretchyModel`
 * Bulk Operations made easy
+* Ingest Pipelines
+* Machine Learning
+* Integrated RAG and LLM connectors
 * Validations, custom attributes, and more...
 
 Follow the guides to learn more about:
@@ -23,6 +26,8 @@ Follow the guides to learn more about:
 * [Querying](guides/querying?id=querying)
 * [Aggregations](guides/aggregations?id=aggregations)
 * [Scopes](guides/scopes?id=scopes) 
+* [Pipelines](guides/pipelines?id=pipelines)
+* [Machine Learning](guides/machine-learning?id=machine-learning)
 
 or walk through of a simple [Data Analysis](examples/data_analysis?id=data-analysis) example.
 

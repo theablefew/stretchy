@@ -118,17 +118,17 @@ Create a file for `CrashEvent` at `app/models/crash_event.rb`
 class CrashEvent < StretchyModel
 
   attribute :occurred_on, :datetime, model_format: '%m/%d/%Y'
-  attribute :location, :string
-  attribute :operator, :string
-  attribute :flight, :string
-  attribute :route, :string
-  attribute :type, :string
-  attribute :registration, :string
-  attribute :cn_in, :string
+  attribute :location, :keyword
+  attribute :operator, :keyword
+  attribute :flight, :keyword
+  attribute :route, :keyword
+  attribute :type, :keyword
+  attribute :registration, :keyword
+  attribute :cn_in, :keyword
   attribute :aboard, :float
   attribute :fatalities, :float
   attribute :ground, :float
-  attribute :summary, :string
+  attribute :summary, :text
 
   scope :operator_fatalities, -> { aggregation(:operator_fatalities, 
       {

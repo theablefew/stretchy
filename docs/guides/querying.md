@@ -252,3 +252,46 @@ Model.skip_callbacks(:routing).where(title: 'goats')
 In this example, the `:routing` requirement is skipped for the immediate query. This means that even though the `Model` class has a `query_must_have` requirement for `:routing`, this requirement will not be enforced for this query. The query will be executed even if the `:routing` option is not included.
 
 Please note that skipping callbacks can potentially harm performance and lead to unexpected results, so it should be used sparingly and only when necessary.
+
+## Vector Searching
+Before using neural search, you must set up a [Machine Learning](guides/machine-learning?id=machine-learning) model. 
+
+
+### neural
+Neural search transforms text into vectors and facilitates vector search both at ingestion time and at search time. During ingestion, neural search transforms document text into vector embeddings and indexes both the text and its vector embeddings in a vector index. When you use a neural query during search, neural search converts the query text into vector embeddings, uses vector search to compare the query and document embeddings, and returns the closest results.
+
+Before you ingest documents into an index, documents are passed through a machine learning (ML) model, which generates vector embeddings for the document fields. When you send a search request, the query text or image is also passed through the ML model, which generates the corresponding vector embeddings. Then neural search performs a vector search on the embeddings and returns matching documents.
+
+```ruby
+Model.neural(vector_embedding: "soft cats", k: 5)
+```
+
+#### Multimodal
+
+By supplying a hash with `query_image` and/or `query_text` to the embedding field you can perform multimodal neural search:
+
+```ruby
+Model.neural(vector_embedding: {
+	query_text: 'Leather coat',
+	query_image: "iDs0djslsdSUAfx11..."
+}, k: 5)
+```
+### neural_sparse
+
+```ruby
+Model.neural_sparse(body_embedding: "A funny thing about...")
+```
+
+### hybrid
+
+Hybrid search combines keyword and neural search to improve search relevance. To implement hybrid search, you need to set up a search pipeline that runs at search time. 
+
+```ruby
+Modeo.hybrid(neural: [
+    {passage_embedding: 'really soft cats', model_id: '1234', k: 2}
+  ], 
+  query: [
+    {term: {status: :active}}
+  ]
+)
+```

@@ -4,9 +4,9 @@
 
 > Elasticsearch Models for Ruby on Rails
 
-- Chainable Aggregations
-- Query Builder
-- Max Power
+- Chainable Queries and Aggregations
+- Integrated RAG and LLM Agents
+- Ingest Pipelines
 
 [GitHub](https://github.com/theablefew/stretchy)
 [Get Started](#stretchy-model)
