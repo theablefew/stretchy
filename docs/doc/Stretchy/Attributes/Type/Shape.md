@@ -33,7 +33,7 @@ Defines a shape attribute for the model. This field type is used for complex sha
 ### Examples[¶](#class-Stretchy::Attributes::Type::Shape-label-Examples) [↑](#top)
 
 ```
-classMyModel\<Stretchy::Recordattribute:boundary,:shape,orientation:'cw'end
+classMyModel\<StretchyModelattribute:boundary,:shape,orientation:'cw'end
 ```
 
 ### Returns[¶](#class-Stretchy::Attributes::Type::Shape-label-Returns) [↑](#top)

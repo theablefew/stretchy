@@ -8,7 +8,7 @@ Any field that contains a JSON object can be configured to be a percolator field
 ### Examples[¶](#class-Stretchy::Attributes::Type::Percolator-label-Examples) [↑](#top)
 
 ```
-classMyModel\<Stretchy::Recordattribute:query,:percolatorend
+classMyModel\<StretchyModelattribute:query,:percolatorend
 ```
 
 ### Returns[¶](#class-Stretchy::Attributes::Type::Percolator-label-Returns) [↑](#top)

@@ -18,7 +18,7 @@ It is analogous to the rank\_feature data type but is better suited when the lis
 ### Examples[¶](#class-Stretchy::Attributes::Type::RankFeatures-label-Examples) [↑](#top)
 
 ```
-classMyModel\<Stretchy::Recordattribute:negative\_reviews,:rank\_features,positive\_score\_impact:falseend
+classMyModel\<StretchyModelattribute:negative\_reviews,:rank\_features,positive\_score\_impact:falseend
 ```
 
 ### Returns[¶](#class-Stretchy::Attributes::Type::RankFeatures-label-Returns) [↑](#top)

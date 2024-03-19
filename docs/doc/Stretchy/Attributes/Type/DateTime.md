@@ -63,7 +63,7 @@ Defines a datetime attribute for the model.
 ### Examples[¶](#class-Stretchy::Attributes::Type::DateTime-label-Examples) [↑](#top)
 
 ```
-classMyModel\<Stretchy::Recordattribute:created\_at,:datetime,format:'strict\_date\_optional\_time||epoch\_millis',locale:'en'end
+classMyModel\<StretchyModelattribute:created\_at,:datetime,format:'strict\_date\_optional\_time||epoch\_millis',locale:'en'end
 ```
 
 ### Returns[¶](#class-Stretchy::Attributes::Type::DateTime-label-Returns) [↑](#top)

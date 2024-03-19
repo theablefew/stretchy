@@ -4,7 +4,7 @@ Defines a long\_range attribute for the model.
 ### Examples[¶](#class-Stretchy::Attributes::Type::Range::LongRange-label-Examples) [↑](#top)
 
 ```
-classMyModel\<Stretchy::Recordattribute:population\_range,:long\_rangeend
+classMyModel\<StretchyModelattribute:population\_range,:long\_rangeend
 ```
 
 ### Returns[¶](#class-Stretchy::Attributes::Type::Range::LongRange-label-Returns) [↑](#top)

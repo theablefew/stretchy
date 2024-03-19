@@ -111,7 +111,7 @@ In Stretchy, the default_sort_key is the field that is used for sorting when no 
 You can change the `default_sort_key` for a model by using the `default_sort_key` class method in your model definition. Here's an example:
 
 ```ruby
-class Model < Stretchy::Record
+class Model < StretchyModel
   default_sort_key :new_sort_field
 end
 ```

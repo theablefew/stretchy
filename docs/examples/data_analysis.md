@@ -115,9 +115,9 @@ Routing determines which shard in the cluster the document will be written route
 Create a file for `CrashEvent` at `app/models/crash_event.rb`
 
 ```ruby
-class CrashEvent < Stretchy::Record
+class CrashEvent < StretchyModel
 
-  attribute :occurred_on, :datetime
+  attribute :occurred_on, :datetime, model_format: '%m/%d/%Y'
   attribute :location, :string
   attribute :operator, :string
   attribute :flight, :string
@@ -162,12 +162,12 @@ end
 Reload your Rails console and start the bulk index operation:
 
 ```ruby
-data = JSON.parse(File.read('airplane_crashes.json'))
+data = JSON.parse(File.read('/Users/spencer/Downloads/airplane_crashes.json'))
 CrashEvent.bulk_in_batches(data, size: 100) do |batch|
-    puts "Processing batch: #{batch.length}"
-    batch.map! do |event|
-      CrashEvent.new(event.symbolize_keys).to_bulk
-    end
+  puts "Processing batch: #{batch.length}"
+  batch.map! do |event|
+    CrashEvent.new(event.symbolize_keys).to_bulk
+  end
 end
 ```
 

@@ -4,7 +4,7 @@ Defines an ip\_range attribute for the model.
 ### Examples[¶](#class-Stretchy::Attributes::Type::Range::IpRange-label-Examples) [↑](#top)
 
 ```
-classMyModel\<Stretchy::Recordattribute:ip\_range,:ip\_rangeend
+classMyModel\<StretchyModelattribute:ip\_range,:ip\_rangeend
 ```
 
 ### Returns[¶](#class-Stretchy::Attributes::Type::Range::IpRange-label-Returns) [↑](#top)

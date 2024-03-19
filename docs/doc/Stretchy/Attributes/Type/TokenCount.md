@@ -43,7 +43,7 @@ Defines a token\_count attribute for the model. This field type is used for coun
 ### Examples[¶](#class-Stretchy::Attributes::Type::TokenCount-label-Examples) [↑](#top)
 
 ```
-classMyModel\<Stretchy::Recordattribute:description\_token\_count,:token\_count,analyzer:'standard'end
+classMyModel\<StretchyModelattribute:description\_token\_count,:token\_count,analyzer:'standard'end
 ```
 
 ### Returns[¶](#class-Stretchy::Attributes::Type::TokenCount-label-Returns) [↑](#top)

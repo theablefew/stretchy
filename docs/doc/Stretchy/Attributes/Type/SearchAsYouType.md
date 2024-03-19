@@ -63,7 +63,7 @@ Defines a search\_as\_you\_type attribute for the model. This field type is opti
 ### Examples[¶](#class-Stretchy::Attributes::Type::SearchAsYouType-label-Examples) [↑](#top)
 
 ```
-classMyModel\<Stretchy::Recordattribute:name,:search\_as\_you\_type,max\_shingle\_size:4end
+classMyModel\<StretchyModelattribute:name,:search\_as\_you\_type,max\_shingle\_size:4end
 ```
 
 ### Returns[¶](#class-Stretchy::Attributes::Type::SearchAsYouType-label-Returns) [↑](#top)

@@ -33,7 +33,7 @@ Defines a hash attribute for the model.
 ### Examples[¶](#class-Stretchy::Attributes::Type::Hash-label-Examples) [↑](#top)
 
 ```
-classMyModel\<Stretchy::Recordattribute:metadata,:hash,dynamic:'strict',subobjects:falseend
+classMyModel\<StretchyModelattribute:metadata,:hash,dynamic:'strict',subobjects:falseend
 ```
 
 ### Returns[¶](#class-Stretchy::Attributes::Type::Hash-label-Returns) [↑](#top)

@@ -18,7 +18,7 @@ Defines a version attribute for the model. This field type is used for software 
 ### Examples[¶](#class-Stretchy::Attributes::Type::Version-label-Examples) [↑](#top)
 
 ```
-classMyModel\<Stretchy::Recordattribute:software\_version,:versionend
+classMyModel\<StretchyModelattribute:software\_version,:versionend
 ```
 
 ### Returns[¶](#class-Stretchy::Attributes::Type::Version-label-Returns) [↑](#top)

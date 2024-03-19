@@ -4,7 +4,7 @@ Defines an integer\_range attribute for the model.
 ### Examples[¶](#class-Stretchy::Attributes::Type::Range::IntegerRange-label-Examples) [↑](#top)
 
 ```
-classMyModel\<Stretchy::Recordattribute:age\_range,:integer\_rangeend
+classMyModel\<StretchyModelattribute:age\_range,:integer\_rangeend
 ```
 
 ### Returns[¶](#class-Stretchy::Attributes::Type::Range::IntegerRange-label-Returns) [↑](#top)

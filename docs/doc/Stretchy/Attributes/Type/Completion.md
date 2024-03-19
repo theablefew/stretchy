@@ -38,7 +38,7 @@ Defines a completion attribute for the model.
 ### Examples[¶](#class-Stretchy::Attributes::Type::Completion-label-Examples) [↑](#top)
 
 ```
-classMyModel\<Stretchy::Recordattribute:name,:completion,analyzer:'simple',max\_input\_length:100end
+classMyModel\<StretchyModelattribute:name,:completion,analyzer:'simple',max\_input\_length:100end
 ```
 
 ### Returns[¶](#class-Stretchy::Attributes::Type::Completion-label-Returns) [↑](#top)

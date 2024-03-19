@@ -3,10 +3,10 @@
 
 ## Creating Stretchy Documents
 
-Create your models in app/models and subclass the `Stretchy::Record` class. 
+Create your models in app/models and subclass the `StretchyModel` class. 
 
 ```ruby
-class Profile < Stretchy::Record
+class Profile < StretchyModel
 end
 ```
 
@@ -17,7 +17,7 @@ The index name `profiles` will be inferred from the `Profile` model.
 If you need a different naming convention for your indexes, you can override the default conventions.
 
 ```ruby
-class Profile < Stretchy::Record
+class Profile < StretchyModel
     index_name 'user_profiles'
 end
 ```
@@ -28,7 +28,7 @@ By default Stretchy Models are sorted by `created_at`. If you have another field
 
 
 ```ruby
-class Profile < Stretchy::Record
+class Profile < StretchyModel
      default_sort_key :updated_at
 end
 ```
@@ -97,7 +97,7 @@ Avoid using `:keyword` fields for full-text search. Use the `:text` type instead
 
 
 ```ruby
-class Profile < Stretchy::Record
+class Profile < StretchyModel
 
     attribute :first_name,  :keyword
     attribute :last_name,   :keyword
@@ -284,7 +284,7 @@ profile.save
 Associations can be made between models. While Elasticsearch is not a relational database, it is sometimes useful to have a link between records. 
 
 ```ruby
-class Animal < Stretchy::Record
+class Animal < StretchyModel
     attribute :name, :keyword
     attribute :zoo_id, :keyword
 
@@ -293,7 +293,7 @@ end
 ```
 
 ```ruby
-class Zoo < Stretchy::Record
+class Zoo < StretchyModel
     has_many :animals
 end
 ```

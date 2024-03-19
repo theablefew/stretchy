@@ -4,7 +4,7 @@ Defines a date\_range attribute for the model.
 ### Examples[¶](#class-Stretchy::Attributes::Type::Range::DateRange-label-Examples) [↑](#top)
 
 ```
-classMyModel\<Stretchy::Recordattribute:birth\_date\_range,:date\_rangeend
+classMyModel\<StretchyModelattribute:birth\_date\_range,:date\_rangeend
 ```
 
 ### Returns[¶](#class-Stretchy::Attributes::Type::Range::DateRange-label-Returns) [↑](#top)

@@ -14,7 +14,7 @@ Stretchy simplifies the process of querying, aggregating, and managing Elasticse
 * Chain `queries`, `scopes` and `aggregations`
 * Reduce Elasticsearch query complexity
 * Support for time-based indices and aliases
-* Associations to both ActiveRecord models and `Stretchy::Record`
+* Associations to both ActiveRecord models and `StretchyModel`
 * Bulk Operations made easy
 * Validations, custom attributes, and more...
 

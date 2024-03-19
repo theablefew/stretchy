@@ -18,7 +18,7 @@ Defines a rank\_feature attribute for the model.
 ### Examples[¶](#class-Stretchy::Attributes::Type::RankFeature-label-Examples) [↑](#top)
 
 ```
-classMyModel\<Stretchy::Recordattribute:url\_length,:rank\_feature,positive\_score\_impact:falseend
+classMyModel\<StretchyModelattribute:url\_length,:rank\_feature,positive\_score\_impact:falseend
 ```
 
 ### Returns[¶](#class-Stretchy::Attributes::Type::RankFeature-label-Returns) [↑](#top)

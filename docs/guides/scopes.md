@@ -5,7 +5,7 @@ In Stretchy, `scope` is a method that allows you to define commonly used queries
 Here's an example of how you might define a scope:
 
 ```ruby
-class Model < Stretchy::Record
+class Model < StretchyModel
   scope :published, -> { where(published: true) }
 end
 ```
@@ -53,7 +53,7 @@ Aggregations in Elasticsearch provide a way to group and summarize your data in 
 Here's an example of how you might define a scope that includes an aggregation:
 
 ```ruby
-class Model < Stretchy::Record
+class Model < StretchyModel
   scope :published, -> { where(published: true) }
   scope :average_rating_agg, -> { aggregation(:average_rating, avg: { field: :rating }) }
 end
@@ -74,7 +74,7 @@ This will return the average rating of published documents.
 Just like other scopes, aggregation scopes are chainable and can take arguments, allowing you to create dynamic aggregation queries. For example, you could define a scope that calculates the average rating for a specific category:
 
 ```ruby
-class Model < Stretchy::Record
+class Model < StretchyModel
   scope :average_rating_agg_for, ->(category) { 
     where(category: category).aggregation(:average_rating, avg: { field: :rating }) 
   }
@@ -91,7 +91,7 @@ This will return the average rating of all documents in the 'Books' category.
 
 ### Shared Scopes
 
-Stretchy has built-in shared scopes available to all Stretchy::Record models.
+Stretchy has built-in shared scopes available to all StretchyModel models.
 
 #### Between Scope
 The `between` scope is used to filter documents based on a range of values in a specific field. By default, this field is created_at, but you can specify a different field if needed.
@@ -121,4 +121,4 @@ Model.using_time_based_indices(2.months.ago..1.day.ago)
 
 In this example, the search will be performed across all indices for the Model class that were created in the last two months.
 
-These scopes are available to all `Stretchy::Record` models, making it easy to perform common types of queries.
+These scopes are available to all `StretchyModel` models, making it easy to perform common types of queries.
