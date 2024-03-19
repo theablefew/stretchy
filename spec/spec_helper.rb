@@ -45,7 +45,9 @@ end
 
 RSpec.configure do |config|
   if ENV['BACKEND'] == 'opensearch'
-    config.filter_run_excluding opensearch_incompatible: true
+    config.filter_run_excluding elasticsearch_only: true
+  else
+    config.filter_run_excluding opensearch_only: true
   end
 
   # rspec-expectations config goes here. You can use an alternate

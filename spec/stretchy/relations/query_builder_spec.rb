@@ -35,8 +35,8 @@ describe Stretchy::Relations::QueryBuilder do
 
   describe '#neural_sparse' do
     it 'returns the neural_query value' do
-      subject = described_class.new(neural_query: {embedding: { query_text: 'hello world', model_id: '1234'}})
-      expect(subject.neural_query).to eq({embedding: { query_text: 'hello world', model_id: '1234'}})
+      subject = described_class.new(neural_sparse: {embedding: { query_text: 'hello world', model_id: '1234'}})
+      expect(subject.neural_sparse).to eq({embedding: { query_text: 'hello world', model_id: '1234'}})
     end
   end
 

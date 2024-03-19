@@ -319,7 +319,7 @@ describe "Aggregations" do
             end
 
             context 'boxplot' do
-                it 'returns boxplot statistics', opensearch_incompatible: true  do
+                it 'returns boxplot statistics', elasticsearch_only: true  do
                     boxplot_agg = described_class.size(0).aggregation(:age_stats, boxplot: {field: :age})
                     expect(boxplot_agg.aggregations.age_stats).to be_a(Hash)
                     expect(boxplot_agg.aggregations.age_stats).to include(:q1, :q3, :min, :max)
@@ -457,7 +457,7 @@ describe "Aggregations" do
             end
 
             context 'rate' do
-                it 'returns rate', opensearch_incompatible: true do
+                it 'returns rate', elasticsearch_only: true do
                     rate_agg = described_class.size(0).aggregation(:by_date, 
                         date_histogram: {
                             field: :created_at,
@@ -507,7 +507,7 @@ describe "Aggregations" do
             end
 
             context 'string_stats' do
-                it 'returns string statistics', opensearch_incompatible: true do
+                it 'returns string statistics', elasticsearch_only: true do
                     string_stats_agg = described_class.size(0).aggregation(:position_stats, string_stats: {field: 'position.name'})
                     expect(string_stats_agg.aggregations.position_stats).to be_a(Hash)
                     expect(string_stats_agg.aggregations.position_stats).to include(:count, :min_length, :max_length, :avg_length, :entropy)
@@ -525,7 +525,7 @@ describe "Aggregations" do
             end
 
             context 't_test' do
-                it 'returns t-test statistics', opensearch_incompatible: true do
+                it 'returns t-test statistics', elasticsearch_only: true do
                     t_test_agg = described_class.size(0).aggregation(:t_test, 
                         t_test: {
                             a: {field: :income},
@@ -560,7 +560,7 @@ describe "Aggregations" do
             end
 
             context 'top_metrics' do
-                it 'returns top metrics', opensearch_incompatible: true do
+                it 'returns top metrics', elasticsearch_only: true do
                     top_metrics_agg = described_class.size(0).aggregation(:top_metrics, 
                         top_metrics: {
                             metrics: [{field: :income}, {field: :age}],

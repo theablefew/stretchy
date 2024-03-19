@@ -13,10 +13,10 @@ describe 'ML Model', opensearch_only: true do
         response = model.status
         Stretchy.logger.debug response
         model.instance_variable_set(:@model_id, response['model_id'])
-        puts response['model_id']
         response['state'] == 'COMPLETED'
       end
     end
+
     @model_id = @sparse_model.model_id
     @sparse_model.deploy do |model|
       model.wait_until_complete(sleep_time: 5) do

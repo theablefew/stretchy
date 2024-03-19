@@ -16,17 +16,13 @@ describe 'Ingest Pipeline' do
         description: "Extracts first and last name from name field",
         lang: "painless",
         source: <<~PAINLESS
-            String name = ctx['name'];
-            int index = name.indexOf('. ');
-            if (index >= 0) {
-              name = name.substring(index + 2);
-            }
-            String[] parts = /\\s+/.split(name);
+            ctx['name'] = /^[\\w\\s]+\\.\\s/.matcher(ctx['name']).replaceAll("");
+            String[] parts = /\\s+/.split(ctx['name']);
             ctx['first_name'] = parts[0];
             if (parts.length > 1) {
               ctx['last_name'] = parts[1];
             }
-          PAINLESS
+        PAINLESS
         
       processor :html_strip, field: :ssn
       processor :convert, field: :systolic, type: :integer
@@ -62,7 +58,7 @@ describe 'Ingest Pipeline' do
         "age" => Faker::Number.between(from: 19, to: 84),
         "ssn" => "<b>#{Faker::IDNumber.valid}</b>"
       }
-    end
+    end 
   end
 
   let(:bulk_records) do
@@ -101,7 +97,7 @@ describe 'Ingest Pipeline' do
     expect(intake_form.default_pipeline).to eq('intake_form_pipeline')
     expect(intake_form.count).to eq(initial_data.size)
     intake_form.all.each_with_index do |form, index|
-      name = initial_data[index]["name"].gsub(/^\w+\.\s/, '')
+      name = initial_data[index]["name"].gsub(/^[\w\s]+\.\s/, '')
       expect(form.first_name).to eq(name.split(' ')[0])
       expect(form.last_name).to eq(name.split(' ')[1])
       expect(form.ssn).not_to include('<b>', '</b>')
@@ -111,6 +107,7 @@ describe 'Ingest Pipeline' do
       expect(form.diastolic).to eq(initial_data[index]["vitals"].split(',')[2].to_i)
       expect(form.age).to eq(initial_data[index]["age"])
     end
+
   end
 
   it 'appears in the pipeline list' do
