@@ -49,6 +49,8 @@ REMOVE --> INDEX
 ```
 By doing these transformations as part of the ingest process, we ensure that the data is in the right format and structure for our needs right from the moment it enters Elasticsearch. This makes our subsequent data handling and analysis tasks much easier and more efficient.
 
+_app/pipelines/intake_form_pipeline.rb_
+
 ```ruby
 class IntakeFormPipeline < Stretchy::Pipeline
 
@@ -100,11 +102,18 @@ Once the pipeline is created, it's ready to preprocess any documents that are se
 IntakeFormPipeline.create!
 ```
 
+**Response:**
+```ruby
+#=> {"acknowledged"=>true} 
+```
+
 Remember, the pipeline only needs to be created once. After it's created, it will be used automatically whenever documents are indexed in Elasticsearch. If you need to change the pipeline, you can remove it with the `IntakeFormPipeline.delete! command.
 
 ## Describe the Model
 
 The `IntakeForm` model represents the index were we’ll store our intake forms. 
+
+*app/models/intake_form.rb*
 
 ```ruby
 class IntakeForm < StretchyModel
@@ -130,6 +139,11 @@ The `default_pipeline` method sets the default ingest pipeline for the model. In
 
 ```ruby
 IntakeForm.create_index!
+```
+
+**Response:**
+```ruby
+#=> {"acknowledged"=>true, "shards_acknowledged"=>true, "index"=>"intake_forms"} 
 ```
 
 ## Run the pipeline
@@ -167,6 +181,30 @@ We prepare the initial data by making sure each entry has a `_source` field with
 IntakeFormPipeline.simulate(docs)
 ```
 
+**Response:**
+```ruby
+#=> {"docs"=>
+#  [{"processor_results"=>
+#     [{"processor_type"=>"csv",
+#       "status"=>"success",
+#       "doc"=>
+#        {"_index"=>"_index",
+#         "_type"=>"_doc",
+#         "_id"=>"_id",
+#         "_source"=>{"systolic"=>"120", "diastolic"=>"72", "name"=>"Gov. Candy Williams", #"heart_rate"=>"700", "id"=>"ta0j288", "vitals"=>"700,120,72", "age"=>30, "ssn"=>"<b>547-93-4227</#b>"},
+#         "_ingest"=>{"pipeline"=>"intake_form_pipeline", "timestamp"=>"2024-03-20T13:06:17.661745464Z"}}},
+#      {"processor_type"=>"script",
+#       "status"=>"success",
+#       "description"=>"Extracts first and last name from name field",
+#       "doc"=>
+#        {"_index"=>"_index",
+#         "_type"=>"_doc",
+#         "_id"=>"_id",
+#         "_source"=>{"heart_rate"=>"700", "last_name"=>"Williams", "ssn"=>"<b>547-93-4227</b>", #"systolic"=>"120", "diastolic"=>"72", "name"=>"Candy Williams", "id"=>"ta0j288", #"first_name"=>"Candy", "vitals"=>"700,120,72", "age"=>30},
+#         "_ingest"=>{"pipeline"=>"intake_form_pipeline", "timestamp"=>"2024-03-20T13:06:17.661745464Z"}}},
+# ...
+```
+
 The response should show the results of simulation, with each processor step and it’s status.  
 
 #### Ingest
@@ -174,11 +212,32 @@ The response should show the results of simulation, with each processor step and
 Now, let’s ingest the data into the index. We’ll use a bulk request to index our documents:
 
 ```ruby 
-bulk_records = initial_data.map do |record|
+bulk_records = initial_data.map do |data|
 	{ index: { _index: IntakeForm.index_name, data: data } }
 end
 
 IntakeForm.bulk(bulk_records)
+```
+
+**Response:**
+```ruby
+ => 
+{"took"=>3,
+ "ingest_took"=>1,
+ "errors"=>false,
+ "items"=>
+  [{"index"=>{"_index"=>"intake_forms", "_type"=>"_doc", "_id"=>"vzz8W44BuORXSU88oIRr", "_version"=>1, "result"=>"created", "_shards"=>{"total"=>2, "successful"=>1, "failed"=>0}, "_seq_no"=>0, "_primary_term"=>1, "status"=>201}},
+   {"index"=>{"_index"=>"intake_forms", "_type"=>"_doc", "_id"=>"wDz8W44BuORXSU88oIRr", "_version"=>1, "result"=>"created", "_shards"=>{"total"=>2, "successful"=>1, "failed"=>0}, "_seq_no"=>1, "_primary_term"=>1, "status"=>201}},
+   {"index"=>{"_index"=>"intake_forms", "_type"=>"_doc", "_id"=>"wTz8W44BuORXSU88oIRr", "_version"=>1, "result"=>"created", "_shards"=>{"total"=>2, "successful"=>1, "failed"=>0}, "_seq_no"=>2, "_primary_term"=>1, "status"=>201}},
+   {"index"=>{"_index"=>"intake_forms", "_type"=>"_doc", "_id"=>"wjz8W44BuORXSU88oIRr", "_version"=>1, "result"=>"created", "_shards"=>{"total"=>2, "successful"=>1, "failed"=>0}, "_seq_no"=>3, "_primary_term"=>1, "status"=>201}},
+   {"index"=>{"_index"=>"intake_forms", "_type"=>"_doc", "_id"=>"wzz8W44BuORXSU88oIRr", "_version"=>1, "result"=>"created", "_shards"=>{"total"=>2, "successful"=>1, "failed"=>0}, "_seq_no"=>4, "_primary_term"=>1, "status"=>201}},
+   {"index"=>{"_index"=>"intake_forms", "_type"=>"_doc", "_id"=>"xDz8W44BuORXSU88oIRr", "_version"=>1, "result"=>"created", "_shards"=>{"total"=>2, "successful"=>1, "failed"=>0}, "_seq_no"=>5, "_primary_term"=>1, "status"=>201}},
+   {"index"=>{"_index"=>"intake_forms", "_type"=>"_doc", "_id"=>"xTz8W44BuORXSU88oIRr", "_version"=>1, "result"=>"created", "_shards"=>{"total"=>2, "successful"=>1, "failed"=>0}, "_seq_no"=>6, "_primary_term"=>1, "status"=>201}},
+   {"index"=>{"_index"=>"intake_forms", "_type"=>"_doc", "_id"=>"xjz8W44BuORXSU88oIRr", "_version"=>1, "result"=>"created", "_shards"=>{"total"=>2, "successful"=>1, "failed"=>0}, "_seq_no"=>7, "_primary_term"=>1, "status"=>201}},
+   {"index"=>{"_index"=>"intake_forms", "_type"=>"_doc", "_id"=>"xzz8W44BuORXSU88oIRr", "_version"=>1, "result"=>"created", "_shards"=>{"total"=>2, "successful"=>1, "failed"=>0}, "_seq_no"=>8, "_primary_term"=>1, "status"=>201}},
+   {"index"=>{"_index"=>"intake_forms", "_type"=>"_doc", "_id"=>"yDz8W44BuORXSU88oIRr", "_version"=>1, "result"=>"created", "_shards"=>{"total"=>2, "successful"=>1, "failed"=>0}, "_seq_no"=>9, "_primary_term"=>1, "status"=>201}},
+   {"index"=>{"_index"=>"intake_forms", "_type"=>"_doc", "_id"=>"yTz8W44BuORXSU88oIRr", "_version"=>1, "result"=>"created", "_shards"=>{"total"=>2, "successful"=>1, "failed"=>0}, "_seq_no"=>10, "_primary_term"=>1, "status"=>201}}]} 
+
 ```
 
 Our ingest pipeline will perform all of the operations we defined as `processors` in the `IntakeFormPipeline` and index the resulting document. 
@@ -187,7 +246,7 @@ Let's see how it did:
 
 ```ruby
 IntakeForm.count
-#=> 10
+#=> 11
 
 IntakeForm.first.heart_rate
 #=> 700
@@ -211,6 +270,44 @@ results = IntakeForm.range(:ages, {
       aggs: {avg_heart_rate: {avg: {field: :heart_rate}}}).size(0)
 
 ap results.aggregations.ages.buckets
+```
+
+**Response:**
+```ruby
+
+{
+  "19.0-39.0" => {
+    "from"           => 19.0,
+    "to"             => 39.0,
+    "doc_count"      => 3,
+    "avg_heart_rate" => {
+      "value" => 286.3333333333333
+    }
+  },
+  "40.0-59.0" => {
+    "from"           => 40.0,
+    "to"             => 59.0,
+    "doc_count"      => 4,
+    "avg_heart_rate" => {
+      "value" => 92.75
+    }
+  },
+  "60.0-79.0" => {
+    "from"           => 60.0,
+    "to"             => 79.0,
+    "doc_count"      => 2,
+    "avg_heart_rate" => {
+      "value" => 69.0
+    }
+  },
+  "80.0-*"    => {
+    "from"           => 80.0,
+    "doc_count"      => 1,
+    "avg_heart_rate" => {
+      "value" => 114.0
+    }
+  }
+}
 ```
 
 In this guide, we've walked through the process of creating an ingest pipeline with Elasticsearch using `stretchy-model`.
