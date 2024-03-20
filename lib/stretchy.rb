@@ -9,7 +9,7 @@ require 'active_model'
 require 'active_support/all'
 
 require_relative "stretchy/version"
-require_relative "rails/instrumentation/railtie" if defined?(Rails)
+require_relative "stretchy/rails/instrumentation/railtie" if defined?(Rails)
 require_relative 'elasticsearch/api/namespace/machine_learning/model'
 
 module Stretchy

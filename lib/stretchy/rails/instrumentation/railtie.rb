@@ -3,17 +3,21 @@ module Stretchy
 
     class Railtie < ::Rails::Railtie
 
-      require 'rails/instrumentation/publishers'
-      Stretchy.instrument!
+      require_relative 'publishers'
 
       ActiveSupport::Notifications.subscribe 'search.stretchy' do |name, start, finish, id, payload|
         message = [
-           Rainbow("  #{payload[:klass]}").bright, 
-           "(#{(finish.to_time - start.to_time).round(2)}ms)",
-           Stretchy::Utils.to_curl(payload[:klass].constantize, payload[:search])
+            Rainbow("  #{payload[:klass]}").bright, 
+            "(#{(finish.to_time - start.to_time).round(2)}ms)",
+            Stretchy::Utils.to_curl(payload[:klass].constantize, payload[:search])
         ].join(" ")
         ::Rails.logger.debug(Rainbow(message).color(:yellow))
-     end
+      end
+
+      
+      initializer 'stretchy.instrumentation' do
+        Stretchy.instrument!
+      end
 
       # initializer 'stretchy.set_defaults' do
       #   config.elasticsearch_cache_store = :redis_store
@@ -21,5 +25,6 @@ module Stretchy
       # end
 
     end
+
   end
 end
