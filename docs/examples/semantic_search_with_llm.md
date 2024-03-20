@@ -1,35 +1,22 @@
 # Semantic Search with LLMs
 
+>[!INFO|style:flat]
+> This guide only works with features found in Opensearch 2.12+
 
-# Text Embeddings
+**Prerequisites:**
+
+- Opensearch installed and running
+- Ruby on Rails or stretchy-model's `bin/console`
+
+Follow the [Quick Start](guides/quick-start) for detailed steps. 
+
+## Text Embeddings
 
 * OpenAI embeddings
-* Elasticsearch Embeddings with Compatible Models
-  * `all-MiniLM-L6-v2`
 
-# Set up Elasticsearch
-
-# Ingest Pipeline
+## Ingest Pipeline
 
 _Set up ingest pipeline with inference model_
-
-
-# Rails app
-
-_Use simple stimulus app_
-
-```
-rails new semantic_search
-```
-
-```
-cd semantic_search
-```
-
-```
-bundle add stretchy-model
-```
-
 
 ## Define Models
 ```ruby
@@ -42,9 +29,9 @@ end
 ```
 
 ```ruby
-class File < StretchyModel
+class RepoFile < StretchyModel
 	attribute :name, :string
-  attribute :path, :string
+    attribute :path, :string
 	attribute :content, :text
 	attribute :file_embeddings, :dense_vector
 	attribute :method_definitions, :array
@@ -56,9 +43,8 @@ end
 ```ruby
 def search
   query_text = params[:query_text] 
-  # =>  "Please provide a patch to fix this error:\nNameError: uninitialized constant TestModel\n# ./spec/stretchy_model_spec.rb:29:in `block in <top (required)>'"
 
-  response = File.where(content: query_text)
+  response = RepoFile.where(content: query_text)
         .exists?(field: :file_embeddings)
         .knn(
           field: :file_embeddings,

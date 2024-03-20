@@ -1,11 +1,12 @@
 # Simple Ingest Pipeline
 
-**Prerequisites:**
-
-- Opensearch installed and running
-- Ruby on Rails or stretchy-model's `bin/console`
-
-Follow the [Quick Start](guides/quick-start) for detailed steps. 
+>[!INFO|style:flat]
+>**Prerequisites:**
+>
+>- Opensearch installed and running
+>- Ruby on Rails or stretchy-model's `bin/console`
+>
+>Follow the [Quick Start](guides/quick-start) for detailed steps. 
 
 ## Data Source
 
