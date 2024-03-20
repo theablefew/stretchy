@@ -114,7 +114,7 @@ end
 
 ```
 
->__NOTE__
+>[!TIP]
 >
 > `created_at`, `updated_at` and `id` are automatically included
 
@@ -151,11 +151,11 @@ attribute :metadata, :hash, properties: {
 ```
 In this example, the metadata attribute is a hash object with fields: title, tags and checkins. The title field is of type `:text`, which means it will be analyzed and can be used for full-text search. The tags field is of type `:keyword`, which means it will not be analyzed and can be used for exact match searches. The checkins field is of type `:array` which means it can contain zero or more values.
 
-> _**Note on arrays**_
+> [!NOTE]
 >
 >When adding a field dynamically, the first value in the array determines the field type. All subsequent values must be of the same data type or it must at least be possible to coerce subsequent values to the same data type.
 >
->Arrays with a mixture of data types are not supported: [ 10, "some string" ]
+>Arrays with a mixture of data types are not supported: `[ 10, "some string" ]`
 
 By specifying the fields within the hash object, you have fine-tuned control over the mappings and can optimize the search performance and accuracy for your specific use case. 
 
@@ -313,7 +313,7 @@ Associations largely work the same as their Rails counterparts. The following as
 * `has_one`
 
 
->__WARNING__
+>[!WARNING]
 >
 > Because Elasticsearch is not a relational database, there are no join statements. This means associations will generate additional queries to fetch data.
 

@@ -59,6 +59,7 @@ class Model < StretchyModel
 end
 ```
 
+> [!TIP]
 > _Implementing a naming convention for aggregation scopes can help make your code more readable and maintainable. By appending `_agg` to the name of aggregation scopes, you can easily distinguish them from other scopes._
 
 In this example, a scope named `average_rating_agg` is defined. This scope includes an aggregation that calculates the average value of the `rating` field.

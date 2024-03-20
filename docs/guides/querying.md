@@ -253,7 +253,10 @@ In this example, the `:routing` requirement is skipped for the immediate query. 
 
 Please note that skipping callbacks can potentially harm performance and lead to unexpected results, so it should be used sparingly and only when necessary.
 
-## Vector Searching
+## Vector Search
+>[!NOTE|style:flat]
+> Some of these features only work with Opensearch 2.12+ or require an Elasticsearch license to access Machine Learning features.
+
 Before using neural search, you must set up a [Machine Learning](guides/machine-learning?id=machine-learning) model. 
 
 
@@ -266,7 +269,7 @@ Before you ingest documents into an index, documents are passed through a machin
 Model.neural(vector_embedding: "soft cats", k: 5)
 ```
 
-#### Multimodal
+##### Multimodal
 
 By supplying a hash with `query_image` and/or `query_text` to the embedding field you can perform multimodal neural search:
 
