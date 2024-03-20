@@ -313,7 +313,7 @@ Associations largely work the same as their Rails counterparts. The following as
 * `has_one`
 
 
->[!WARNING]
+>[!WARNING|label:Associations in Elasticsearch]
 >
 > Because Elasticsearch is not a relational database, there are no join statements. This means associations will generate additional queries to fetch data.
 

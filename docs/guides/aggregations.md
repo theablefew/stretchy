@@ -27,7 +27,10 @@ returns:
 }
 ```
 
-> You can access the entire structure through dot notation. `aggregations.flagged_counts.buckets.first.doc_count` => `123`
+>[!TIP|label:Accessing Aggregation Results] 
+>You can access the entire structure through dot notation. 
+>
+>`aggregations.flagged_counts.buckets.first.doc_count` => `123`
 
 
 --- 

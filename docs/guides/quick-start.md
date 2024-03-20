@@ -4,10 +4,11 @@
 
 - Ruby and Rails installed on your machine
 
->[!TIP|style:flat]
+>[!TIP|style:flat|label:Single Node Clusters]
 > These docker commands will run a single-node cluster suitable for local development.
->
-> Choose Elasticsearch or OpenSearch
+
+
+#### Choose Elasticsearch or OpenSearch
 
 __Start Elasticsearch:__
 
@@ -31,7 +32,7 @@ cd fantastic_thing
 bundle add stretchy-model   
 ```
 
-> [!INFO|style:flat]
+> [!INFO|style:flat|label:OpenSearch]
 > If using Opensearch be sure to add it to your Gemfile:
 >
 ```sh

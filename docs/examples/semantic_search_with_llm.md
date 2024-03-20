@@ -1,6 +1,6 @@
 # Semantic Search with LLMs
 
->[!INFO|style:flat]
+>[!INFO|style:flat|label:OpenSearch Only]
 > This guide only works with features found in Opensearch 2.12+
 
 **Prerequisites:**

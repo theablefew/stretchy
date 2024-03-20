@@ -1,10 +1,10 @@
 # Machine Learning
->[!NOTE|style:flat]
+>[!NOTE|style:flat|label:OpenSearch Compatability]
 > OpenSearch and Elasticsearch diverge in how they handle machine learning APIs. These features are in active development and subject to change.
 >
 > This guide largely covers OpenSearch Machine Learning unless otherwise stated. 
 
->[!WARNING]
+>[!WARNING|label:Machine Learning on Elasticsearch]
 > Elasticsearch requires a license to enable ML capabilities
 
 ## Models
@@ -33,6 +33,10 @@ end
 
 
 ## Managing Models
+
+>[!TIP|label:Machine Learning Settings]
+> When running development or single-node clusters you may need to adjust your cluster settings to allow Machine Learning models to run on all nodes instead of dedicated machine learning nodes.
+> Add `Stretchy::MachineLearning::Model.ml_on_all_nodes!` to your *config/environments/development.rb* file to enable machine learning on all nodes. 
 
 ### register
 Registers the machine learning model. 
