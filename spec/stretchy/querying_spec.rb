@@ -99,10 +99,16 @@ describe "QueryMethods" do
                 end
 
                 context 'when using ranges' do
-                    it 'handles date ranges' do
+                    it 'gte and lte with .. ranges' do
                       begin_date = 2.days.ago.beginning_of_day.utc
                         end_date = 1.day.ago.end_of_day.utc
-                      expect(described_class.where(date: begin_date...end_date).to_elastic[:query][:bool]).to eq({filter: [{range: {date: {gte: begin_date, lte: end_date}}}]}.with_indifferent_access)
+                      expect(described_class.where(date: begin_date..end_date).to_elastic[:query][:bool]).to eq({filter: [{range: {date: {gte: begin_date, lte: end_date}}}]}.with_indifferent_access)
+                    end
+
+                    it 'gte and lt with ... ranges' do
+                        begin_date = 2.days.ago.beginning_of_day.utc
+                        end_date = 1.day.ago.end_of_day.utc
+                      expect(described_class.where(date: begin_date...end_date).to_elastic[:query][:bool]).to eq({filter: [{range: {date: {gte: begin_date, lt: end_date}}}]}.with_indifferent_access)
                     end
                 
                     it 'handles integer ranges' do
