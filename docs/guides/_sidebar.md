@@ -11,3 +11,4 @@
 
 * __Examples__
     * [Data Analysis](examples/data_analysis)
+    * [Simple Ingest Pipeline](examples/simple-ingest-pipeline)

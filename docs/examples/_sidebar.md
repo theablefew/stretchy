@@ -11,4 +11,5 @@
 
 * __Examples__
     * [Data Analysis](examples/data_analysis)
+    * [Simple Ingest Pipeline](examples/simple-ingest-pipeline?id=simple-ingest-pipeline)
     * [Semantic Search with LLMs](examples/semantic_search_with_llm)
