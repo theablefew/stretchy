@@ -53,14 +53,14 @@ If bundler is not being used to manage dependencies, install the gem by executin
   gem install stretchy-model
 ```
 
-<details>
-<summary>Rails Configuration</summary>
-
-
 >[!TIP]
 > If using OpenSearch make sure to add the gem to your Gemfile.
 >
 > `bundle add opensearch-ruby`
+
+<details>
+<summary>Rails Configuration</summary>
+
 
 ```sh
 rails credentials:edit
