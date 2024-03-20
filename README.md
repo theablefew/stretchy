@@ -8,10 +8,7 @@ stretchy-model
 
 </p>
 
-<<<<<<< HEAD
 Stretchy provides Elasticsearch/Opensearch models in Rails applications with an Rails-like model interface.
-=======
->>>>>>> main
 
 ## Features
 Stretchy simplifies the process of querying, aggregating, and managing Elasticsearch-backed models, allowing Rails developers to work with search indices as comfortably as they would with traditional Rails models.
@@ -27,79 +24,6 @@ Stretchy simplifies the process of querying, aggregating, and managing Elasticse
 * Vector and Neural search 
 * Integrated RAG and LLM connectors
 * Validations, custom attributes, and more...
-<<<<<<< HEAD
-
-## Models
-
-### Attributes
-
-```ruby
-class Post < Stretchy::Record
-
-    attribute :title,                   :string
-    attribute :body,                    :string
-    attribute :flagged,                 :boolean,  default: false  
-    attribute :author,                  :hash 
-    attribute :tags,                    :array, default: []
-
-end
-```
->[!NOTE]
->`created_at`, `:updated_at` and `:id` are automatically added to all `Stretchy::Records`
-> 
-> The `default_sort_key` is :created_at
-
-
-### Query
-```ruby
-Post.where(title: :goat, flagged: false)
-#=> <Post id: 309sXA2s, title: "goat", body: "...", flagged: false, author...>
-```
-Query object fields with dot notation
-```ruby
-  Post.where('author.name': "Jadzia", flagged: true).first
-  #=> <Post id: aW02w3092, title: "Fun Cats", body: "...", flagged: true,
-  #         author: {name: "Jadzia", age: 20}, tags: ["cat", "amusing"]>
-```
-
-### Aggregations
-```ruby
-
-  result = Post.aggregation(:post_frequency, 
-    date_histogram: {
-      field: :created_at,
-      calender_interval: :month
-    })
-
-  result.aggregations.post_frequency
-  #=> {buckets: [{key_as_string: "2024-01-01", doc_count: 20}, ...]}
-```
-### Filters
-
-```ruby
-Post.filter(:range, 'author.age': {gte: 18, lte: 30}).where(title: "Welcome")
-#=> filters authors with age greater than 18 and less than 30
-```
-
-### Scopes
-Scopes can contain any query methods, filters or aggregations, resulting in composable queries. 
-```ruby
-class Post < Stretchy::Record
-  # ...attributes
-
-  # Scopes
-  scope :flagged, -> { where(flagged: true) }
-  scope :top_links, lambda do |size=10, url=".com"| 
-    aggregation(:links, 
-      terms: {
-        field: :links, 
-        size: size, 
-        include: ".*#{url}.*"
-      })
-  end
-end
-=======
->>>>>>> main
 
 Follow the guides to learn more about:
 * [Models](https://theablefew.github.io/stretchy/#/guides/models?id=models)

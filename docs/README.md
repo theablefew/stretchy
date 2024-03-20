@@ -10,14 +10,15 @@ Stretchy provides Elasticsearch/Opensearch models in Rails applications with an 
 ## Features
 Stretchy simplifies the process of querying, aggregating, and managing Elasticsearch-backed models, allowing Rails developers to work with search indices as comfortably as they would with traditional Rails models.
 
-* Model fully back by Elasticsearch/Opensearch
+* Models fully back by Elasticsearch/Opensearch
 * Chain `queries`, `scopes` and `aggregations`
 * Reduce Elasticsearch query complexity
 * Support for time-based indices and aliases
 * Associations to both ActiveRecord models and `StretchyModel`
 * Bulk Operations made easy
-* Ingest Pipelines
+* Ingest and Search Pipelines
 * Machine Learning
+* Vector and Neural search 
 * Integrated RAG and LLM connectors
 * Validations, custom attributes, and more...
 
@@ -29,7 +30,10 @@ Follow the guides to learn more about:
 * [Pipelines](guides/pipelines?id=pipelines)
 * [Machine Learning](guides/machine-learning?id=machine-learning)
 
-or walk through of a simple [Data Analysis](examples/data_analysis?id=data-analysis) example.
+**Examples**
+ - [Data Analysis](examples/data_analysis?id=data-analysis)
+ - [Simple Ingest Pipeline](examples/simple-ingest-pipeline?id=simple-ingest-pipeline)
+
 
 ## Installation
 
@@ -45,36 +49,43 @@ If bundler is not being used to manage dependencies, install the gem by executin
 gem install stretchy-model
 ```
 
-<details>
-<summary><strong>Rails Configuration</strong></summary>
+>[!INFO|style:flat]
+> If using OpenSearch add the gem to your Gemfile:
+>
+> ```
+> bundle add opensearch-ruby
+> ```
 
-
+#### Add credentials
 
 ```sh
 rails credentials:edit
 ```
 
-#### Add elasticsearch credentials
 ```yaml
 elasticsearch:
    url: localhost:9200
 
-# or opensearch
+# or if using opensearch
 # opensearch:
-#    host: https://localhost:9200
+#    host: http://localhost:9200
 #    user: admin
 #    password: admin
+#    transport_options:
+#       ssl:
+#         verify: false
 ```
 
 #### Create an initializer 
-<p><sub><em>config/initializers/stretchy.rb</em></sub></p>
+*config/initializers/stretchy.rb*
 
-```ruby {file=config/initializers/stretchy.rb}
+```ruby
 Stretchy.configure do |config|
-    config.client = Elasticsearch::Client.new url: Rails.application.credentials.elasticsearch.url, log: true
+    config.client = Elasticsearch::Client.new Rails.application.credentials.elasticsearch
+    # or if using OpenSearch
+    # config.client = OpenSearch::Client.new Rails.application.credentials.opensearch
 end
 ```
-</details>
 
 
 
@@ -82,10 +93,6 @@ end
 
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
->[!TIP]
->This library is built on top of the excellent [elasticsearch-persistence](https://github.com/elastic/elasticsearch-rails/tree/main/elasticsearch-persistence) gem. 
->
-> Full documentation on [Elasticsearch Query DSL and Aggregation options](https://github.com/elastic/elasticsearch-rails/tree/main/elasticsearch-persistence)
 
 ## Testing
 <details>
