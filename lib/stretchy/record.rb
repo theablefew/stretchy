@@ -16,12 +16,12 @@ module Stretchy
                 include ActiveModel::Serializers::JSON
 
                 include Stretchy::Model::Callbacks
+                include Stretchy::Model::Common
+                include Stretchy::Model::Persistence
+                include Stretchy::Model::Refreshable
                 include Stretchy::Indexing::Bulk
-                include Stretchy::Persistence
                 include Stretchy::Associations 
-                include Stretchy::Refreshable
-                include Stretchy::Common
-                include Stretchy::Scoping
+                include Stretchy::Relations::Scoping
                 include Stretchy::Utils
                 include Stretchy::SharedScopes
                 include Stretchy::Attributes
