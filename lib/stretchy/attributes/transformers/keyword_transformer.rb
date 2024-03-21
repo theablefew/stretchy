@@ -32,7 +32,7 @@ module Stretchy
 
           def protected?(arg)
             return false if arg.nil?
-            Stretchy::Relations::AggregationMethods::AGGREGATION_METHODS.include?(arg.to_sym)
+            Stretchy::Relations::AggregationMethods.registry.include?(arg.to_sym)
           end
           
           def transform(item, *ignore) 
