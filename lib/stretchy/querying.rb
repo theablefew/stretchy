@@ -6,7 +6,7 @@ module Stretchy
     delegate :routing, :search_options, to: :all
 
     delegate *Stretchy::Relations::QueryMethods.registry, to: :all
-    delegate *Stretchy::Relations::AggregationMethods::AGGREGATION_METHODS, to: :all
+    delegate *Stretchy::Relations::AggregationMethods.registry, to: :all
 
 
     def fetch_results(es)
