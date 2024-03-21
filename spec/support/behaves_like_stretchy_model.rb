@@ -25,7 +25,7 @@ shared_examples 'a stretchy model' do |model_class|
     expect(model_class.count).to be_a(Numeric)
   end
 
-  context 'pipelins' do
+  context 'pipelines' do
     it 'responds to default_pipeline' do
       expect(model_class).to respond_to(:default_pipeline)
     end
