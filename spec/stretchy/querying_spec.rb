@@ -124,6 +124,14 @@ describe "QueryMethods" do
                     it 'handles regex' do
                       expect(described_class.where(color: /gr(a|e)y/).to_elastic).to eq({query: {regexp: {'color.keyword': { value: 'gr(a|e)y' }}}}.with_indifferent_access)
                     end
+
+                    it 'handles regex with flags' do
+                        expect(described_class.where(color: /gr(a|e)y/i).to_elastic).to eq({query: {regexp: {'color.keyword': { value: 'gr(a|e)y', case_insensitive: true }}}}.with_indifferent_access)
+                    end
+
+                    it 'handles multiple conditions' do
+                        expect(described_class.where(color: /gr(a|e)y/, age: 30).to_elastic).to eq({query: {bool: {must: {term: {age: 30}}},regexp: {'color.keyword': { value: 'gr(a|e)y' }}}}.with_indifferent_access)
+                    end
                   end
                 
                   context 'when using terms' do
@@ -133,8 +141,8 @@ describe "QueryMethods" do
                   end
                 
                   context 'when using ids' do
-                    xit 'handles ids' do
-                      expect(Model.where(id: [12, 80, 32]).to_elastic).to eq({ids: {values: [12, 80, 32]}})
+                    it 'handles ids' do
+                      expect(described_class.where(id: [12, 80, 32]).to_elastic).to eq({query: {ids: {values: [12, 80, 32]}}}.with_indifferent_access)
                     end
                   end
 

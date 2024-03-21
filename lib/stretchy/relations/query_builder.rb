@@ -51,6 +51,10 @@ module Stretchy
         @shoulds ||= compact_where(values[:should])
       end
 
+      def ids
+        @ids ||= values[:ids]
+      end
+
       def regexes
         @regexes ||= values[:regexp]
       end
@@ -105,7 +109,7 @@ module Stretchy
       private
 
       def missing_bool_query?
-        query.nil? && must_nots.nil? && shoulds.nil? && regexes.nil?
+        query.blank? && must_nots.nil? && shoulds.nil? && regexes.nil?
       end
 
       def missing_query_string?
@@ -121,12 +125,15 @@ module Stretchy
       end
 
       def no_query?
-        missing_bool_query? && missing_query_string? && missing_query_filter? && missing_neural?
+        missing_bool_query? && missing_query_string? && missing_query_filter? && missing_neural? && ids.nil?
       end
 
       def build_query
         return if no_query?
         structure.query do
+          structure.ids do
+            structure.values ids.flatten.compact.uniq
+          end unless ids.nil?
 
           structure.hybrid do
             structure.queries do

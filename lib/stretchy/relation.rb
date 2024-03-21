@@ -3,6 +3,7 @@ module Stretchy
     # It provides methods for querying and manipulating the documents.
     class Relation
 
+
         # These methods cannot be used with the `delete_all` method.
         INVALID_METHODS_FOR_DELETE_ALL = [:limit, :offset]
 
@@ -146,7 +147,7 @@ module Stretchy
             message.unshift entries.join(', ') unless entries.size.zero?
             "#<#{self.class.name} #{message.join(', ')}>"
           rescue StandardError => e
-            e
+            Stretchy.logger.error e.message
             raise e
           end
         end
