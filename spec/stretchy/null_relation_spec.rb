@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe Stretchy::NullRelation do
-    let (:subject) { Stretchy::Relation.extend Stretchy::NullRelation }
+describe Stretchy::Relations::NullRelation do
+    let (:subject) { Stretchy::Relation.extend Stretchy::Relations::NullRelation }
 
     it 'returns an empty array for pluck' do
         expect(subject.pluck).to eq([])

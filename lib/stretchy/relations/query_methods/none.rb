@@ -6,11 +6,11 @@ module Stretchy
 
         # Returns a chainable relation with zero records.
         def none
-          extending(NullRelation)
+          extending(Stretchy::Relations::NullRelation)
         end
 
         def none! # :nodoc:
-          extending!(NullRelation)
+          extending!(Stretchy::Relations::NullRelation)
         end
 
         QueryMethods.register!(:none)

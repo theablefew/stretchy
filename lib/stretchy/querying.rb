@@ -1,10 +1,10 @@
 module Stretchy
   module Querying
-    delegate :first, :first!, :last, :last!, to: :all
     delegate :exists?, :any?, :many?, :includes, to: :all
-    delegate :rewhere, :eager_load, :create_with, :none, :unscope, to: :all
-    delegate :routing, :search_options, to: :all
+    delegate :rewhere, :eager_load, :create_with, :unscoped, to: :all
 
+    delegate *Stretchy::Relations::FinderMethods::METHODS, to: :all
+    delegate *Stretchy::Relations::SearchOptionMethods::METHODS, to: :all
     delegate *Stretchy::Relations::QueryMethods.registry, to: :all
     delegate *Stretchy::Relations::AggregationMethods.registry, to: :all
 

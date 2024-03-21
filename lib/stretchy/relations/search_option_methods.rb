@@ -4,6 +4,8 @@ module Stretchy
     module SearchOptionMethods
       extend ActiveSupport::Concern
 
+      METHODS = [:routing, :search_options]
+
       def routing(args)
         check_if_method_has_arguments!(:routing, args)
         spawn.routing!(args)
