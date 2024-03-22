@@ -1,16 +1,26 @@
 module Stretchy::Attributes::Type
-  # Public: Defines a version attribute for the model. This field type is used for software versions following the Semantic Versioning rules.
+  # The Version attribute type
   #
-  # opts - The Hash options used to refine the attribute (default: {}):
-  #        :meta - The Hash of metadata about the field.
+  # This class is used to define a version attribute for a model. This field type is used for software versions following the Semantic Versioning rules.
   #
-  # Examples
+  # ### Parameters
   #
-  #   class MyModel < Stretchy::Record
+  # - `type:` `:version`.
+  # - `options:` The Hash of options for the attribute.
+  #    - `:meta:` The Hash of metadata about the field.
+  #
+  # ---
+  #
+  # ### Examples
+  #
+  # #### Define a version attribute
+  #
+  # ```ruby
+  #   class MyModel < StretchyModel
   #     attribute :software_version, :version
   #   end
+  # ```
   #
-  # Returns nothing.
   class Version < Stretchy::Attributes::Type::Base
     OPTIONS = [:meta]
 

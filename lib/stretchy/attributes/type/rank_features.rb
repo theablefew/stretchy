@@ -1,19 +1,26 @@
 module Stretchy::Attributes::Type
-  # Public: Defines a rank_features attribute for the model.
+  # The RankFeatures attribute type
   #
-  # A rank_features field can index numeric feature vectors, so that they can later be used to boost documents in queries with a rank_feature query.
-
-  # It is analogous to the rank_feature data type but is better suited when the list of features is sparse so that it wouldn’t be reasonable to add one field to the mappings for each of them.
-  # opts - The Hash options used to refine the attribute (default: {}):
-  #        :positive_score_impact - The Boolean indicating if features correlate positively with the score. If set to false, the score decreases with the value of the feature instead of increasing. Defaults to true.
+  # This class is used to define a rank_features attribute for a model. It provides support for the Elasticsearch rank_features data type, which is a type of data type that can index numeric feature vectors, so that they can later be used to boost documents in queries with a rank_feature query. It is better suited when the list of features is sparse so that it wouldn’t be reasonable to add one field to the mappings for each of them.
   #
-  # Examples
+  # ### Parameters
   #
-  #   class MyModel < Stretchy::Record
+  # - `type:` `:rank_features`.
+  # - `options:` The Hash of options for the attribute.
+  #    - `:positive_score_impact:` The Boolean indicating if features correlate positively with the score. If set to false, the score decreases with the value of the feature instead of increasing. Defaults to true.
+  #
+  # ---
+  #
+  # ### Examples
+  #
+  # #### Define a rank_features attribute
+  #
+  # ```ruby
+  #   class MyModel < StretchyModel
   #     attribute :negative_reviews, :rank_features, positive_score_impact: false
   #   end
+  # ```
   #
-  # Returns nothing.
   class RankFeatures < Stretchy::Attributes::Type::Hash
     OPTIONS = [:positive_score_impact]
 
