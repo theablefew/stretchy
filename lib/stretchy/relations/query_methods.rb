@@ -48,14 +48,14 @@ module Stretchy
 
       MULTI_VALUE_METHODS.each do |name|
         class_eval <<-CODE, __FILE__, __LINE__ + 1
-          def #{name}_values                   # def select_values
-            @values[:#{name}] || []            #   @values[:select] || []
-          end                                  # end
-                                               #
-          def #{name}_values=(values)          # def select_values=(values)
-            raise ImmutableRelation if @loaded #   raise ImmutableRelation if @loaded
-            @values[:#{name}] = values         #   @values[:select] = values
-          end                                  # end
+          def #{name}_values                   
+            @values[:#{name}] || []            
+          end                                  
+                                               
+          def #{name}_values=(values)          
+            raise ImmutableRelation if @loaded 
+            @values[:#{name}] = values         
+          end                                  
         CODE
       end
 
@@ -63,18 +63,22 @@ module Stretchy
 
       SINGLE_VALUE_METHODS.each do |name|
         class_eval <<-CODE, __FILE__, __LINE__ + 1
-          def #{name}_value                    # def readonly_value
-            @values[:#{name}]                  #   @values[:readonly]
-          end                                  # end
+          def #{name}_value                    
+            @values[:#{name}]                  
+          end                                  
         CODE
       end
 
+      # def readonly_value=(value)
+      #   raise ImmutableRelation if @loaded
+      #   @values[:readonly] = value
+      # end
       SINGLE_VALUE_METHODS.each do |name|
         class_eval <<-CODE, __FILE__, __LINE__ + 1
-          def #{name}_value=(value)            # def readonly_value=(value)
-            raise ImmutableRelation if @loaded #   raise ImmutableRelation if @loaded
-            @values[:#{name}] = value          #   @values[:readonly] = value
-          end                                  # end
+          def #{name}_value=(value)            
+            raise ImmutableRelation if @loaded 
+            @values[:#{name}] = value          
+          end                                  
         CODE
       end
 
@@ -99,16 +103,8 @@ module Stretchy
 
       private
 
-      # If terms are used, we assume that the field is a keyword field
-      # and append .keyword to the field name
-      # {terms: {field: 'gender'}}
-      # or nested aggs
-      # {terms: {field: 'gender'}, aggs: {name: {terms: {field: 'position.name'}}}}
-      # should be converted to
-      # {terms: {field: 'gender.keyword'}, aggs: {name: {terms: {field: 'position.name.keyword'}}}}
-      # {date_histogram: {field: 'created_at', interval: 'day'}}
-      # TODO: There may be cases where we don't want to add .keyword to the field and there should be a way to override this
       KEYWORD_AGGREGATION_FIELDS = [:terms, :rare_terms, :significant_terms, :cardinality, :string_stats]
+
       def assume_keyword_field(args={}, parent_match=false)
         if args.is_a?(Hash)
           args.each do |k, v|

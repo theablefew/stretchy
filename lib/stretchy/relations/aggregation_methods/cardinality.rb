@@ -2,19 +2,38 @@ module Stretchy
   module Relations
     module AggregationMethods
       module Cardinality
-        # Public: Perform a cardinality aggregation.
+        # Perform a cardinality aggregation.
         #
-        # name - The Symbol or String name of the aggregation.
-        # options - The Hash options used to refine the aggregation (default: {}):
-        #           :field - The field to perform the aggregation on.
-        # aggs - The Hash of nested aggregations.
+        # This method is used to calculate the cardinality (unique count) of a field. It accepts a name for the aggregation, a hash of options for the aggregation, and an optional array of nested aggregations.
         #
-        # Examples
+        # ### Parameters
         #
+        # - `name:` The Symbol or String representing the name of the aggregation.
+        # - `options:` The Hash representing the options for the aggregation (default: {}).
+        #     - `:field:` The Symbol or String representing the field to calculate the cardinality on.
+        # - `aggs:` The Array of Hashes representing nested aggregations (optional).
+        #
+        # ### Returns
+        # Returns a new Stretchy::Relation with the specified cardinality aggregation.
+        #
+        # ---
+        #
+        # ### Examples
+        #
+        # #### Cardinality aggregation
+        #
+        # ```ruby
         #   Model.cardinality(:unique_names, {field: 'names'})
         #   Model.cardinality(:unique_names, {field: 'names'}, aggs: {...})
+        # ```
         #
-        # Returns a new Stretchy::Relation.
+        # Aggregation results are available in the `aggregations` method of the results under the name provided in the aggregation.
+        #
+        # ```ruby
+        #   results = Model.where(color: :blue).cardinality(:unique_names, {field: 'names'})
+        #   results.aggregations.unique_names
+        # ```
+        #
         def cardinality(name, options = {}, *aggs)
             options = {cardinality: options}.merge(*aggs)
             aggregation(name, options)

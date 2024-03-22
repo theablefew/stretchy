@@ -2,18 +2,30 @@ module Stretchy
   module Relations
     module AggregationMethods
       module Global
-        # Public: Perform a global aggregation.
+        # Perform a global aggregation.
         #
-        # name - The Symbol or String name of the aggregation.
-        # options - The Hash options used to refine the aggregation (default: {}).
-        # aggs - The Array of additional nested aggregations (optional).
+        # This method is used to perform a global aggregation, which allows you to count all documents matching a query, regardless of the search scope. It accepts a name for the aggregation, a hash of options for the aggregation, and an optional array of nested aggregations.
         #
-        # Examples
+        # ### Parameters
         #
+        # - `name:` The Symbol or String representing the name of the aggregation.
+        # - `options:` The Hash representing the options for the aggregation (default: {}).
+        # - `aggs:` The Array of Hashes representing nested aggregations (optional).
+        #
+        # ### Returns
+        # Returns a new Stretchy::Relation with the specified global aggregation.
+        #
+        # ---
+        #
+        # ### Examples
+        #
+        # #### Global aggregation
+        #
+        # ```ruby
         #   Model.global(:my_agg)
         #   Model.global(:my_agg, {}, aggs: {...})
+        # ```
         #
-        # Returns a new Stretchy::Relation.
         def global(name, options = {}, *aggs)
             options = {global: options}.merge(*aggs)
             aggregation(name, options)

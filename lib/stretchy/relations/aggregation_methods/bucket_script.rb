@@ -2,19 +2,38 @@ module Stretchy
   module Relations
     module AggregationMethods
       module BucketScript
-        # Public: Perform a bucket_script aggregation.
+        # Perform a bucket_script aggregation.
         #
-        # name    - The Symbol or String name of the aggregation.
-        # options - The Hash options used to refine the aggregation (default: {}):
-        #           :buckets_path - The paths to the buckets.
-        #           :script       - The script to execute.
-        # aggs - The Hash of nested aggregations.
+        # This method is used to perform computations on the results of other aggregations. It accepts a name for the aggregation, a hash of options for the aggregation, and an optional array of nested aggregations.
         #
-        # Examples
+        # ### Parameters
         #
-        #   Model.aggregation(:total_sales, script: "params.tShirtsSold * params.price", buckets_path: {tShirtsSold: "tShirtsSold", price: "price"})
+        # - `name:` The Symbol or String representing the name of the aggregation.
+        # - `options:` The Hash representing the options for the aggregation (default: {}).
+        #     - `:buckets_path:` The Hash representing the paths to the buckets on which to perform computations.
+        #     - `:script:` The String representing the script to execute.
+        # - `aggs:` The Array of Hashes representing nested aggregations (optional).
         #
-        # Returns a new Stretchy::Relation.
+        # ### Returns
+        # Returns a new Stretchy::Relation with the specified bucket_script aggregation.
+        #
+        # ---
+        #
+        # ### Examples
+        #
+        # #### Bucket_script aggregation
+        #
+        # ```ruby
+        #   Model.bucket_script(:total_sales, script: "params.tShirtsSold * params.price", buckets_path: {tShirtsSold: "tShirtsSold", price: "price"})
+        # ```
+        #
+        # Aggregation results are available in the `aggregations` method of the results under the name provided in the aggregation.
+        #
+        # ```ruby
+        #   results = Model.where(color: :blue).bucket_script(:total_sales, script: "params.tShirtsSold * params.price", buckets_path: {tShirtsSold: "tShirtsSold", price: "price"})
+        #   results.aggregations.total_sales
+        # ```
+        #
         def bucket_script(name, options = {}, *aggs)
           options = {bucket_script: options}.merge(*aggs)
           aggregation(name, options)

@@ -94,3 +94,59 @@ namespace :publish do
     Rake::Task['publish:release'].invoke('patch')
   end
 end
+
+
+namespace :documentation do
+
+  desc "Generate documentation"
+  task :generate do
+    system('rdoc --format=markdown --markup=markdown -o docs/doc --force-output -O')
+    # generate sidebar
+    Rake::Task['documentation:build_sidebar'].invoke
+    
+  end
+
+  desc "Build sidebar"
+  task :build_sidebar do
+    # Get all directories in docs/doc
+    directories = Dir.glob('docs/doc/**/*').select { |f| File.directory?(f) }
+  
+    # For each directory
+    directories.each do |dir|
+      puts "Building sidebar for #{dir}"
+      # Open _sidebar.md in write mode
+      File.open("#{dir}/_sidebar.md", 'w') do |file|
+        # Get all .md files in the directory
+        md_files = Dir.glob("#{dir}/*.md")
+  
+        # Add top level header with link to the directory
+        file.puts("- [#{File.basename(dir)}](#{dir.gsub('docs/', '')}.md)")
+        # For each .md file
+        md_files.each do |md_file|
+          next if md_file.include?('_sidebar.md')
+          # Write a markdown link to the file
+          md_file_path = md_file.gsub('docs/', '')
+          file_name = File.basename(md_file, '.md')
+          file.puts("  - [#{file_name}](#{md_file_path})")
+  
+
+          # Check for a directory with the same name as the file
+          if Dir.exist?("#{dir}/#{file_name}")
+            # Get all .md files in the subdirectory
+            sub_md_files = Dir.glob("#{dir}/#{file_name}/*.md")
+            # For each .md file in the subdirectory
+            # Put the parent directory name as a header
+            sub_md_files.each do |sub_md_file|
+              # Write a markdown link to the file
+              sub_md_file_path = sub_md_file.gsub('docs/', '')
+              sub_file_name = File.basename(sub_md_file, '.md')
+              next if sub_md_file.include?('_sidebar.md')
+              file.puts("    - [#{sub_file_name}](#{sub_md_file_path})")
+            end
+          end
+        end
+      end
+    end
+  end
+
+end

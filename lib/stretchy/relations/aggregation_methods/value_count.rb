@@ -2,20 +2,32 @@ module Stretchy
   module Relations
     module AggregationMethods
       module ValueCount
-        # Public: Perform a value_count aggregation.
+        # Perform a value_count aggregation.
         #
-        # name - The Symbol or String name of the aggregation.
-        # options - The Hash options used to refine the aggregation (default: {}):
-        #           :field - The field to use for the value_count aggregation.
-        #           :script - The script to use for the value_count aggregation. (optional) script: {source: "doc['field_name'].value", lang: "painless"}
-        # aggs - The Array of additional nested aggregations (optional).
+        # This method is used to perform a value_count aggregation, which allows you to compute the count of values for a specific field. It accepts a name for the aggregation, a hash of options for the aggregation, and an optional array of nested aggregations.
         #
-        # Examples
+        # ### Parameters
         #
+        # - `name:` The Symbol or String representing the name of the aggregation.
+        # - `options:` The Hash representing the options for the aggregation (default: {}).
+        #     - `:field:` The String representing the field to use for the value_count aggregation.
+        #     - `:script:` The Hash representing the script to use for the value_count aggregation. Example: script: {source: "doc['field_name'].value", lang: "painless"}
+        # - `aggs:` The Array of Hashes representing nested aggregations (optional).
+        #
+        # ### Returns
+        # Returns a new Stretchy::Relation with the specified value_count aggregation.
+        #
+        # ---
+        #
+        # ### Examples
+        #
+        # #### Value_count aggregation
+        #
+        # ```ruby
         #   Model.value_count(:my_agg, {field: 'field_name'})
         #   Model.value_count(:my_agg, {field: 'field_name'}, aggs: {...})
+        # ```
         #
-        # Returns a new Stretchy::Relation.
         def value_count(name, options = {}, *aggs)
             options = {value_count: options}.merge(*aggs)
             aggregation(name, options)

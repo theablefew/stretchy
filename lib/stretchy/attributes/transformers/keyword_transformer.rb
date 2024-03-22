@@ -1,6 +1,20 @@
 module Stretchy
   module Attributes
     module Transformers
+      # Applies transformations to keyword fields in queries
+      #
+      # ### Examples
+      #
+      # ```ruby
+      # class Goat < StretchyModel
+      #  attribute :name, :keyword
+      #  attribute :age, :integer
+      # end
+      # 
+      # Goat.where(name: 'billy').to_elastic
+      # # => {query: {term: {'name.keyword': 'billy'}}}
+      #
+      # ```
       class KeywordTransformer
 
           KEYWORD_AGGREGATION_KEYS = [:terms, :rare_terms, :significant_terms, :cardinality, :string_stats]
@@ -65,7 +79,6 @@ module Stretchy
           # should be converted to
           # {terms: {field: 'gender.keyword'}, aggs: {name: {terms: {field: 'position.name.keyword'}}}}
           # {date_histogram: {field: 'created_at', interval: 'day'}}
-          # TODO: There may be cases where we don't want to add .keyword to the field and there should be a way to override this
           def assume_keyword_field(args={}, parent_match=false)
             if args.is_a?(Hash)
               args.each do |k, v|

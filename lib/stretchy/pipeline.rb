@@ -30,7 +30,8 @@ module Stretchy
         end
       end
     
-      def find(id)
+      def find(id=nil)
+        id = self.pipeline_name if id.nil?
         client.get_pipeline(id: id)
       end
 

@@ -3,17 +3,32 @@ module Stretchy
     module QueryMethods
       module HasField
         extend ActiveSupport::Concern
-        # Checks if a field exists in the documents.
+
+        # Checks if a field exists in the Elasticsearch document.
         #
-        # This is a helper for the exists filter in Elasticsearch, which returns documents 
-        # that have at least one non-null value in the specified field.
+        # This method is used to filter the results of a query based on whether a field exists or not in the document.
+        # It accepts a field name as an argument and adds an `exists` filter to the query.
         #
-        # @param field [Symbol, String] the field to check for existence
+        # ### Parameters
+        # - `field:` The Symbol or String representing the field name.
         #
-        # @example
-        #   Model.has_field(:name)
+        # ### Returns
+        # Returns a new Stretchy::Relation with the `exists` filter applied.
         #
-        # @return [ActiveRecord::Relation] a new relation, which reflects the exists filter
+        # ---
+        #
+        # ### Examples
+        #
+        # #### Has field
+        # ```ruby
+        #   Model.has_field(:title)
+        # ```
+        #
+        # #### Nested field exists
+        # ```ruby
+        #   Model.has_field('author.name')
+        # ```
+        #
         def has_field(field)
           spawn.filter_query(:exists, {field: field})
         end

@@ -5,13 +5,25 @@ module Stretchy
         extend ActiveSupport::Concern
         # Sets the maximum number of records to be retrieved.
         #
-        # @param args [Integer] the maximum number of records to retrieve
+        # This method is used to limit the number of records returned by the query. It accepts an integer as an argument.
         #
-        # @example
+        # ### Parameters
+        #
+        # - `args:` The Integer representing the maximum number of records to retrieve.
+        #
+        # ### Returns
+        # Returns a new Stretchy::Relation, which reflects the limit.
+        #
+        # ---
+        #
+        # ### Examples
+        #
+        # #### Limit the number of records
+        #
+        # ```ruby
         #   Model.size(10)
+        # ```
         #
-        # @return [ActiveRecord::Relation] a new relation, which reflects the limit
-        # @see #limit
         def size(args)
           spawn.size!(args)
         end

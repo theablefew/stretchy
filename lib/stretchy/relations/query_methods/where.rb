@@ -8,38 +8,52 @@ module Stretchy
             @scope = scope
           end
         end
+
         # Adds conditions to the query.
         #
-        # Each argument is a hash where the key is the attribute to filter by and the value is the value to match.
+        # Each argument is a keyword where the key is the attribute name and the value is the value to match.
+        # This method acts as a convenience method for adding conditions to the query. It can also be used to add
+        # range, regex, terms, and id queries through shorthand parameters.
         #
-        # @overload where(*rest)
-        #   @param rest [Array<Hash>] keywords containing attribute-value pairs to match
+        # ### Parameters
+        # - `opts:` The keywords containing attribute-value pairs for conditions.
         #
-        # @example
+        # ### Returns
+        # Returns a Stretchy::Relation with the specified conditions applied.
+        #
+        # ---
+        #
+        # ### Examples
+        #
+        # #### Multiple Conditions
+        # ```ruby
         #   Model.where(price: 10, color: :green)
+        # ```
         #
-        #   # Elasticsearch equivalent
-        #   # => "query" : {
-        #          "bool" : {
-        #            "must" : [
-        #              { "term" : { "price" : 10 } },
-        #              { "term" : { "color" : "green" } }
-        #            ]
-        #          }
-        #        }
-        #
-        # .where acts as a convienence method for adding conditions to the query. It can also be used to add
-        # range , regex, terms, and id queries through shorthand parameters.
-        #
-        # @example
+        # #### Range
+        # ```ruby
         #   Model.where(price: {gte: 10, lte: 20})
-        #   Model.where(age: 19..33)
-        #   Model.where(color: /gr(a|e)y/)
-        #   Model.where(id: [10, 22, 18])
-        #   Model.where(names: ['John', 'Jane'])
+        # ```
         #
-        # @return [ActiveRecord::Relation, WhereChain] a new relation, which reflects the conditions, or a WhereChain if opts is :chain
-        # @see #must
+        # ```ruby
+        #   Model.where(age: 19..33)
+        # ```
+        #
+        # #### Regular Expressions
+        # ```ruby
+        #   Model.where(color: /gr(a|e)y/)
+        # ```
+        #
+        # #### IDs
+        # ```ruby
+        #   Model.where(id: [10, 22, 18])
+        # ```
+        # 
+        # #### Terms
+        # ```ruby
+        #   Model.where(names: ['John', 'Jane'])
+        # ```
+        #
         def where(opts = :chain, *rest)
           if opts == :chain
             WhereChain.new(spawn)

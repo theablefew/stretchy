@@ -1,13 +1,14 @@
 stretchy-model
 ===
 <p>
-    <a href="https://stretchy.io/" target="_blank"><img src="./stretchy.logo.png" alt="Gum Image" width="450" /></a>
+    <a href="https://stretchy.io/" target="_blank"><img src="./stretchy.logo.png" alt="Stretchy Image" width="450" /></a>
     <br><br>
     <a href="https://github.com/theablefew/stretchy/releases"><img src="https://img.shields.io/github/v/release/theablefew/stretchy?sort=semver&color=blue"></a>
     <a href="https://github.com/theablefew/stretchy/actions"><img src="https://github.com/theablefew/stretchy/actions/workflows/spec.yml/badge.svg"></a>
 
 </p>
 
+Stretchy provides Elasticsearch/Opensearch models in Rails applications with an Rails-like model interface.
 
 ## Features
 Stretchy simplifies the process of querying, aggregating, and managing Elasticsearch-backed models, allowing Rails developers to work with search indices as comfortably as they would with traditional Rails models.

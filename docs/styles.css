@@ -1,0 +1,90 @@
+:root {
+    --theme-color: #F9448F;
+    --theme-color-light: #f79fc4;
+    --secondary-color: #8E4EB0;
+}
+
+
+section.cover .cover-main>p:last-child a {
+    border-radius: 2rem;
+    border: 1px solid #F9448F;
+    border-color: var(--theme-color,#F9448F);
+    box-sizing: border-box;
+    color: #F9448F;
+    color: var(--theme-color,#F9448F);
+    display: inline-block;
+    font-size: 1.05rem;
+    letter-spacing: .1rem;
+    margin: .5rem 1rem;
+    padding: .75em 2rem;
+    text-decoration: none;
+    transition: all .15s ease;
+}
+
+section.cover .cover-main>p:last-child a:last-child {
+    background-color: #F9448F;
+    background-color: var(--theme-color,#F9448F);
+    color: #fff;
+}
+
+section.cover .cover-main>p:last-child a:hover {
+    color: #fff !important;
+    border-color: var(--secondary-color, #8E4EB0);
+    background-color: var(--secondary-color, #8E4EB0);
+    /* opacity: .8; */
+}
+
+.docsify-hide a:first-child>img{ display: none;}
+
+.app-sub-sidebar li:before {
+    content: "";
+    padding-right: 4px;
+    float: left;
+}
+
+.sidebar h3 {
+    text-align: center;
+}
+
+
+pre {
+    position: relative;
+}
+pre .clipboard-copy {
+    position: absolute;
+    right: 15px;
+    opacity: 1;
+    top: 20px;
+    color: var(--theme-color, #F9448F);
+    background-color: transparent;
+
+}
+pre .clipboard-copy:hover {
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    opacity: 1;
+}
+
+pre .clipboard-copy .copy-text {
+    position: absolute;
+    opacity: 0;
+    left: -70px;
+    top: 15px;
+}
+
+pre .clipboard-copy .copy-text.show {
+    transition: top 0.3s ease, opacity 0.3s ease;
+    opacity: 1;
+    color: #8E4EB0;
+    top: 0px;
+}
+
+.show {
+    display: block;
+}
+
+
+
+/*dt,dd {
+    display: flex;
+} */

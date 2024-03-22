@@ -3,19 +3,31 @@ module Stretchy
     module AggregationMethods
       module Min
 
-        # Public: Perform a min aggregation.
+        # Perform a min aggregation.
         #
-        # name - The Symbol or String name of the aggregation.
-        # options - The Hash options used to refine the aggregation (default: {}):
-        #           :field - The field to use for the min aggregation.
-        # aggs - The Array of additional nested aggregations (optional).
+        # This method is used to perform a min aggregation, which allows you to find the minimum value of a field in the data set. It accepts a name for the aggregation, a hash of options for the aggregation, and an optional array of nested aggregations.
         #
-        # Examples
+        # ### Parameters
         #
+        # - `name:` The Symbol or String representing the name of the aggregation.
+        # - `options:` The Hash representing the options for the aggregation (default: {}).
+        #     - `:field:` The String representing the field to use for the min aggregation.
+        # - `aggs:` The Array of Hashes representing nested aggregations (optional).
+        #
+        # ### Returns
+        # Returns a new Stretchy::Relation with the specified min aggregation.
+        #
+        # ---
+        #
+        # ### Examples
+        #
+        # #### Min aggregation
+        #
+        # ```ruby
         #   Model.min(:my_agg, {field: 'field_name'})
         #   Model.min(:my_agg, {field: 'field_name'}, aggs: {...})
+        # ```
         #
-        # Returns a new Stretchy::Relation.
         def min(name, options = {}, *aggs)
             options = {min: options}.merge(*aggs)
             aggregation(name, options)

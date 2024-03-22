@@ -1,5 +1,28 @@
 module Stretchy::Attributes::Type
-  class Array < Stretchy::Attributes::Type::Base # :nodoc:
+  # The Array attribute type
+  #
+  # This class is used to define an array attribute for a model. It provides support for the Elasticsearch array data type, which is a type of data type that can hold multiple values.
+  #
+  # ### Parameters
+  #
+  # - `type:` `:array`.
+  # - `options:` The Hash of options for the attribute.
+  #    - `:data_type:` The Symbol representing the data type for the array. Defaults to `:text`.
+  #    - `:fields:` The Boolean indicating if fields should be included in the mapping. Defaults to `true`.
+  #
+  # ---
+  #
+  # ### Examples
+  #
+  # #### Define an array attribute
+  #
+  # ```ruby
+  #   class MyModel < StretchyModel
+  #     attribute :tags, :array, data_type: :text
+  #   end
+  # ```
+  #
+  class Array < Stretchy::Attributes::Type::Base
     OPTIONS = [:data_type, :fields]
     def type
       :array

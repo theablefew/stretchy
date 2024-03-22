@@ -2,23 +2,44 @@ module Stretchy
   module Relations
     module AggregationMethods
       module DateRange
-        # Public: Perform a date_range aggregation.
+        # Perform a date_histogram aggregation.
         #
-        # name - The Symbol or String name of the aggregation.
-        # options - The Hash options used to refine the aggregation (default: {}):
-        #           :field - The field to use for the date_range aggregation.
-        #           :format - The format for the date_range aggregation.
-        #           :time_zone - The time zone for the date_range aggregation.
-        #           :ranges - The ranges for the date_range aggregation.
-        #           :keyed - The keyed option for the date_range aggregation.
-        # aggs - The Hash of nested aggregations.
+        # This method is used to perform a date_histogram aggregation, which allows you to aggregate time-based data by a certain interval. It accepts a name for the aggregation, a hash of options for the aggregation, and an optional array of nested aggregations.
         #
-        # Examples
+        # ### Parameters
         #
-        #   Model.date_range(:my_agg, {field: 'date', format: 'MM-yyyy', time_zone: 'UTC', ranges: [{to: 'now', from: 'now-1M'}]})
-        #   Model.date_range(:my_agg, {field: 'date', format: 'MM-yyyy', time_zone: 'UTC', ranges: [{to: 'now', from: 'now-1M'}]}, aggs: {...})
+        # - `name:` The Symbol or String representing the name of the aggregation.
+        # - `options:` The Hash representing the options for the aggregation (default: {}).
+        #     - `:field:` The String representing the field to use for the date_histogram aggregation.
+        #     - `:interval:` The String representing the interval for the date_histogram aggregation.
+        #     - `:calendar_interval:` The Symbol representing the calendar interval for the date_histogram aggregation.
+        #     - `:format:` The String representing the format for the date_histogram aggregation.
+        #     - `:time_zone:` The String representing the time zone for the date_histogram aggregation.
+        #     - `:min_doc_count:` The Integer representing the minimum document count for the date_histogram aggregation.
+        #     - `:extended_bounds:` The Hash representing the extended bounds for the date_histogram aggregation.
+        # - `aggs:` The Array of Hashes representing nested aggregations (optional).
         #
-        # Returns a new Stretchy::Relation.
+        # ### Returns
+        # Returns a new Stretchy::Relation with the specified date_histogram aggregation.
+        #
+        # ---
+        #
+        # ### Examples
+        #
+        # #### Date_histogram aggregation
+        #
+        # ```ruby
+        #   Model.date_histogram(:my_agg, {field: 'date', interval: 'month', format: 'MM-yyyy', time_zone: 'UTC'})
+        #   Model.date_histogram(:my_agg, {field: 'date', calendar_interval: :month, format: 'MM-yyyy', time_zone: 'UTC'}, aggs: {...})
+        # ```
+        #
+        # Aggregation results are available in the `aggregations` method of the results under the name provided in the aggregation.
+        #
+        # ```ruby
+        #   results = Model.where(color: :blue).date_histogram(:my_agg, {field: 'date', interval: 'month', format: 'MM-yyyy', time_zone: 'UTC'})
+        #   results.aggregations.my_agg
+        # ```
+        #
         def date_range(name, options = {}, *aggs)
             options = {date_range: options}.merge(*aggs)
             aggregation(name, options)

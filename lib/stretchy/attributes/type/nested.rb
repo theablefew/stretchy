@@ -1,20 +1,25 @@
 module Stretchy::Attributes::Type
-  # Public: Defines a nested attribute for the model.
+  # The MatchOnlyText attribute type
   #
-  # opts - The Hash options used to refine the attribute (default: {}):
-  #        :dynamic - The String indicating if new properties should be added dynamically to an existing nested object. Can be 'true', 'false', or 'strict'. Defaults to 'true'.
-  #        :properties - The Hash of fields within the nested object, which can be of any data type, including nested.
-  #        :include_in_parent - The Boolean indicating if all fields in the nested object are also added to the parent document as standard fields. Defaults to false.
-  #        :include_in_root - The Boolean indicating if all fields in the nested object are also added to the root document as standard fields. Defaults to false.
+  # This class is used to define a match_only_text attribute for a model. It provides support for the Elasticsearch match_only_text data type, which is a space-optimized variant of text that disables scoring and performs slower on queries that need positions. It is best suited for indexing log messages.
   #
-  # Examples
+  # ### Parameters
   #
-  #   class MyModel
-  #     include StretchyModel
-  #     attribute :metadata, :nested, dynamic: 'strict', include_in_parent: true
+  # - `type:` `:match_only_text`.
+  # - `options:` The Hash of options for the attribute. This type does not have any specific options.
+  #
+  # ---
+  #
+  # ### Examples
+  #
+  # #### Define a match_only_text attribute
+  #
+  # ```ruby
+  #   class MyModel < StretchyModel
+  #     attribute :log_message, :match_only_text
   #   end
+  # ```
   #
-  # Returns nothing.
   class Nested < Stretchy::Attributes::Type::Base
     OPTIONS = [:dynamic, :properties, :include_in_parent, :include_in_root]
 

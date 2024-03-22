@@ -2,19 +2,31 @@ module Stretchy
   module Relations
     module AggregationMethods
       module GeoCentroid
-        # Public: Perform a geo_centroid aggregation.
+        # Perform a geo_centroid aggregation.
         #
-        # name - The Symbol or String name of the aggregation.
-        # options - The Hash options used to refine the aggregation (default: {}):
-        #           :field - The field to use for the geo_centroid aggregation.
-        # aggs - The Array of additional nested aggregations (optional).
+        # This method is used to perform a geo_centroid aggregation, which allows you to find the central point (centroid) of all geo_point values for a particular field. It accepts a name for the aggregation, a hash of options for the aggregation, and an optional array of nested aggregations.
         #
-        # Examples
+        # ### Parameters
         #
+        # - `name:` The Symbol or String representing the name of the aggregation.
+        # - `options:` The Hash representing the options for the aggregation (default: {}).
+        #     - `:field:` The String representing the field to use for the geo_centroid aggregation.
+        # - `aggs:` The Array of Hashes representing nested aggregations (optional).
+        #
+        # ### Returns
+        # Returns a new Stretchy::Relation with the specified geo_centroid aggregation.
+        #
+        # ---
+        #
+        # ### Examples
+        #
+        # #### Geo_centroid aggregation
+        #
+        # ```ruby
         #   Model.geo_centroid(:my_agg, {field: 'location_field'})
         #   Model.geo_centroid(:my_agg, {field: 'location_field'}, aggs: {...})
+        # ```
         #
-        # Returns a new Stretchy::Relation.
         def geo_centroid(name, options = {}, *aggs)
             options = {geo_centroid: options}.merge(*aggs)
             aggregation(name, options)
