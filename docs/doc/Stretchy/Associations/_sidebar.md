@@ -1,0 +1,2 @@
+- [Associations](doc/Stretchy/Associations.md)
+  - [ElasticRelation](doc/Stretchy/Associations/ElasticRelation.md)

@@ -1,0 +1,2 @@
+- [Actions](doc/Elasticsearch/API/MachineLearning/Models/Actions.md)
+  - [ParamsRegistry](doc/Elasticsearch/API/MachineLearning/Models/Actions/ParamsRegistry.md)

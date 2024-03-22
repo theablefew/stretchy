@@ -1,0 +1,3 @@
+- [OpenSearch](doc/OpenSearch.md)
+  - [API](doc/OpenSearch/API.md)
+    - [MachineLearning](doc/OpenSearch/API/MachineLearning.md)

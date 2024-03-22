@@ -1,0 +1,3 @@
+- [Delegation](doc/Stretchy/Delegation.md)
+  - [DelegateCache](doc/Stretchy/Delegation/DelegateCache.md)
+  - [GatewayDelegation](doc/Stretchy/Delegation/GatewayDelegation.md)

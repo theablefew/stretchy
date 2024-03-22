@@ -1,0 +1,4 @@
+- [MachineLearning](doc/Elasticsearch/API/MachineLearning.md)
+  - [Models](doc/Elasticsearch/API/MachineLearning/Models.md)
+    - [Actions](doc/Elasticsearch/API/MachineLearning/Models/Actions.md)
+    - [MachineLearningClient](doc/Elasticsearch/API/MachineLearning/Models/MachineLearningClient.md)

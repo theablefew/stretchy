@@ -1,0 +1,2 @@
+- [Indexing](doc/Stretchy/Indexing.md)
+  - [Bulk](doc/Stretchy/Indexing/Bulk.md)

@@ -1,0 +1,3 @@
+- [API](doc/Elasticsearch/API.md)
+  - [MachineLearning](doc/Elasticsearch/API/MachineLearning.md)
+    - [Models](doc/Elasticsearch/API/MachineLearning/Models.md)

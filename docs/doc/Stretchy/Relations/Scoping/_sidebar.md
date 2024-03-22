@@ -1,0 +1,6 @@
+- [Scoping](doc/Stretchy/Relations/Scoping.md)
+  - [ClassMethods](doc/Stretchy/Relations/Scoping/ClassMethods.md)
+  - [Default](doc/Stretchy/Relations/Scoping/Default.md)
+    - [ClassMethods](doc/Stretchy/Relations/Scoping/Default/ClassMethods.md)
+  - [Named](doc/Stretchy/Relations/Scoping/Named.md)
+    - [ClassMethods](doc/Stretchy/Relations/Scoping/Named/ClassMethods.md)

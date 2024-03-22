@@ -1,0 +1,6 @@
+- [Model](doc/Stretchy/Model.md)
+  - [Callbacks](doc/Stretchy/Model/Callbacks.md)
+  - [Common](doc/Stretchy/Model/Common.md)
+  - [Persistence](doc/Stretchy/Model/Persistence.md)
+  - [Refreshable](doc/Stretchy/Model/Refreshable.md)
+  - [Serialization](doc/Stretchy/Model/Serialization.md)

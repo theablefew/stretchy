@@ -1,0 +1,2 @@
+- [Named](doc/Stretchy/Relations/Scoping/Named.md)
+  - [ClassMethods](doc/Stretchy/Relations/Scoping/Named/ClassMethods.md)

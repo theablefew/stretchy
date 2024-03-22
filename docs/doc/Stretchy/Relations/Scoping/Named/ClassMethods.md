@@ -1,0 +1,24 @@
+# Stretchy::Relations::Scoping::Named::ClassMethods [](#module-Stretchy::Relations::Scoping::Named::ClassMethods) [](#top)
+
+    
+## Constants
+| Name | Description |
+| ---- | ----------- |
+| **BLACKLISTED_CLASS_METHODS[](#BLACKLISTED_CLASS_METHODS)** | Not Documented |
+
+# Public Instance Methods
+
+      
+## all(options={}) [](#method-i-all)
+         
+  
+        
+---
+
+
+## scope(name, body, &block) [](#method-i-scope)
+         
+  
+        
+---
+

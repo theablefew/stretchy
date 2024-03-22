@@ -1,0 +1,3 @@
+- [Rails](doc/Stretchy/Rails.md)
+  - [Instrumentation](doc/Stretchy/Rails/Instrumentation.md)
+    - [Publishers](doc/Stretchy/Rails/Instrumentation/Publishers.md)

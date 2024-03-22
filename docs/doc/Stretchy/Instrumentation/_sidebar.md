@@ -1,0 +1,2 @@
+- [Instrumentation](doc/Stretchy/Instrumentation.md)
+  - [Railtie](doc/Stretchy/Instrumentation/Railtie.md)

@@ -1,0 +1,4 @@
+- [MachineLearning](doc/OpenSearch/API/MachineLearning.md)
+  - [Models](doc/OpenSearch/API/MachineLearning/Models.md)
+    - [Actions](doc/OpenSearch/API/MachineLearning/Models/Actions.md)
+    - [MachineLearningClient](doc/OpenSearch/API/MachineLearning/Models/MachineLearningClient.md)

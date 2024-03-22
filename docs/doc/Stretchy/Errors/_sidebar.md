@@ -1,0 +1,2 @@
+- [Errors](doc/Stretchy/Errors.md)
+  - [QueryOptionMissing](doc/Stretchy/Errors/QueryOptionMissing.md)

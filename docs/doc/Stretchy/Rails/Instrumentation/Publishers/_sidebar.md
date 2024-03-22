@@ -1,0 +1,2 @@
+- [Publishers](doc/Stretchy/Rails/Instrumentation/Publishers.md)
+  - [Record](doc/Stretchy/Rails/Instrumentation/Publishers/Record.md)
