@@ -2,20 +2,39 @@ module Stretchy
   module Relations
     module AggregationMethods
       module ExtendedStats
-        # Public: Perform an extended_stats aggregation.
+        # Perform an extended_stats aggregation.
         #
-        # name - The Symbol or String name of the aggregation.
-        # options - The Hash options used to refine the aggregation (default: {}):
-        #           :field - The field to use for the extended_stats aggregation.
-        #           :sigma - The sigma for the extended_stats aggregation.
-        # aggs - The Array of additional nested aggregations (optional).
+        # This method is used to perform an extended_stats aggregation, which allows you to compute several statistical measures from your data. It accepts a name for the aggregation, a hash of options for the aggregation, and an optional array of nested aggregations.
         #
-        # Examples
+        # ### Parameters
         #
+        # - `name:` The Symbol or String representing the name of the aggregation.
+        # - `options:` The Hash representing the options for the aggregation (default: {}).
+        #     - `:field:` The String representing the field to use for the extended_stats aggregation.
+        #     - `:sigma:` The Float representing the sigma for the extended_stats aggregation.
+        # - `aggs:` The Array of Hashes representing nested aggregations (optional).
+        #
+        # ### Returns
+        # Returns a new Stretchy::Relation with the specified extended_stats aggregation.
+        #
+        # ---
+        #
+        # ### Examples
+        #
+        # #### Extended_stats aggregation
+        #
+        # ```ruby
         #   Model.extended_stats(:my_agg, {field: 'field_name', sigma: 1.0})
         #   Model.extended_stats(:my_agg, {field: 'field_name', sigma: 1.0}, aggs: {...})
+        # ```
         #
-        # Returns a new Stretchy::Relation.
+        # Aggregation results are available in the `aggregations` method of the results under the name provided in the aggregation.
+        #
+        # ```ruby
+        #   results = Model.where(color: :blue).extended_stats(:my_agg, {field: 'field_name', sigma: 1.0})
+        #   results.aggregations.my_agg
+        # ```
+        #
         def extended_stats(name, options = {}, *aggs)
             options = {extended_stats: options}.merge(*aggs)
             aggregation(name, options)

@@ -10,13 +10,23 @@ module Stretchy
         # Field names can be included in the query string to search for specific values in specific fields. (e.g. "eye_color: green")
         # The default operator between terms are treated as OR operators.
         #
-        # @param query [String] the query string
-        # @param rest [Array] additional arguments (not normally used)
+        # ### Parameters
         #
-        # @example
+        # - `opts:` The query string 
+        #
+        # ### Returns
+        # Returns a new Stretchy::Relation, which reflects the query string.
+        #
+        # ---
+        #
+        # ### Examples
+        #
+        # #### Query string
+        #
+        # ```ruby
         #   Model.query_string("((big cat) OR (domestic cat)) AND NOT panther eye_color: green")
+        # ```
         #
-        # @return [Stretchy::Relation] a new relation, which reflects the query string
         def query_string(opts = :chain, *rest)
           if opts == :chain
             WhereChain.new(spawn)

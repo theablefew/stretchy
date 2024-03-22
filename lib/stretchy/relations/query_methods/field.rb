@@ -4,7 +4,7 @@ module Stretchy
       module Field
         extend ActiveSupport::Concern
         
-        # Public: Specify the fields to be returned by the Elasticsearch query.
+        # Specify the fields to be returned by the Elasticsearch query.
         #
         # This method accepts a variable number of arguments, each of which is the name of a field to be returned.
         # If no arguments are provided, all fields are returned.
@@ -19,18 +19,42 @@ module Stretchy
         #   Returns fields calculated by a script at index time
         #   Returns fields from related indices using lookup runtime fields
         #
-        # args - The Array of field names to be returned by the query (default: []).
+        # ### Parameters
+        # - `args:` The Array of field names to be returned by the query (default: []).
         #
-        # Examples
+        # ### Returns
+        # Returns a new Stretchy::Relation with the specified fields to be returned.
         #
+        # ---
+        #
+        # ### Examples
+        #
+        # #### Single field
+        # ```ruby
+        #   Model.fields(:title)
+        # ```
+        #
+        # #### Multiple fields
+        # ```ruby
         #   Model.fields(:title, :author)
-        #   Model.field('author.name', 'author.age')
-        #   Model.fields('books.*')
+        # ```
         #
-        # Returns a new relation with the specified fields to be returned.
+        # #### Nested fields
+        # ```ruby
+        #   Model.fields('author.name', 'author.age')
+        # ```
+        #
+        # #### Wildcard
+        # ```ruby
+        #   Model.fields('books.*')
+        # ```
+        #
         def field(*args)
           spawn.field!(*args)
         end
+
+        # Alias for {#field}
+        # @see #field
         alias :fields :field
 
         def field!(*args) # :nodoc:

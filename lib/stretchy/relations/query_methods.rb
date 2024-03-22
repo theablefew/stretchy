@@ -103,21 +103,8 @@ module Stretchy
 
       private
 
-      # This code is responsible for handling terms in the query. If terms are used, we assume that the field is a keyword field
-      # and append .keyword to the field name.
-      #
-      # For example, a query like this:
-      #   {terms: {field: 'gender'}}
-      # or nested aggs like this:
-      #   {terms: {field: 'gender'}, aggs: {name: {terms: {field: 'position.name'}}}}
-      # should be converted to this:
-      #   {terms: {field: 'gender.keyword'}, aggs: {name: {terms: {field: 'position.name.keyword'}}}}
-      #
-      # Date histograms are handled like this:
-      #   {date_histogram: {field: 'created_at', interval: 'day'}}
-      #
-      # TODO: There may be cases where we don't want to add .keyword to the field and there should be a way to override this
       KEYWORD_AGGREGATION_FIELDS = [:terms, :rare_terms, :significant_terms, :cardinality, :string_stats]
+
       def assume_keyword_field(args={}, parent_match=false)
         if args.is_a?(Hash)
           args.each do |k, v|

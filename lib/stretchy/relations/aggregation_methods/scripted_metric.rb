@@ -2,22 +2,34 @@ module Stretchy
   module Relations
     module AggregationMethods
       module ScriptedMetric
-        # Public: Perform a scripted_metric aggregation.
+        # Perform a scripted_metric aggregation.
         #
-        # name - The Symbol or String name of the aggregation.
-        # options - The Hash options used to refine the aggregation (default: {}):
-        #           :init_script - The initialization script for the scripted_metric aggregation.
-        #           :map_script - The map script for the scripted_metric aggregation.
-        #           :combine_script - The combine script for the scripted_metric aggregation.
-        #           :reduce_script - The reduce script for the scripted_metric aggregation.
-        # aggs - The Array of additional nested aggregations (optional).
+        # This method is used to perform a scripted_metric aggregation, which allows you to define your own aggregations using scripts. It accepts a name for the aggregation, a hash of options for the aggregation, and an optional array of nested aggregations.
         #
-        # Examples
+        # ### Parameters
         #
+        # - `name:` The Symbol or String representing the name of the aggregation.
+        # - `options:` The Hash representing the options for the aggregation (default: {}).
+        #     - `:init_script:` The String representing the initialization script for the scripted_metric aggregation.
+        #     - `:map_script:` The String representing the map script for the scripted_metric aggregation.
+        #     - `:combine_script:` The String representing the combine script for the scripted_metric aggregation.
+        #     - `:reduce_script:` The String representing the reduce script for the scripted_metric aggregation.
+        # - `aggs:` The Array of Hashes representing nested aggregations (optional).
+        #
+        # ### Returns
+        # Returns a new Stretchy::Relation with the specified scripted_metric aggregation.
+        #
+        # ---
+        #
+        # ### Examples
+        #
+        # #### Scripted_metric aggregation
+        #
+        # ```ruby
         #   Model.scripted_metric(:my_agg, {init_script: '...', map_script: '...', combine_script: '...', reduce_script: '...'})
         #   Model.scripted_metric(:my_agg, {init_script: '...', map_script: '...', combine_script: '...', reduce_script: '...'}, aggs: {...})
+        # ```
         #
-        # Returns a new Stretchy::Relation.
         def scripted_metric(name, options = {}, *aggs)
             options = {scripted_metric: options}.merge(*aggs)
             aggregation(name, options)

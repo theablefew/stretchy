@@ -3,19 +3,39 @@ module Stretchy
     module QueryMethods
       module FilterQuery
         extend ActiveSupport::Concern
-        # Adds a filter to the query.
+
+        # Adds a filter to the Elasticsearch query.
         #
-        # This method supports all filters supported by Elasticsearch.
+        # This method is used to filter the results of a query without affecting the score. It accepts a type and a condition.
+        # The type can be any valid Elasticsearch filter type, such as `:term`, `:range`, or `:bool`. The condition is a hash
+        # that specifies the filter conditions.
         #
-        # @overload filter_query(type, opts)
-        #   @param type [Symbol] the type of filter to add (:range, :term, etc.)
-        #   @param opts [Hash] a hash containing the attribute and value to filter by
+        # ### Parameters
+        # - `type:` The Symbol representing the filter type.
+        # - `condition:` The Hash containing the filter conditions.
         #
-        # @example
-        #   Model.filter_query(:range, age: {gte: 30})
-        #   Model.filter_query(:term, color: :blue)
+        # ### Returns
+        # Returns a new Stretchy::Relation with the specified filter applied.
         #
-        # @return [Stretchy::Relation] a new relation, which reflects the filter
+        # ---
+        #
+        # ### Examples
+        #
+        # #### Term filter
+        # ```ruby
+        #   Model.filter_query(:term, color: 'blue')
+        # ```
+        #
+        # #### Range filter
+        # ```ruby
+        #   Model.filter_query(:range, age: { gte: 21 })
+        # ```
+        #
+        # #### Bool filter
+        # ```ruby
+        #   Model.filter_query(:bool, must: [{ term: { color: 'blue' } }, { range: { age: { gte: 21 } } }])
+        # ```
+        #
         def filter_query(name, options = {}, &block)
           spawn.filter_query!(name, options, &block)
         end

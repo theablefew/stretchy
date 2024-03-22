@@ -5,16 +5,25 @@ module Stretchy
         extend ActiveSupport::Concern
         # Adds negated conditions to the query.
         #
-        # Each argument is a hash where the key is the attribute to filter by and the value is the value to exclude.
+        # Each argument is a keyword where the key is the attribute name and the value is the value to exclude.
+        # This method acts as a convenience method for adding negated conditions to the query. It can also be used to add
+        # range, regex, terms, and id queries through shorthand parameters.
         #
-        # @overload must_not(*rest)
-        #   @param rest [Array<Hash>] a hash containing attribute-value pairs to exclude
+        # ### Parameters:
+        # - `opts:` The keywords containing attribute-value pairs for conditions.
         #
-        # @example
+        # ### Returns
+        # Returns a new Stretchy::Relation with the specified conditions excluded.
+        #
+        # ---
+        #
+        # ### Examples
+        #
+        # #### Exclude multiple conditions
+        # ```ruby
         #   Model.must_not(color: 'blue', size: :large)
+        # ```
         #
-        # @return [Stretchy::Relation] a new relation, which reflects the negated conditions
-        # @see #where_not
         def must_not(opts = :chain, *rest)
           if opts == :chain
             WhereChain.new(spawn)
