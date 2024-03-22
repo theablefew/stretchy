@@ -34,6 +34,8 @@ Follow the guides to learn more about:
  - [Data Analysis](examples/data_analysis?id=data-analysis)
  - [Simple Ingest Pipeline](examples/simple-ingest-pipeline?id=simple-ingest-pipeline)
 
+- [RDoc](doc/Stretchy/Associations)
+
 
 ## Installation
 
