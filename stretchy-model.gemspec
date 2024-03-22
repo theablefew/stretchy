@@ -48,6 +48,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "octokit", "~> 4.20"
   spec.add_development_dependency "versionomy", "~> 0.5.0"
   spec.add_development_dependency "faker", "~> 2.18"
+  spec.add_development_dependency "rdoc", "~> 6.6.3"
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
 end
