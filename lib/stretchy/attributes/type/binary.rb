@@ -24,7 +24,7 @@ module Stretchy
             #   end
             # ```
             #
-            class Binary < ActiveModel::Type::Value
+            class Binary < Stretchy::Attributes::Type::Base
                 OPTIONS = [:doc_values, :store]
                 attr_reader *OPTIONS 
 

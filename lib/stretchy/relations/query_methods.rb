@@ -103,21 +103,6 @@ module Stretchy
 
       private
 
-      KEYWORD_AGGREGATION_FIELDS = [:terms, :rare_terms, :significant_terms, :cardinality, :string_stats]
-
-      def assume_keyword_field(args={}, parent_match=false)
-        if args.is_a?(Hash)
-          args.each do |k, v|
-            if v.is_a?(Hash) 
-              assume_keyword_field(v, KEYWORD_AGGREGATION_FIELDS.include?(k))
-            else
-              next unless v.is_a?(String) || v.is_a?(Symbol)
-              args[k] = ([:field, :fields].include?(k.to_sym) && v !~ /\.keyword$/ && parent_match) ? "#{v}.keyword" : v.to_s
-            end
-          end
-        end
-      end
-
       def check_if_method_has_arguments!(method_name, args)
         if args.blank?
           raise ArgumentError, "The method .#{method_name}() must contain arguments."

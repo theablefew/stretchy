@@ -18,6 +18,10 @@ module Stretchy
                 end
                 super
               end
+
+              def keyword_field?
+                fields.present? && fields.include?(:keyword)
+              end
       
               def mappings(name)
                 options = {type: type_for_database}

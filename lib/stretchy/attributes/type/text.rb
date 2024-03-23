@@ -48,6 +48,11 @@ module Stretchy::Attributes::Type
         :text
       end
 
+      # The default for the `:text` type is to have a keyword field if no fields are specified.
+      def keyword_field?
+        fields.nil? || fields.has_key?(:keyword)
+      end
+
       def mappings(name)
         options = {type: type_for_database}
         OPTIONS.each { |option| options[option] = send(option) unless send(option).nil? }
