@@ -27,6 +27,10 @@ module Stretchy
         @query ||= compact_where(values[:where])
       end
 
+      def match_query
+        @match_query ||= values[:match]
+      end
+
       def query_strings
         @query_string ||= compact_where(values[:query_string], bool: false)
       end
@@ -125,7 +129,7 @@ module Stretchy
       end
 
       def no_query?
-        missing_bool_query? && missing_query_string? && missing_query_filter? && missing_neural? && ids.nil?
+        missing_bool_query? && missing_query_string? && missing_query_filter? && missing_neural? && ids.nil? && match_query.nil?
       end
 
       def build_query
@@ -134,6 +138,8 @@ module Stretchy
           structure.ids do
             structure.values ids.flatten.compact.uniq
           end unless ids.nil?
+
+          structure.match match_query unless match_query.nil?
 
           structure.hybrid do
             structure.queries do
