@@ -34,6 +34,7 @@ describe "QueryMethods" do
                     {"name": "David Turner", "email": "david@example.com", "phone": "555-123-4567", "position": {"name": "Data Scientist", "level": "Senior"}, "gender": "male", "age": 39, "income": 150000, "income_after_raise": 160000},
                     {"name": "Emma Allen", "email": "emma@example.com", "phone": "555-987-6543", "position": {"name": "CEO", "level": "Senior"}, "gender": "female", "age": 26, "income": 200000, "income_after_raise": 250000} 
                 ]
+                described_class.create_index! unless described_class.index_exists?
                 described_class.bulk_in_batches(records, size: 100) do |batch|
                     batch.map! { |record| described_class.new(record).to_bulk }
                 end

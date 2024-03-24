@@ -3,6 +3,12 @@ module Stretchy::Attributes::Type
     #
     # This class is used to define a text attribute for a model. It provides support for the Elasticsearch text data type, which is a type of data type that can hold text strings.
     #
+    # >[!NOTE]
+    # >
+    # > The default for the `:text` type is to have a keyword multified if `field:` is not specified and `fields:` is not explicitly false.
+    # > This can be disabled by setting `Stretchy.configuration.add_keyword_field_to_text_attributes` to false.
+    # > The default keyword field name is `:keyword`, but this can be changed by setting `Stretchy.configuration.default_keyword_field`.
+    #
     # ### Parameters
     #
     # - `type:` `:text`.
@@ -39,13 +45,24 @@ module Stretchy::Attributes::Type
     #
     class Text < Stretchy::Attributes::Type::Base
       OPTIONS = [:analyzer, :eager_global_ordinals, :fielddata, :fielddata_frequency_filter, :fields, :index, :index_options, :index_prefixes, :index_phrases, :norms, :position_increment_gap, :store, :search_analyzer, :search_quote_analyzer, :similarity, :term_vector, :meta]
-  
+
+      def initialize(**args)
+        # Add a keyword field by default if no fields are specified
+        args.reverse_merge!(fields: {keyword: {type: :keyword, ignore_above: 256}}) if args[:fields].nil? && Stretchy.configuration.add_keyword_field_to_text_attributes
+        super 
+      end
+
       def type
         :text
       end
 
       def type_for_database
         :text
+      end
+
+      # The default for the `:text` type is to have a keyword field if no fields are specified.
+      def keyword_field?
+        fields.find { |k,d| d[:type].to_sym == :keyword}.present?
       end
 
       def mappings(name)

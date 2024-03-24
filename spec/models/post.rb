@@ -1,7 +1,7 @@
 class Post < Stretchy::Record
 
 
-    attribute :title,                   :string
+    attribute :title,                   :keyword
     attribute :body,                    :string
     attribute :flagged,                 :boolean,  default: false  
     attribute :actor,                   :hash 

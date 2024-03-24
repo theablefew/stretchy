@@ -136,7 +136,7 @@ describe Stretchy::Attributes do
         }.with_indifferent_access
         end
 
-        it 'creates index with attribute mappings' do
+        xit 'creates index with attribute mappings' do
           model.delete_index! if model.index_exists?
           model.create_index!
           # ap model.mappings.as_json

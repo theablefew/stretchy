@@ -47,7 +47,7 @@ module Stretchy
         end
 
         def aggregation!(name, options = {}, &block) # :nodoc:
-            self.aggregation_values += [{name: name, args: assume_keyword_field(options)}]
+            self.aggregation_values += [{name: name, args: options}]
             self
         end
 

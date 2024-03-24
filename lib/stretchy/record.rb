@@ -46,6 +46,7 @@ module Stretchy
                 def initialize(attributes = {})
                     @highlights = attributes.delete(:_highlights) 
                     super(attributes)
+                    run_callbacks :initialize 
                 end
 
             end

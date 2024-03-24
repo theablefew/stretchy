@@ -31,7 +31,7 @@ module Stretchy::Attributes::Type::Numeric
   # ```
   #
   class Base < Stretchy::Attributes::Type::Base #:nodoc:
-    OPTIONS = [:coerce, :doc_values, :ignore_malformed, :index, :meta, :null_value, :on_script_error, :script, :store, :time_series_dimension, :time_series_metric]
+    OPTIONS = [:coerce, :doc_values, :ignore_malformed, :index, :meta, :null_value, :on_script_error, :script, :store, :time_series_dimension, :time_series_metric] + self.superclass::OPTIONS
 
     def type
       raise NotImplementedError, "You must use one of the numeric types: integer, long, short, byte, double, float, half_float, scaled_float."
