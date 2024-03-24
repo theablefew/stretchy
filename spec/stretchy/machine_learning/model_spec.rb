@@ -2,10 +2,8 @@ require 'spec_helper'
 
 describe Stretchy::MachineLearning::Model do
 
-  let(:backend) { Stretchy.configuration.opensearch? ? OpenSearch : Elasticsearch }
-
   it 'should have a client' do
-    expect(Stretchy::MachineLearning::Model.client).to be_a("#{backend}::API::MachineLearning::Models::MachineLearningClient".constantize)
+    expect(Stretchy::MachineLearning::Model.client).to be_a("#{Stretchy.configuration.search_backend_const}::API::MachineLearning::Models::MachineLearningClient".constantize)
   end
 
   it 'should lookup a model' do

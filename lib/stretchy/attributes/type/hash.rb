@@ -36,9 +36,13 @@ module Stretchy::Attributes::Type
     end
 
     def mappings(name)
-      options = {}
+      options = {type: type_for_database}
       OPTIONS.each { |option| options[option] = send(option) unless send(option).nil? }
       { name => options }.as_json
+    end
+
+    def keyword_field?
+      true
     end
 
     private

@@ -41,31 +41,38 @@ module Stretchy
 
   class Configuration
 
-    attr_accessor :client
-    attr_accessor :opensearch
+    attr_accessor :options
+
+    delegate_missing_to :@options
 
     def initialize
-        @client = Elasticsearch::Client.new url: 'http://localhost:9200'
-        @opensearch = false
+        @options = Hashie::Mash.new(
+          default_keyword_field: :keyword,
+          add_keyword_field_to_text_attributes: true,
+          auto_target_keywords: true,
+          opensearch: false,
+          client: Elasticsearch::Client.new(url: 'http://localhost:9200')
+        )
     end
 
-    def client=(client)
-        @client = client
-        self.opensearch = true if @client.class.name =~ /OpenSearch/
+    def client=(klient)
+        @options[:client] = klient
+        self.opensearch = true if klient.class.name =~ /OpenSearch/
     end
 
     def search_backend_const
-        @opensearch ? OpenSearch : Elasticsearch
+        self.opensearch? ? OpenSearch : Elasticsearch
     end
 
     def opensearch=(bool)
-        @opensearch = bool
+        @options[:opensearch] = bool
         OpenSearchCompatibility.opensearch_patch! if bool
     end
 
     def opensearch?
-        @opensearch
+        @options[:opensearch]
     end
+
 
   end
 

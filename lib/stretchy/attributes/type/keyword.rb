@@ -27,5 +27,6 @@ module Stretchy::Attributes::Type
       def type
         :keyword
       end
+
     end
   end
