@@ -102,7 +102,7 @@ module Stretchy
         build_highlights unless highlights.blank?
         build_fields unless fields.blank?
         build_source unless source.blank?
-        build_aggregations unless aggregations.blank?
+        build_aggregations(aggregations, structure) unless aggregations.blank?
         structure.attributes!.with_indifferent_access
       end
 
@@ -264,10 +264,10 @@ module Stretchy
         end
       end
 
-      def build_aggregations
-        structure.aggregations do
-          aggregations.each do |agg|
-            structure.set! agg[:name], aggregation(agg[:name], keyword_transformer.transform(agg[:args], :name))
+      def build_aggregations(aggregation_args, aggregation_structure)
+        aggregation_structure.aggregations do
+          aggregation_args.each do |agg|
+            aggregation_structure.set! agg[:name], aggregation(agg[:name], keyword_transformer.transform(agg[:args], :aggs, :aggregations))
           end
         end
       end
@@ -335,8 +335,6 @@ module Stretchy
         _and.join(" AND ")
       end
 
-
-
       def extract_highlighter(highlighter)
         Jbuilder.new do |highlight|
           highlight.extract! highlighter
@@ -357,12 +355,17 @@ module Stretchy
       end
 
       def aggregation(name, opts = {})
-        Jbuilder.new do |agg|
+        Jbuilder.new do |agg_structure|
           case
           when opts.is_a?(Hash)
-              agg.extract! opts, *opts.keys
+              nested_agg = opts.delete(:aggs) || opts.delete(:aggregations)
+
+              agg_structure.extract! opts, *opts.keys
+
+              build_aggregations(nested_agg.map {|d| {:name => d.first, :args => d.last } }, agg_structure) if nested_agg
+                
           when opts.is_a?(Array)
-              extract_filter_arguments_from_array(agg, opts)
+              extract_filter_arguments_from_array(agg_structure, opts)
           else
             raise "#aggregation only accepts Hash or Array"
           end

@@ -5,7 +5,6 @@ module Stretchy
 
               OPTIONS = []
 
-      
               def initialize(**args)
 
                 define_option_methods!
@@ -13,13 +12,14 @@ module Stretchy
                 args.each do |k, v|
                   if self.class::OPTIONS.include?(k)
                     instance_variable_set("@#{k}", v) 
-                    args.delete(k)
                   end
+                  args.delete(k)
                 end
                 super
               end
 
               def keyword_field?
+                return false unless respond_to? :fields
                 fields.present? && fields.include?(:keyword)
               end
       

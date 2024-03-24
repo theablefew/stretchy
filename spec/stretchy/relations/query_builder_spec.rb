@@ -155,10 +155,10 @@ describe Stretchy::Relations::QueryBuilder do
         context 'keywords' do
           let(:model) do
             class MyModel < Stretchy::Record
-              attribute :title, :keyword
-              attribute :status, :keyword
-              attribute :terms, :keyword
-              attribute :term, :keyword
+              attribute :title, :string
+              attribute :status, :string
+              attribute :terms, :string
+              attribute :term, :string
             end
             MyModel
           end
@@ -168,7 +168,7 @@ describe Stretchy::Relations::QueryBuilder do
           it 'converts aggregation keyword attribute names to .keyword' do
             aggregation = {aggregation: [{ name: :terms, args: { terms: {field: 'value'}, aggs: { more_terms: { terms: { field: :title }}}}}]}
             elastic_hash = described_class.new(aggregation, model.attribute_types).to_elastic
-            expect(elastic_hash).to eq({aggregations: {terms: {terms: {field: 'value'}, aggs: { more_terms: {terms: {field: 'title.keyword'}}}}}}.with_indifferent_access)
+            expect(elastic_hash).to eq({aggregations: {terms: {terms: {field: 'value'}, aggregations: { more_terms: {terms: {field: 'title.keyword'}}}}}}.with_indifferent_access)
           end
 
           it 'converts filter keyword attribute names to .keyword' do
