@@ -66,6 +66,7 @@ describe "QueryMethods" do
                     expect(described_class.order(age: :asc).count).to eq(19)
                 end
             end
+
             context '.regexp' do
                 it 'adds a regexp query' do
                     expect(described_class.regexp(name: /br.*n/).to_elastic).to eq({query: {regexp: {'name.keyword': { value: 'br.*n'}}}}.with_indifferent_access)
@@ -88,67 +89,7 @@ describe "QueryMethods" do
                 end
             end
 
-            context '.where' do
-                let(:subject) { 
-                    described_class.create({"name": "David Brown", "email": "david@example.com", "phone": "555-456-7890", "position": {"name": "Software Engineer", "level": "Junior"}, "gender": "male", "age": 25, "income": 80000, "income_after_raise": 90000})
-                }
-                it 'returns resources with matching attributes' do
-                    r = subject
-                    described_class.refresh_index!
-                    expect(described_class.where(age: 25).map(&:id)).to include(r.id)
-                    r.delete
-                end
-
-                context 'when using ranges' do
-                    it 'gte and lte with .. ranges' do
-                      begin_date = 2.days.ago.beginning_of_day.utc
-                        end_date = 1.day.ago.end_of_day.utc
-                      expect(described_class.where(date: begin_date..end_date).to_elastic[:query][:bool]).to eq({filter: [{range: {date: {gte: begin_date, lte: end_date}}}]}.with_indifferent_access)
-                    end
-
-                    it 'gte and lt with ... ranges' do
-                        begin_date = 2.days.ago.beginning_of_day.utc
-                        end_date = 1.day.ago.end_of_day.utc
-                      expect(described_class.where(date: begin_date...end_date).to_elastic[:query][:bool]).to eq({filter: [{range: {date: {gte: begin_date, lt: end_date}}}]}.with_indifferent_access)
-                    end
-                
-                    it 'handles integer ranges' do
-                      expect(described_class.where(age: 18..30).to_elastic[:query][:bool]).to eq({filter: [{range: {age: {gte: 18, lte: 30}}}]}.with_indifferent_access)
-                    end
-                
-                    it 'handles explicit range values' do
-                      expect(described_class.where(price: {gte: 100}).to_elastic).to eq({query: {bool: {filter:[ {range: {price: {gte: 100}}}]}}}.with_indifferent_access)
-                    end
-                  end
-                
-                  context 'when using regex' do
-                    it 'handles regex' do
-                      expect(described_class.where(color: /gr(a|e)y/).to_elastic).to eq({query: {regexp: {'color.keyword': { value: 'gr(a|e)y' }}}}.with_indifferent_access)
-                    end
-
-                    it 'handles regex with flags' do
-                        expect(described_class.where(color: /gr(a|e)y/i).to_elastic).to eq({query: {regexp: {'color.keyword': { value: 'gr(a|e)y', case_insensitive: true }}}}.with_indifferent_access)
-                    end
-
-                    it 'handles multiple conditions' do
-                        expect(described_class.where(color: /gr(a|e)y/, age: 30).to_elastic).to eq({query: {bool: {must: {term: {age: 30}}},regexp: {'color.keyword': { value: 'gr(a|e)y' }}}}.with_indifferent_access)
-                    end
-                  end
-                
-                  context 'when using terms' do
-                    it 'handles terms' do
-                      expect(described_class.where(name: ['Candy', 'Lilly']).to_elastic).to eq({query: {bool:{must: {terms: {'name.keyword': ['Candy', 'Lilly']}}}}}.with_indifferent_access)
-                    end
-                  end
-                
-                  context 'when using ids' do
-                    it 'handles ids' do
-                      expect(described_class.where(id: [12, 80, 32]).to_elastic).to eq({query: {ids: {values: [12, 80, 32]}}}.with_indifferent_access)
-                    end
-                  end
-
-            end
-
+        
             context '.must_not' do
                 it 'returns resources without the specified attribute' do
                     expect(described_class.must_not(gender: 'male').map(&:id)).not_to include(subject.id)

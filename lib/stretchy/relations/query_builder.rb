@@ -310,7 +310,7 @@ module Stretchy
       def compact_where(q, opts = {bool:true})
         return if q.nil?
         if opts.delete(:bool)
-          as_must(q)
+          as_must([merge_and_append(q)])
         else
           as_query_string(q.flatten)
         end
@@ -349,20 +349,19 @@ module Stretchy
       end
 
       def merge_and_append(queries)
-        builder = {}
-      
-        queries.each do |q|
-          q.each do |k, v|
-            if builder.key?(k)
-              builder[k] = builder[k].class == Array ? builder[k] : [builder[k]]
-              builder[k] << v
+        result = {}
+        queries.each do |hash|
+          hash.each do |key, value|
+            if result[key].is_a?(Array)
+              result[key] << value
+            elsif result.key?(key)
+              result[key] = [result[key], value]
             else
-              builder[k] = v  
+              result[key] = value
             end
           end
         end
-      
-        builder
+        result
       end
 
       def extract_highlighter(highlighter)

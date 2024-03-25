@@ -63,8 +63,11 @@ module Stretchy
             opts.each do |key, value|
               case value
               when Range
-                opts.delete(key)
-                between(value, key)
+                range = opts.delete(key)
+                range_options = {gte: range.begin}
+                upper_bound = range.exclude_end? ? :lt : :lte
+                range_options[upper_bound] = range.end
+                filter_query(:range, key => range_options)
               when Hash
                 opts.delete(key)
                 filter_query(:range, key => value) if value.keys.any? { |k| [:gte, :lte, :gt, :lt].include?(k) }

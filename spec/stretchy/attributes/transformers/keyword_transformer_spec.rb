@@ -74,7 +74,7 @@ describe Stretchy::Attributes::Transformers::KeywordTransformer do
 
     it 'does not transform' do
       transformed_keywords = values[:where].map do |arg|
-        described_class.new(model.attribute_types).transform(arg)
+        expect(described_class.new(model.attribute_types).transform(arg)).to eq(arg)
       end 
     end
   end
