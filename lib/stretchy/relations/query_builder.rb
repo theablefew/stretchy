@@ -139,7 +139,14 @@ module Stretchy
             structure.values ids.flatten.compact.uniq
           end unless ids.nil?
 
-          structure.match match_query unless match_query.nil?
+          structure.match do 
+            mq = match_query.dup
+            field, value = mq.first.shift
+            structure.set! field do
+              structure.query value
+              structure.extract! mq.last, *mq.last.keys
+            end
+          end unless match_query.nil?
 
           structure.hybrid do
             structure.queries do
@@ -192,8 +199,8 @@ module Stretchy
           end unless neural.blank?
 
           structure.regexp do
-            build_regexp unless regexes.nil?
-          end
+            build_regexp 
+          end unless regexes.nil?
 
           structure.bool do
 
@@ -339,6 +346,23 @@ module Stretchy
           _and << "(#{arg})" if arg.class == String
         end
         _and.join(" AND ")
+      end
+
+      def merge_and_append(queries)
+        builder = {}
+      
+        queries.each do |q|
+          q.each do |k, v|
+            if builder.key?(k)
+              builder[k] = builder[k].class == Array ? builder[k] : [builder[k]]
+              builder[k] << v
+            else
+              builder[k] = v  
+            end
+          end
+        end
+      
+        builder
       end
 
       def extract_highlighter(highlighter)
