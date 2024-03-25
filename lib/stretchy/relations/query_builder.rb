@@ -64,7 +64,7 @@ module Stretchy
       end
 
       def fields
-        values[:field]
+        values[:fields]
       end
 
       def source

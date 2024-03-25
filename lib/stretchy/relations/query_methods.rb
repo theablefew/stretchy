@@ -27,7 +27,7 @@ module Stretchy
       MULTI_VALUE_METHODS = [
         :where,
         :order, 
-        :field,
+        :fields,
         :highlight,
         :source,
         :must_not,

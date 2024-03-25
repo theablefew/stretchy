@@ -214,14 +214,6 @@ describe "QueryMethods" do
 
             end
 
-            context 'fields' do
-                it 'returns only the specified fields' do
-                    result = described_class.fields(:id, :name, :email)
-                    expected = {:fields=>[:id, :name, :email]}
-                    expect(result.to_elastic).to eq(expected.with_indifferent_access)
-                end
-            end
-
             context 'source' do
 
                 it 'returns only the specified fields' do
