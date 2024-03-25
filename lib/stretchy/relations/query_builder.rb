@@ -27,6 +27,10 @@ module Stretchy
         @query ||= compact_where(values[:where])
       end
 
+      def match_query
+        @match_query ||= values[:match]
+      end
+
       def query_strings
         @query_string ||= compact_where(values[:query_string], bool: false)
       end
@@ -125,7 +129,7 @@ module Stretchy
       end
 
       def no_query?
-        missing_bool_query? && missing_query_string? && missing_query_filter? && missing_neural? && ids.nil?
+        missing_bool_query? && missing_query_string? && missing_query_filter? && missing_neural? && ids.nil? && match_query.nil?
       end
 
       def build_query
@@ -134,6 +138,15 @@ module Stretchy
           structure.ids do
             structure.values ids.flatten.compact.uniq
           end unless ids.nil?
+
+          structure.match do 
+            mq = match_query.dup
+            field, value = mq.first.shift
+            structure.set! field do
+              structure.query value
+              structure.extract! mq.last, *mq.last.keys
+            end
+          end unless match_query.nil?
 
           structure.hybrid do
             structure.queries do
@@ -186,8 +199,8 @@ module Stretchy
           end unless neural.blank?
 
           structure.regexp do
-            build_regexp unless regexes.nil?
-          end
+            build_regexp 
+          end unless regexes.nil?
 
           structure.bool do
 
@@ -333,6 +346,23 @@ module Stretchy
           _and << "(#{arg})" if arg.class == String
         end
         _and.join(" AND ")
+      end
+
+      def merge_and_append(queries)
+        builder = {}
+      
+        queries.each do |q|
+          q.each do |k, v|
+            if builder.key?(k)
+              builder[k] = builder[k].class == Array ? builder[k] : [builder[k]]
+              builder[k] << v
+            else
+              builder[k] = v  
+            end
+          end
+        end
+      
+        builder
       end
 
       def extract_highlighter(highlighter)

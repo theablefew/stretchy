@@ -39,6 +39,7 @@ module Stretchy
         :or_filter,
         :extending,
         :skip_callbacks,
+        :match,
         :neural_sparse,
         :neural,
         :hybrid,
