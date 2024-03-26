@@ -16,6 +16,11 @@ describe Stretchy::Relations::QueryMethods::Where do
       end
     end
 
+    it 'stores values' do
+      relation.where(title: 'Fun times')
+      expect(relation_values).to eq([{title: 'Fun times'}])
+    end
+
     context 'when chained' do
       context 'with duplicate conditions' do
         it 'stacks values' do
@@ -59,19 +64,19 @@ describe Stretchy::Relations::QueryMethods::Where do
 
         it 'handles regex' do
           relation.where(color: /gr(a|e)y/)
-          expect(relation_regexp_values).to eq([[{"color.keyword"=>"gr(a|e)y"}, {}]])
+          expect(relation_regexp_values).to eq([[{color: "gr(a|e)y"}, {}]])
           expect(relation_values).to be_nil
         end
 
         it 'handles regex with flags' do
           relation.where(color: /gr(a|e)y/i)
-          expect(relation_regexp_values).to eq([[{"color.keyword"=>"gr(a|e)y"}, {:case_insensitive=>true}]])
+          expect(relation_regexp_values).to eq([[{color: "gr(a|e)y"}, {:case_insensitive=>true}]])
           expect(relation_values).to be_nil
         end
 
         it 'handles multiple conditions' do
           relation.where(color: /gr(a|e)y/, age: 30)
-          expect(relation_regexp_values).to eq([[{"color.keyword"=>"gr(a|e)y"}, {}]])
+          expect(relation_regexp_values).to eq([[{color: "gr(a|e)y"}, {}]])
           expect(relation_values).to eq([{age: 30}])
         end
       end
@@ -103,7 +108,12 @@ describe Stretchy::Relations::QueryMethods::Where do
     subject { described_class.new(values, attribute_types) }
 
     context 'when built' do
-      
+      context 'with no values' do
+        it 'is nil' do
+          expect(clause).to be_nil
+        end
+      end
+
       context 'the structure has' do
         it 'query.bool.must' do
           values[:where] = [{title: 'Fun times'}]

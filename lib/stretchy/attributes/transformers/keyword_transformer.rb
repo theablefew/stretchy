@@ -60,6 +60,9 @@ module Stretchy
           # `:text` and `:string` fields add a `:keyword` subfield to the attribute mapping automatically
           def transform(item, *ignore) 
             return item unless Stretchy.configuration.auto_target_keywords
+            if item.is_a?(String)
+              return (!protected?(item) && keyword_available?(item)) ? "#{item}.#{keyword_field_for(item)}" : item 
+            end
             item.each_with_object({}) do |(key, value), new_item|
               if ignore && ignore.include?(key)
                 new_item[key] = value

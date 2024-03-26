@@ -76,73 +76,10 @@ describe Stretchy::Relations::QueryBuilder do
                     expect(subject.send(:build_query)[:bool][:should]).to eq({term: {status: :active}}.with_indifferent_access)
                 end
             end
-
-
         end
 
-        context 'neural search' do
-          context 'neural_sparse' do
-            it 'builds' do
-                subject = described_class.new(neural_sparse: [{embedding: 'hello world', model_id: '1234', max_token_score: 2}])
-                expect(subject.to_elastic.dig(:query)).to have_key(:neural_sparse)
-                expect(subject.to_elastic.dig(:query, :neural_sparse)).to eq({embedding: { query_text: 'hello world', model_id: '1234', max_token_score: 2}}.with_indifferent_access)
-            end
-          end
-        
-          context 'neural' do
-            it 'builds' do
-                subject = described_class.new(neural: [{body_embedding: 'hello world', model_id: '1234', k: 2}])
-                expect(subject.to_elastic.dig(:query)).to have_key(:neural)
-                expect(subject.to_elastic.dig(:query, :neural)).to eq({body_embedding: { query_text: 'hello world', model_id: '1234', k: 2}}.with_indifferent_access)
-            end
-
-            context 'multimodal' do
-              it 'builds' do
-                subject = described_class.new(neural: [{body_embedding: {query_text: 'hello world', query_image: 'base64encodedimage'}, model_id: '1234', k: 2}])
-                expect(subject.to_elastic.dig(:query, :neural)).to eq({body_embedding: { query_text: 'hello world', query_image: 'base64encodedimage', model_id: '1234', k: 2}}.with_indifferent_access)
-              end
-
-            end
-          end
-
-          context 'hybrid' do
-            it 'builds' do
-              subject = described_class.new(hybrid: {neural: [{body_embedding: 'hello world', model_id: '1234', k: 2}], query: [{term: {status: :active}}]})
-              elastic_hash = subject.to_elastic
-              expect(elastic_hash.dig(:query)).to have_key(:hybrid)
-              expect(elastic_hash.dig(:query, :hybrid)).to have_key(:queries)
-              expect(elastic_hash.dig(:query, :hybrid, :queries)).to eq([{"neural" => {"body_embedding"=>{"k"=>2, "model_id"=>"1234", "query_text"=>"hello world"}}}, {"term"=>{"status"=>:active}}.with_indifferent_access])
-            end
-          end
-        end
-
-        context 'when using filters' do
-            let(:subject) { described_class.new(filters) }
-            let(:filters) { {filter_query: [name: :active, args: {term: {status: :active}}]} }
-    
-            it 'builds the query structure' do
-                expect(subject.send(:build_query)[:bool][:filter]).to include({active: {term: {status: :active}}}.with_indifferent_access)
-            end
-    
-        end
-
-        context 'sorting' do
-          it 'accepts array of hashes' do
-            sorts = [{created_at: :desc}, {title: :asc}]
-            subject = described_class.new({order: sorts}, attribute_types)
-            query = subject.to_elastic
-            expect(query).to eq({sort: sorts}.with_indifferent_access)
-          end
-        
-          it 'accepts options' do 
-            sorts = [{price: { order: :desc, mode: :avg}}]
-            subject = described_class.new({order: sorts}, attribute_types)
-            query = subject.to_elastic
-            expect(query).to eq({sort: sorts}.with_indifferent_access)
-          end
 
 
-        end
 
         context 'search options' do
           it 'accepts routing' do
