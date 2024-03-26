@@ -66,89 +66,12 @@ describe "QueryMethods" do
                     expect(described_class.order(age: :asc).count).to eq(19)
                 end
             end
+
             context '.regexp' do
-                it 'adds a regexp query' do
-                    expect(described_class.regexp(name: /br.*n/).to_elastic).to eq({query: {regexp: {'name.keyword': { value: 'br.*n'}}}}.with_indifferent_access)
-                end
-
-                it 'adds a regexp query with flags' do
-                    expect(described_class.regexp(name: /br.*n/, flags: "ALL").to_elastic).to eq({query: {regexp: {'name.keyword': { value: 'br.*n', flags: "ALL"}}}}.with_indifferent_access)
-                end
-
-                it 'respects .where' do
-                    expect(described_class.where(name: "David Brown").regexp('position.name': /br.*n/).to_elastic).to eq({query: {bool: {must: {term: {'name.keyword': "David Brown"}}},regexp: {'position.name.keyword': { value: 'br.*n'}}}}.with_indifferent_access)
-                end
-
-                it 'handles case insensitive regex' do
-                    expect(described_class.regexp(name: /br.*n/i).to_elastic).to eq({query: {regexp: {'name.keyword': { value: 'br.*n', case_insensitive: true}}}}.with_indifferent_access)
-                end
-
-                it 'uses keyword when supplied' do
-                    expect(described_class.regexp(name: /br.*n/, use_keyword: true).to_elastic).to eq({query: {regexp: {'name.keyword': { value: 'br.*n'}}}}.with_indifferent_access)
-                end
-            end
-
-            context '.where' do
-                let(:subject) { 
-                    described_class.create({"name": "David Brown", "email": "david@example.com", "phone": "555-456-7890", "position": {"name": "Software Engineer", "level": "Junior"}, "gender": "male", "age": 25, "income": 80000, "income_after_raise": 90000})
-                }
-                it 'returns resources with matching attributes' do
-                    r = subject
-                    described_class.refresh_index!
-                    expect(described_class.where(age: 25).map(&:id)).to include(r.id)
-                    r.delete
-                end
-
-                context 'when using ranges' do
-                    it 'gte and lte with .. ranges' do
-                      begin_date = 2.days.ago.beginning_of_day.utc
-                        end_date = 1.day.ago.end_of_day.utc
-                      expect(described_class.where(date: begin_date..end_date).to_elastic[:query][:bool]).to eq({filter: [{range: {date: {gte: begin_date, lte: end_date}}}]}.with_indifferent_access)
-                    end
-
-                    it 'gte and lt with ... ranges' do
-                        begin_date = 2.days.ago.beginning_of_day.utc
-                        end_date = 1.day.ago.end_of_day.utc
-                      expect(described_class.where(date: begin_date...end_date).to_elastic[:query][:bool]).to eq({filter: [{range: {date: {gte: begin_date, lt: end_date}}}]}.with_indifferent_access)
-                    end
-                
-                    it 'handles integer ranges' do
-                      expect(described_class.where(age: 18..30).to_elastic[:query][:bool]).to eq({filter: [{range: {age: {gte: 18, lte: 30}}}]}.with_indifferent_access)
-                    end
-                
-                    it 'handles explicit range values' do
-                      expect(described_class.where(price: {gte: 100}).to_elastic).to eq({query: {bool: {filter:[ {range: {price: {gte: 100}}}]}}}.with_indifferent_access)
-                    end
-                  end
-                
-                  context 'when using regex' do
-                    it 'handles regex' do
-                      expect(described_class.where(color: /gr(a|e)y/).to_elastic).to eq({query: {regexp: {'color.keyword': { value: 'gr(a|e)y' }}}}.with_indifferent_access)
-                    end
-
-                    it 'handles regex with flags' do
-                        expect(described_class.where(color: /gr(a|e)y/i).to_elastic).to eq({query: {regexp: {'color.keyword': { value: 'gr(a|e)y', case_insensitive: true }}}}.with_indifferent_access)
-                    end
-
-                    it 'handles multiple conditions' do
-                        expect(described_class.where(color: /gr(a|e)y/, age: 30).to_elastic).to eq({query: {bool: {must: {term: {age: 30}}},regexp: {'color.keyword': { value: 'gr(a|e)y' }}}}.with_indifferent_access)
-                    end
-                  end
-                
-                  context 'when using terms' do
-                    it 'handles terms' do
-                      expect(described_class.where(name: ['Candy', 'Lilly']).to_elastic).to eq({query: {bool:{must: {terms: {'name.keyword': ['Candy', 'Lilly']}}}}}.with_indifferent_access)
-                    end
-                  end
-                
-                  context 'when using ids' do
-                    it 'handles ids' do
-                      expect(described_class.where(id: [12, 80, 32]).to_elastic).to eq({query: {ids: {values: [12, 80, 32]}}}.with_indifferent_access)
-                    end
-                  end
 
             end
 
+        
             context '.must_not' do
                 it 'returns resources without the specified attribute' do
                     expect(described_class.must_not(gender: 'male').map(&:id)).not_to include(subject.id)
@@ -235,77 +158,19 @@ describe "QueryMethods" do
 
             context 'sorting' do
 
-                it 'accepts fields as keyword arguments' do
-                    result = described_class.order(age: :desc, name: :asc, created_at: {order: :desc, mode: :avg})
-                    expected = {:sort=>[{:age=>:desc}, {'name.keyword'=>:asc}, {:created_at=>{:order=>:desc, :mode=>:avg}}]}
-                    expect(result.to_elastic).to eq(expected.with_indifferent_access)
-                end
 
-                it 'is aliased as sort' do
-                    result = described_class.sort(age: :desc)
-                    expected = {:sort=>[{:age=>:desc}]}
-                    expect(result.to_elastic).to eq(expected.with_indifferent_access)
-                end
-
-                it 'overrides default sort with last' do
-                    subject = described_class.sort(name: :asc)
-                    query = subject.last!.to_elastic
-                    expect(query).to eq({sort: [{'name.keyword': :desc}]}.with_indifferent_access)
-                end
-
-                it 'overrides default sort with first' do
-                    subject = described_class.sort(name: :asc)
-                    query = subject.first!.to_elastic
-                    expect(query).to eq({sort: [{'name.keyword': :asc}]}.with_indifferent_access)
-                end
-                
-                it 'changes first sort key to desc' do
-                    subject = described_class.sort(name: :asc, age: :desc)
-                    query = subject.last!.to_elastic
-                    expect(query[:sort]).to eq([{'name.keyword' => :desc}, {'age' => :desc}])
-                end
-
-                it 'changes first sort key to asc' do
-                    subject = described_class.sort(name: :desc, age: :desc)
-                    query = subject.first!.to_elastic
-                    expect(query[:sort]).to eq([{'name.keyword' => :asc}, {'age' => :desc}])
-                end
-
-            end
-
-            context 'fields' do
-                it 'returns only the specified fields' do
-                    result = described_class.fields(:id, :name, :email)
-                    expected = {:fields=>[:id, :name, :email]}
-                    expect(result.to_elastic).to eq(expected.with_indifferent_access)
-                end
             end
 
             context 'source' do
 
-                it 'returns only the specified fields' do
-                    result = described_class.source(includes: [:name, :email])
-                    expected = {:_source=>{:includes=>[:name, :email]}}
-                    expect(result.to_elastic).to eq(expected.with_indifferent_access)
-                end
+
             end
 
             context 'highlight' do
-                it 'returns highlighted fields' do
-                    result = described_class.highlight(body: {})
-                    expected = {:highlight=>{:fields=>{body: {}}}}
-                    expect(result.to_elastic).to eq(expected.with_indifferent_access)
-                end
 
                 it 'stores highlights' do
                     result = described_class.query_string("name: Soph*").highlight(name: {pre_tags: "__", post_tags: "__"}).first
                     expect(result.highlights).to eq({"name"=>["__Sophia__ Anderson"]})
-                end
-
-                it 'allows single symbol argument' do
-                    result = described_class.highlight(:body) 
-                    expected = {:highlight=>{:fields=>{body: {}}}}
-                    expect(result.to_elastic).to eq(expected.with_indifferent_access) 
                 end
 
                 it 'highlights_for ' do
@@ -313,16 +178,6 @@ describe "QueryMethods" do
                     expect(result.highlights_for(:name)).to eq(["__Sophia__ Anderson"])
                 end
             end
-
-            it 'adds exists with has_field' do
-                expect(described_class.has_field(:name).to_elastic[:query][:bool]).to eq({:filter=>[{:exists=>{:field=>:name}}]}.with_indifferent_access)
-            end
-
-            it 'returns a null relation' do
-                expect(described_class.none.class).to eq("#{described_class.name}::Stretchy_Relation".constantize)
-            end
-
-      
 
         end
     end

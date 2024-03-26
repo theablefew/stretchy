@@ -64,7 +64,7 @@ module Stretchy
       end
 
       def fields
-        values[:field]
+        values[:fields]
       end
 
       def source
@@ -150,24 +150,21 @@ module Stretchy
 
           structure.hybrid do
             structure.queries do
-                hybrid[:neural].each do |n|
-                  structure.child! do
-                    params = n.dup
-                    field_name, query_text = params.shift
-                    structure.neural do
-                      structure.set! field_name do
-                        structure.query_text query_text
-                        structure.extract! params, *params.keys
-                      end
-                    end
+              structure.child! do
+                params = hybrid[:neural].dup
+                field_name, query_text = params.shift 
+                structure.neural do
+                  structure.set! field_name do
+                    structure.query_text query_text
+                    structure.extract! params, *params.keys
                   end
                 end
+              end
 
-                hybrid[:query].each do |query|
-                  structure.child! do
-                    structure.extract! query, *query.keys
-                  end
-                end
+              structure.child! do
+                hybrid_query = hybrid[:query].dup
+                structure.extract! hybrid_query, *hybrid_query.keys
+              end
 
             end
           end unless hybrid.nil?
@@ -222,7 +219,7 @@ module Stretchy
 
       def build_regexp
         regexes.each do |args|
-            target_field = args.first.keys.first
+            target_field = keyword_transformer.transform(args.first.keys.first.to_s)
             value_field = args.first.values.first
             structure.set! target_field, args.last.merge(value: value_field)
         end
@@ -300,7 +297,7 @@ module Stretchy
 
       def extra_search_options
         unless self.count?
-          values[:size] = size.present? ? size : values[:default_size]
+          values[:size] = size.present? ? size : default_size
         else 
           values[:size] = nil
         end
@@ -310,7 +307,7 @@ module Stretchy
       def compact_where(q, opts = {bool:true})
         return if q.nil?
         if opts.delete(:bool)
-          as_must(q)
+          as_must([merge_and_append(q)])
         else
           as_query_string(q.flatten)
         end
@@ -343,26 +340,29 @@ module Stretchy
 
         q.each do |arg|
           arg.each_pair { |k,v|  _and << "(#{k}:#{v})" } if arg.class == Hash
-          _and << "(#{arg})" if arg.class == String
+          if q.length == 1
+            _and << "#{arg}" if arg.class == String
+          else
+            _and << "(#{arg})" if arg.class == String
+          end
         end
         _and.join(" AND ")
       end
 
       def merge_and_append(queries)
-        builder = {}
-      
-        queries.each do |q|
-          q.each do |k, v|
-            if builder.key?(k)
-              builder[k] = builder[k].class == Array ? builder[k] : [builder[k]]
-              builder[k] << v
+        result = {}
+        queries.each do |hash|
+          hash.each do |key, value|
+            if result[key].is_a?(Array)
+              result[key] << value
+            elsif result.key?(key)
+              result[key] = [result[key], value]
             else
-              builder[k] = v  
+              result[key] = value
             end
           end
         end
-      
-        builder
+        result
       end
 
       def extract_highlighter(highlighter)

@@ -48,8 +48,6 @@ module Stretchy
           args = args.to_a
           target_field, regex = args.shift
           opts = args.to_h
-          opts.reverse_merge!(use_keyword: true)
-          target_field = "#{target_field}.keyword" if opts.delete(:use_keyword)
           opts.merge!(case_insensitive: true) if regex.casefold?
           self.regexp_values += [[Hash[target_field, regex.source], opts]]
           self

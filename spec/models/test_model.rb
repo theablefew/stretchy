@@ -1,5 +1,6 @@
 class TestModel < StretchyModel
   attribute :name, :text
+  attribute :title, :keyword
   attribute :age, :integer
   attribute :tags, :array
   attribute :data, :hash
