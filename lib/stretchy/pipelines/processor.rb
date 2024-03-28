@@ -48,9 +48,11 @@ module Stretchy::Pipelines
       @type = type
       @description = opts[:description]
       @opts = opts
+      @model = opts.delete(:model)
     end
 
     def to_hash
+      @opts[:model_id] = @model.model_id if @model
       { type => @opts }
     end
   end

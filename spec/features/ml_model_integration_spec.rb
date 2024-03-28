@@ -2,16 +2,16 @@ require 'spec_helper'
 
 describe 'ML Model', opensearch_only: true, type: :integration do
   before(:all) do
-    @sparse_model = Stretchy::MachineLearning::Model.new(
-      model: :neural_sparse_encoding,
-      version: '1.0.1',
-      model_format: 'TORCH_SCRIPT',
-      description: 'Creates sparse embedding for onboarding docs'
-    )
+    @sparse_model = SparseEmbeddingModel = Class.new(Stretchy::MachineLearning::Model) do
+      model :neural_sparse_encoding
+      version '1.0.1'
+      model_format 'TORCH_SCRIPT'
+      description 'Creates sparse embedding for onboarding docs'
+    end
     Stretchy::MachineLearning::Model.ml_on_all_nodes!
 
     @sparse_model.register do |model|
-      model.wait_until_complete do
+      model.wait_until_complete(max_attempts: 30, sleep_time: 5) do
         Stretchy.logger.debug "Registering model #{model.model}"
         model.registered?
       end

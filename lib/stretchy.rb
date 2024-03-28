@@ -36,6 +36,10 @@ module Stretchy
     Stretchy::Delegation::GatewayDelegation.send(:include, Rails::Instrumentation::Publishers::Record)
   end
 
+  def self.env
+    ENV['RACK_ENV'] || ENV['RAILS_ENV'] || 'development'
+  end
+
   module Errors
     class QueryOptionMissing < StandardError; end
   end
