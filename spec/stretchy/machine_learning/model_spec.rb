@@ -119,8 +119,8 @@ describe Stretchy::MachineLearning::Model do
 
       context 'not deployed' do
         it 'should check if deployed' do
-          # described_class.registry.delete
           model.instance_variable_set(:@deployed, nil)
+          allow(model).to receive(:model_id).and_return('78910')
           allow(model).to receive(:registry).and_return(double('Registry', model_id: '78910'))
           allow(model.client).to receive(:get_model).with(id: '78910').and_return(status_deploying)
           expect(model.deployed?).to be_falsey
