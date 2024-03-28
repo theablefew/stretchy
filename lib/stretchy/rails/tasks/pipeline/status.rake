@@ -4,21 +4,19 @@ namespace :stretchy do
     desc "Check the status of all pipelines"
     task status: :environment do
       klass = ENV['MODEL']
-      unless klass.nil?
-        klass = klass.constantize
-      end
 
       Rails.application.eager_load!
+      models = klass.nil? ? Stretchy::Pipeline.descendants : [klass.constantize]
 
       puts Rainbow("Pipelines").color :gray
-      Stretchy::Pipeline.descendants.each do |klass|
-        response = klass.exists?
+      models.each do |model|
+        response = model.exists?
         status = if response
           Rainbow("[CREATED]").green.bright
         else
-          Rainbow("[MISSING]").gray.bright
+          Rainbow("[MISSING]").white
         end
-        puts "#{klass.pipeline_name}".ljust(60) + status
+        puts "#{model.pipeline_name}".ljust(JUSTIFICATION) + status
       end
       puts "\n\n"
     end
