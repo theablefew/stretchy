@@ -10,6 +10,7 @@ require 'active_support/all'
 
 require_relative "stretchy/version"
 require_relative "stretchy/rails/instrumentation/railtie" if defined?(Rails)
+require_relative "stretchy/rails/railtie" if defined?(Rails)
 require_relative 'elasticsearch/api/namespace/machine_learning/model'
 
 module Stretchy
@@ -33,6 +34,10 @@ module Stretchy
 
   def self.instrument!
     Stretchy::Delegation::GatewayDelegation.send(:include, Rails::Instrumentation::Publishers::Record)
+  end
+
+  def self.env
+    ENV['RACK_ENV'] || ENV['RAILS_ENV'] || 'development'
   end
 
   module Errors

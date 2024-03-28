@@ -31,7 +31,153 @@ module Stretchy
       end
 
       class << self
-        attr_accessor :model, :group_id 
+
+        # delegate :find, :status, :deployed?, :registered?, :task_id, :deploy_id, :model_id, :register, :deploy, :undeploy, :delete, to: :model
+
+        METHODS = [
+                    :model,
+                    :group_id, 
+                    :version, 
+                    :description, 
+                    :model_format, 
+                    :enabled, 
+                    :connector_id, 
+                    :connector, 
+                    :function_name, 
+                    :model_config, 
+                    :model_content_hash_value, 
+                    :url  
+                  ]
+
+        def settings
+          @settings ||= {}
+        end
+
+        METHODS.each do |method|
+          define_method(method) do |args = nil|
+            return settings[method] unless args.present?
+            settings[method] = args
+          end
+        end
+
+        def model(model = nil)
+          return settings[:model] unless model
+          settings[:model] = model_lookup(model)
+        end
+
+        def model_id
+          @model_id || registry.model_id
+        end
+
+        def task_id
+          @task_id || registry.register_task_id
+        end
+
+        def deploy_id
+          @deploy_id || registry.deploy_task_id
+        end
+
+
+        def registry
+          @registry ||= Stretchy::MachineLearning::Registry.register(class_name: self.name)
+        end
+
+        def register
+          begin
+  
+            response = client.register(body: self.to_hash, deploy: true)
+  
+            @task_id = response['task_id']
+  
+            self.registry.update(register_task_id: @task_id)
+  
+            yield self if block_given? 
+  
+            registered?
+            self.registry.update(model_id: @model_id) 
+            @model_id
+          rescue => e
+            Stretchy.logger.error "Error registering model: #{e.message}"
+            false
+          end
+          true
+        end
+
+        def registered?
+          return false unless task_id
+          response = status
+          @model_id = response['model_id'] if response['model_id']
+          response['state'] == 'COMPLETED' && @model_id.present?
+        end
+  
+        def status
+          client.get_status(task_id: self.task_id)
+        end
+
+
+        def deploy
+          @deployed = nil
+
+          @deploy_id = client.deploy(id: self.model_id)['task_id']
+          self.registry.update(deploy_task_id: @deploy_id)
+          yield self if block_given? 
+          @deploy_id
+        end
+  
+        def undeploy
+          @deployed = nil
+          response = client.undeploy(id: self.model_id)
+          self.registry.update(deploy_task_id: nil)
+          yield self if block_given? 
+          response
+        end
+  
+        def deployed?
+          return @deployed if @deployed
+          response = client.get_model(id: self.model_id)
+          # raise "Model not deployed" if response['model_state'] == 'FAILED'
+          @deployed = response['model_state'] == 'DEPLOYED'
+        end
+  
+        def delete
+          self.registry.delete
+          client.delete_model(id: self.model_id)
+        end
+
+        def find 
+          begin
+            client.get_model(id: self.model_id)
+          rescue "#{Stretchy.search_backend_const}::Transport::Transport::Errors::InternalServerError".constantize => e
+            raise Stretchy::MachineLearning::Errors::ModelMissingError
+          end
+        end
+  
+        def to_hash
+          {
+            name: self.model,
+            model_group_id: self.group_id,
+            version: self.version,
+            description: self.description,
+            model_format: self.model_format,
+            is_enabled: self.enabled?,
+            uid: self.class.name.underscore
+          }.compact
+        end
+  
+        def enabled?
+          self.enabled
+        end
+  
+        def wait_until_complete(max_attempts: 20, sleep_time: 4)
+          attempts = 0
+          loop do
+            result = yield
+            break if result
+            attempts += 1
+            break if attempts >= max_attempts
+            sleep(sleep_time)
+          end
+        end
 
         def all
           client.get_model
@@ -75,114 +221,6 @@ module Stretchy
           end.to_h
 
           @flattened_models[model.to_sym] || model.to_s
-        end
-      end
-
-      attr_accessor :model,
-                    :group_id, 
-                    :version, 
-                    :description, 
-                    :model_format, 
-                    :enabled, 
-                    :connector_id, 
-                    :connector, 
-                    :function_name, 
-                    :model_config, 
-                    :model_content_hash_value, 
-                    :url
-
-      attr_reader :task_id, :model_id, :deploy_id
-
-      def initialize(args = {})
-        model_name = args.delete(:model)
-        args.each do |k,v|
-          self.send("#{k}=", v)
-        end
-        @model = self.class.model_lookup model_name
-      end
-
-      def register
-        begin
-          response = client.register(body: self.to_hash, deploy: true)
-
-          @task_id = response['task_id']
-
-          yield self if block_given? 
-
-          @model_id
-        rescue => e
-          Stretchy.logger.error "Error registering model: #{e.message}"
-          false
-        end
-        true
-      end
-
-      def registered?
-        response = status
-        @model_id = response['model_id'] if response['model_id']
-        response['state'] == 'COMPLETED' && @model_id.present?
-      end
-
-      def status
-        client.get_status(task_id: self.task_id)
-      end
-
-      def deploy
-        @deployed = nil
-        @deploy_id = client.deploy(id: self.model_id)['task_id']
-        yield self if block_given? 
-        @deploy_id
-      end
-
-      def undeploy
-        @deployed = nil
-        response = client.undeploy(id: self.model_id)
-        yield self if block_given? 
-        response
-      end
-
-      def deployed?
-        return @deployed if @deployed
-        response = client.get_model(id: self.model_id)
-        # raise "Model not deployed" if response['model_state'] == 'FAILED'
-        @deployed = response['model_state'] == 'DEPLOYED'
-      end
-
-      def delete
-        client.delete_model(id: self.model_id)
-      end
-
-      def client
-        @@client
-      end
-
-      def find 
-        client.get_model(id: self.model_id)
-      end
-
-      def to_hash
-        {
-          name: self.model,
-          model_group_id: self.group_id,
-          version: self.version,
-          description: self.description,
-          model_format: self.model_format,
-          is_enabled: self.enabled?
-        }.compact
-      end
-
-      def enabled?
-        self.enabled
-      end
-
-      def wait_until_complete(max_attempts: 20, sleep_time: 4)
-        attempts = 0
-        loop do
-          result = yield
-          break if result
-          attempts += 1
-          break if attempts >= max_attempts
-          sleep(sleep_time)
         end
       end
 

@@ -10,27 +10,13 @@ describe Stretchy::MachineLearning::Model do
     expect(described_class.model_lookup :neural_sparse_encoding).to eq('amazon/neural-sparse/opensearch-neural-sparse-encoding-v1')
   end
 
-  context 'model name' do
-    it 'should have a model name' do
-      model = described_class.new(model: 'great-model')
-      expect(model.model).to eq('great-model')
-    end
-    
-    it 'should lookup short names' do
-      model = described_class.new model: :neural_sparse_encoding
-      expect(model.model).to eq('amazon/neural-sparse/opensearch-neural-sparse-encoding-v1')
-    end
-
-  end
-
   context 'api' do
     let(:model) {  
-      described_class.new(
-        model: :neural_sparse_encoding, 
-        version: '1.0.1', 
-        model_format: 'TORCH_SCRIPT', 
-        description: 'A great model'
-      )
+      TestEmbedding ||= Class.new(Stretchy::MachineLearning::Model) do
+        model :sentence_transformers_minilm_12
+        model_format 'TORCH_SCRIPT'
+        version '1.0.1'
+      end
     }
 
     let(:status_complete) {
@@ -58,6 +44,19 @@ describe Stretchy::MachineLearning::Model do
       end
     end
 
+    context 'standalone' do
+      it 'has model' do
+        expect(model.model).to eq('huggingface/sentence-transformers/all-MiniLM-L12-v2')
+      end
+
+      it 'has version' do
+        expect(model.version).to eq('1.0.1')
+      end
+
+      it 'has model format' do
+        expect(model.model_format).to eq('TORCH_SCRIPT')
+      end
+    end
 
     context 'register' do
       before(:each) do
@@ -114,14 +113,15 @@ describe Stretchy::MachineLearning::Model do
       end
 
       it 'should check if deployed' do
-        allow(model).to receive(:model_id).and_return('78910')
-        allow(model.client).to receive(:get_model).with(id: '78910').and_return(status_deployed)
+        allow(model.client).to receive(:get_model).and_return(status_deployed)
         expect(model.deployed?).to be_truthy
       end
 
       context 'not deployed' do
         it 'should check if deployed' do
+          model.instance_variable_set(:@deployed, nil)
           allow(model).to receive(:model_id).and_return('78910')
+          allow(model).to receive(:registry).and_return(double('Registry', model_id: '78910'))
           allow(model.client).to receive(:get_model).with(id: '78910').and_return(status_deploying)
           expect(model.deployed?).to be_falsey
         end
