@@ -29,12 +29,10 @@ module Stretchy
               end
 
               def mappings(name) 
-                  {
-                    properties: {
-                      "#{name}.tokens": {
-                          type: "sparse_vector"
-                      }
-                    }
+                {
+                  "#{name}.tokens": {
+                      type: "sparse_vector"
+                  }
                 }.as_json
               end
           end

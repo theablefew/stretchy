@@ -47,9 +47,7 @@ module Stretchy
             options = {type: type}
             OPTIONS.each { |_| options[_] = self.send(_) }
             {
-              properties: {
-                "#{name}.tokens": options
-              }
+              "#{name}.tokens": options
             }.as_json
           end
       end
