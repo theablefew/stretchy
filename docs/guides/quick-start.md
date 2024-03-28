@@ -70,3 +70,40 @@ Stretchy.configure do |config|
     # config.client = Openseaerch::Client.new Rails.application.credentials.opensearch
 end
 ```
+
+#### Create a model
+
+```ruby
+class Product < StretchyModel
+    attribute :price, :integer
+    attribute :upc, :keyword
+    attribute :color, :keyword
+end
+```
+
+#### Managing Models, Pipelines and Machine Learning Models
+
+Stretchy has a suite of rake tasks built in to make working with Elasticsearch and OpenSearch easier.
+
+```sh
+rake stretchy:index:create              # Create indices
+rake stretchy:index:delete              # Delete indices
+rake stretchy:index:status              # Check the status of all indexes
+rake stretchy:ml:delete                 # Delete the model ENV['MODEL']
+rake stretchy:ml:deploy                 # Deploy the model ENV['MODEL']
+rake stretchy:ml:register               # Register the model ENV['MODEL']
+rake stretchy:ml:status                 # Check the status of all pipelines
+rake stretchy:ml:undeploy               # Undeploy the model ENV['MODEL']
+rake stretchy:pipeline:create           # Create pipeline
+rake stretchy:pipeline:delete           # Delete pipeline
+rake stretchy:pipeline:status           # Check the status of all pipelines
+rake stretchy:status                    # Check the status of all indexes, pipelines and ml models
+rake stretchy:status:all                # Check the status of all indexes
+rake stretchy:up                        # Create all indexes, pipelines and deploy all models
+rake stretchy:down                      # Delete all indexes, pipelines and undeploy all models
+```
+
+
+![rake](../media/stretchy_up.mov)
+
+Run `rake:stretchy:up` to create all Machine Learning models, Pipelines and Indices. 
