@@ -32,7 +32,7 @@ module Stretchy::Attributes::Type
   #
   class DateTime < Stretchy::Attributes::Type::Base
     OPTIONS = [:doc_values, :format, :locale, :ignore_malformed, :index, :null_value, :on_script_error, :script, :store, :meta]
-    attr_reader *OPTIONS
+    attr_reader *OPTIONS + self.superclass::OPTIONS
     include ActiveModel::Type::Helpers::Timezone
     include ActiveModel::Type::Helpers::AcceptsMultiparameterTime.new(
       defaults: { 4 => 0, 5 => 0 }

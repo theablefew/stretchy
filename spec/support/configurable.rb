@@ -25,6 +25,23 @@ shared_examples 'configurable' do |model|
         expect(Stretchy.configuration.client.transport.transport.hosts.first[:host]).to eq('localhost')
         expect(Stretchy.configuration.client.transport.transport.hosts.first[:port]).to eq(92929)
         expect(model.gateway.client.transport.transport.hosts.first[:port]).to eq(92929)
+    end
 
+    context 'defaults' do
+        it 'defaults to Elasticsearch' do
+            expect(Stretchy.configuration.search_backend_const).to eq(Elasticsearch)
+        end
+
+        it 'defaults to add keyword field to text attributes' do
+            expect(Stretchy.configuration.add_keyword_field_to_text_attributes).to be(true)
+        end
+    end
+
+    it 'can disable keyword field on text attributes' do
+        Stretchy.configure do |config|
+            config.add_keyword_field_to_text_attributes = false
+        end
+
+        expect(Stretchy.configuration.add_keyword_field_to_text_attributes).to be(false)
     end
 end

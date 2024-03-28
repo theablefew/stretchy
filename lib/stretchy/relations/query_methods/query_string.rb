@@ -28,22 +28,12 @@ module Stretchy
         # ```
         #
         def query_string(opts = :chain, *rest)
-          if opts == :chain
-            WhereChain.new(spawn)
-          elsif opts.blank?
-            self
-          else
-            spawn.query_string!(opts, *rest)
-          end
+          spawn.query_string!(opts, *rest)
         end
 
         def query_string!(opts, *rest) # :nodoc:
-          if opts == :chain
-            WhereChain.new(self)
-          else
-            self.query_string_values += build_where(opts, rest)
-            self
-          end
+          self.query_string_values += build_where(opts, rest)
+          self
         end
 
         QueryMethods.register!(:query_string)

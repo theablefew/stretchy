@@ -49,7 +49,7 @@ module Stretchy
         end
 
         def hybrid!(opts) # :nodoc:
-          self.hybrid_values += [opts]
+          self.hybrid_values = opts
           self
         end
 

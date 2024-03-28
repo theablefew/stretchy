@@ -66,6 +66,7 @@ module Stretchy
       ActiveModel::Type.register(:ip, Stretchy::Attributes::Type::IP)
       ActiveModel::Type.register(:join, Stretchy::Attributes::Type::Join)
       ActiveModel::Type.register(:keyword, Stretchy::Attributes::Type::Keyword)
+      ActiveModel::Type.register(:knn_vector, Stretchy::Attributes::Type::KnnVector)
       ActiveModel::Type.register(:match_only_text, Stretchy::Attributes::Type::MatchOnlyText)
       ActiveModel::Type.register(:nested, Stretchy::Attributes::Type::Nested)
       ActiveModel::Type.register(:percolator, Stretchy::Attributes::Type::Percolator)

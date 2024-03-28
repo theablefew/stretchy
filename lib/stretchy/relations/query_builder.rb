@@ -27,6 +27,10 @@ module Stretchy
         @query ||= compact_where(values[:where])
       end
 
+      def match_query
+        @match_query ||= values[:match]
+      end
+
       def query_strings
         @query_string ||= compact_where(values[:query_string], bool: false)
       end
@@ -60,7 +64,7 @@ module Stretchy
       end
 
       def fields
-        values[:field]
+        values[:fields]
       end
 
       def source
@@ -102,7 +106,7 @@ module Stretchy
         build_highlights unless highlights.blank?
         build_fields unless fields.blank?
         build_source unless source.blank?
-        build_aggregations unless aggregations.blank?
+        build_aggregations(aggregations, structure) unless aggregations.blank?
         structure.attributes!.with_indifferent_access
       end
 
@@ -125,7 +129,7 @@ module Stretchy
       end
 
       def no_query?
-        missing_bool_query? && missing_query_string? && missing_query_filter? && missing_neural? && ids.nil?
+        missing_bool_query? && missing_query_string? && missing_query_filter? && missing_neural? && ids.nil? && match_query.nil?
       end
 
       def build_query
@@ -135,26 +139,32 @@ module Stretchy
             structure.values ids.flatten.compact.uniq
           end unless ids.nil?
 
+          structure.match do 
+            mq = match_query.dup
+            field, value = mq.first.shift
+            structure.set! field do
+              structure.query value
+              structure.extract! mq.last, *mq.last.keys
+            end
+          end unless match_query.nil?
+
           structure.hybrid do
             structure.queries do
-                hybrid[:neural].each do |n|
-                  structure.child! do
-                    params = n.dup
-                    field_name, query_text = params.shift
-                    structure.neural do
-                      structure.set! field_name do
-                        structure.query_text query_text
-                        structure.extract! params, *params.keys
-                      end
-                    end
+              structure.child! do
+                params = hybrid[:neural].dup
+                field_name, query_text = params.shift 
+                structure.neural do
+                  structure.set! field_name do
+                    structure.query_text query_text
+                    structure.extract! params, *params.keys
                   end
                 end
+              end
 
-                hybrid[:query].each do |query|
-                  structure.child! do
-                    structure.extract! query, *query.keys
-                  end
-                end
+              structure.child! do
+                hybrid_query = hybrid[:query].dup
+                structure.extract! hybrid_query, *hybrid_query.keys
+              end
 
             end
           end unless hybrid.nil?
@@ -186,8 +196,8 @@ module Stretchy
           end unless neural.blank?
 
           structure.regexp do
-            build_regexp unless regexes.nil?
-          end
+            build_regexp 
+          end unless regexes.nil?
 
           structure.bool do
 
@@ -209,7 +219,7 @@ module Stretchy
 
       def build_regexp
         regexes.each do |args|
-            target_field = args.first.keys.first
+            target_field = keyword_transformer.transform(args.first.keys.first.to_s)
             value_field = args.first.values.first
             structure.set! target_field, args.last.merge(value: value_field)
         end
@@ -264,10 +274,10 @@ module Stretchy
         end
       end
 
-      def build_aggregations
-        structure.aggregations do
-          aggregations.each do |agg|
-            structure.set! agg[:name], aggregation(agg[:name], keyword_transformer.transform(agg[:args], :name))
+      def build_aggregations(aggregation_args, aggregation_structure)
+        aggregation_structure.aggregations do
+          aggregation_args.each do |agg|
+            aggregation_structure.set! agg[:name], aggregation(agg[:name], keyword_transformer.transform(agg[:args], :aggs, :aggregations))
           end
         end
       end
@@ -287,7 +297,7 @@ module Stretchy
 
       def extra_search_options
         unless self.count?
-          values[:size] = size.present? ? size : values[:default_size]
+          values[:size] = size.present? ? size : default_size
         else 
           values[:size] = nil
         end
@@ -297,7 +307,7 @@ module Stretchy
       def compact_where(q, opts = {bool:true})
         return if q.nil?
         if opts.delete(:bool)
-          as_must(q)
+          as_must([merge_and_append(q)])
         else
           as_query_string(q.flatten)
         end
@@ -308,10 +318,16 @@ module Stretchy
         q.each do |arg|
           case arg
           when Hash
-            arg = keyword_transformer.transform(arg)
+            arg = keyword_transformer.transform(arg, :match)
             arg.each_pair do |k,v| 
-              # If v is an array, we build a terms query otherwise a term query
-              _must << (v.is_a?(Array) ? {terms: Hash[k,v]} : {term: Hash[k,v]}) 
+              if k == :match
+                v.each do |field, value|
+                  _must << (field.is_a?(Hash) ? { k => field} : { k => {field => value}})
+                end
+              else
+                # If v is an array, we build a terms query otherwise a term query
+                _must << (v.is_a?(Array) ? {terms: Hash[k,v]} : {term: Hash[k,v]}) 
+              end
             end
           when String
             _must << {term: Hash[[arg.split(/:/).collect(&:strip)]]}
@@ -330,12 +346,30 @@ module Stretchy
 
         q.each do |arg|
           arg.each_pair { |k,v|  _and << "(#{k}:#{v})" } if arg.class == Hash
-          _and << "(#{arg})" if arg.class == String
+          if q.length == 1
+            _and << "#{arg}" if arg.class == String
+          else
+            _and << "(#{arg})" if arg.class == String
+          end
         end
         _and.join(" AND ")
       end
 
-
+      def merge_and_append(queries)
+        result = {}
+        queries.each do |hash|
+          hash.each do |key, value|
+            if result[key].is_a?(Array)
+              result[key] << value
+            elsif result.key?(key)
+              result[key] = [result[key], value]
+            else
+              result[key] = value
+            end
+          end
+        end
+        result
+      end
 
       def extract_highlighter(highlighter)
         Jbuilder.new do |highlight|
@@ -357,12 +391,17 @@ module Stretchy
       end
 
       def aggregation(name, opts = {})
-        Jbuilder.new do |agg|
+        Jbuilder.new do |agg_structure|
           case
           when opts.is_a?(Hash)
-              agg.extract! opts, *opts.keys
+              nested_agg = opts.delete(:aggs) || opts.delete(:aggregations)
+
+              agg_structure.extract! opts, *opts.keys
+
+              build_aggregations(nested_agg.map {|d| {:name => d.first, :args => d.last } }, agg_structure) if nested_agg
+                
           when opts.is_a?(Array)
-              extract_filter_arguments_from_array(agg, opts)
+              extract_filter_arguments_from_array(agg_structure, opts)
           else
             raise "#aggregation only accepts Hash or Array"
           end

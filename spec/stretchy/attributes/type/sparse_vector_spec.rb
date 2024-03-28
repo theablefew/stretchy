@@ -17,13 +17,13 @@ describe "SparseVector" do
   it 'has mappings' do
     vector_attribute = model_class.attribute_types["vector"]
     mappings = vector_attribute.mappings("vector")
-    expect(mappings).to eq({
-      properties: {
+    expect(mappings).to eq(
+      {
         "vector.tokens": {
           type: :sparse_vector
         }
-      }
-    }.as_json)
+      }.as_json
+    )
   end
 
 end

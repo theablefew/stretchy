@@ -1,7 +1,7 @@
 module Stretchy
   module Relations
     module QueryMethods
-      module Field
+      module Fields
         extend ActiveSupport::Concern
         
         # Specify the fields to be returned by the Elasticsearch query.
@@ -49,16 +49,16 @@ module Stretchy
         #   Model.fields('books.*')
         # ```
         #
-        def field(*args)
+        def fields(*args)
           spawn.field!(*args)
         end
 
         # Alias for {#field}
         # @see #field
-        alias :fields :field
+        alias :field :fields
 
         def field!(*args) # :nodoc:
-          self.field_values += args
+          self.fields_values += args
           self
         end
 

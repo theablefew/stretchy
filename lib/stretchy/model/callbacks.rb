@@ -8,6 +8,7 @@ module Stretchy
         included do
           mattr_accessor :_circuit_breaker_callbacks, default: []
 
+          define_model_callbacks :initialize, only: :after
           define_model_callbacks :create, :save, :update, :destroy
           define_model_callbacks :find, :touch, only: :after
         end

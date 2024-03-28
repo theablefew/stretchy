@@ -27,6 +27,7 @@ describe "Aggregations" do
                 {"name": "David Turner", "email": "david@example.com", "phone": "555-123-4567", "position": {"name": "Data Scientist", "level": "Senior"}, "gender": "male", "age": 39, "income": 150000, "income_after_raise": 0},
                 {"name": "Emma Allen", "email": "emma@example.com", "phone": "555-987-6543", "position": {"name": "CEO", "level": "Senior"}, "gender": "female", "age": 26, "income": 200000, "income_after_raise": 0}
             ]
+            described_class.create_index!
             described_class.bulk_in_batches(records, size: 100) do |batch|
                 batch.map! { |record| described_class.new(record).to_bulk }
             end
@@ -282,7 +283,7 @@ describe "Aggregations" do
                         query_builder = described_class.size(0).aggregation(:gender, {terms: {field: :gender}, aggs: {position: {terms: {field: 'position.name'}}}}).to_elastic
                         #{"aggregations"=>{"gender"=>{"terms"=>{:field=>"gender.keyword"}, "aggs"=>{:position=>{:terms=>{:field=>"position.name.keyword"}}}}}}
                         expect(query_builder[:aggregations][:gender][:terms][:field].to_s).to eq('gender.keyword')
-                        expect(query_builder[:aggregations][:gender][:aggs][:position][:terms][:field].to_s).to eq('position.name.keyword')
+                        expect(query_builder[:aggregations][:gender][:aggregations][:position][:terms][:field].to_s).to eq('position.name.keyword')
                     end
 
                     it 'does not assume keyword field if specified' do

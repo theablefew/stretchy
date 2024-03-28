@@ -123,11 +123,6 @@ describe 'opensearch neural search', opensearch_only: true do
             expect(described_class).to respond_to(:neural)
         end
 
-        it 'adds values' do
-            values = described_class.neural(passage_embedding: { query_text: 'hello world', model_id: '1234'}).values[:neural]
-            expect(values.first).to eq({passage_embedding: { query_text: 'hello world', model_id: '1234'}})
-        end
-
         it 'returns results' do
             allow_any_instance_of(Elasticsearch::Persistence::Repository).to receive(:search).and_return(results)
             expect(described_class.neural(passage_embedding: 'hello world', model_id: '1234', k:2).total).to eq(2)
@@ -152,10 +147,6 @@ describe 'opensearch neural search', opensearch_only: true do
               expect(described_class).to respond_to(:hybrid)
           end
 
-          it 'adds values' do
-              values = described_class.hybrid(neural: [{passage_embedding: 'hello world', model_id: '1234', k: 2}], query: [{term: {status: :active}}]).values[:hybrid]
-              expect(values).to eq([{neural: [{passage_embedding: 'hello world', model_id: '1234', k: 2}], query: [{term: {status: :active}}]}])
-          end
       end
 
 

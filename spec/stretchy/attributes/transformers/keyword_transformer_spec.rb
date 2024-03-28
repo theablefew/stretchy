@@ -13,7 +13,10 @@ describe Stretchy::Attributes::Transformers::KeywordTransformer do
 
   let (:model) do
     class MyModel < Stretchy::Record
-      attribute :title, :keyword
+      attribute :title, :text
+      attribute :text_with_keyword, :text, fields: {slug: {type: :keyword}}
+      attribute :no_keyword, :text, fields: {no_keyword: {type: :text}}
+      attribute :hash_with_keyword, :hash
     end
     MyModel
   end
@@ -26,8 +29,59 @@ describe Stretchy::Attributes::Transformers::KeywordTransformer do
     expect(transformed_keywords).to eq([{ 'title.keyword' => 'Lilly' }])
   end
 
-  it 'does not transform protected parameters keys to .keyword' do
-    model.attribute :terms, :keyword
+  context 'when hash' do
+    let(:values) { {where: [{'hash_with_keyword.title': 'Lilly' }]} }
+    it 'converts dot notation to .keyword' do
+      transformed_keywords = values[:where].map do |arg|
+        described_class.new(model.attribute_types).transform(arg).with_indifferent_access
+      end
+      expect(transformed_keywords).to eq([{ 'hash_with_keyword.title.keyword' => 'Lilly' }])
+    end
+  end
+
+  context 'when multifield' do
+    let(:values) { {where: [{text_with_keyword: 'Cici' }]} }
+
+    it 'automatically uses a keyword field if available' do
+      transformed_keywords = values[:where].map do |arg|
+        described_class.new(model.attribute_types).transform(arg).with_indifferent_access
+      end
+      expect(transformed_keywords).to eq([{ 'text_with_keyword.slug' => 'Cici' }])
+    end
+
+    it 'does not transform if the attribute does not have a keyword field' do
+      values[:where] = [{ no_keyword: 'Mia' }]
+      transformed_keywords = values[:where].map do |arg|
+        described_class.new(model.attribute_types).transform(arg).with_indifferent_access
+      end
+      expect(transformed_keywords).to eq([{ 'no_keyword' => 'Mia' }])
+
+    end
+  end
+
+  context 'when auto_target_keywords is false' do
+    before(:each) do
+      Stretchy.configure do |config|
+        config.auto_target_keywords = false
+      end
+    end
+
+    after(:each) do
+      Stretchy.configure do |config|
+        config.auto_target_keywords = true
+      end
+    end
+
+    it 'does not transform' do
+      transformed_keywords = values[:where].map do |arg|
+        expect(described_class.new(model.attribute_types).transform(arg)).to eq(arg)
+      end 
+    end
+  end
+
+
+  it 'does not transform protected parameter keys to .keyword' do
+    model.attribute :terms, :text
     transformed_keywords = values[:aggregation].map do |arg|
       described_class.new(model.attribute_types).transform(arg, :name)
     end

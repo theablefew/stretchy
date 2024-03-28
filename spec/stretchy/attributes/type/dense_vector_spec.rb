@@ -37,8 +37,8 @@ let(:model_class) {
 
     vector_attribute = model_class.attribute_types["vector"]
     mappings = vector_attribute.mappings("vector")
-    expect(mappings).to eq({
-      properties: {
+    expect(mappings).to eq(
+      {
         "vector.tokens": {
           type: :dense_vector,
           dims: 3,
@@ -51,8 +51,8 @@ let(:model_class) {
             ef_construction: 200
           }
         }
-      }
-    }.as_json)
+      }.as_json
+    )
   end
 
 end

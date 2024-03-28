@@ -15,6 +15,64 @@ You can pass one or more key-value pairs to `.where` to search for documents whe
 Model.where(color: 'blue', :title: "Candy")
 ```
 
+>[!INFO|label:Default Behavior|style:flat]
+> The default behavior is to create a term query for each argument against keyword fields. 
+
+```ruby
+Model.must(file_name: 'rb', content: '.where')
+```
+
+```ruby
+{
+  "query" => {
+    "bool" => {
+      "must" => [
+        {
+          "term" => {
+            "file_name.keyword" => "rb"
+          }
+        },
+        {
+          "term" => {
+            "content.keyword" => ".where"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+For `match` behavior the query can be modified like so:
+
+```ruby
+Model.must(match: {file_name: '*.rb', content: '.where'})
+#or Model.where(match: {file_name: '*.rb', content: '.where'})
+```
+
+```ruby
+{
+  "query" => {
+    "bool" => {
+      "must" => [
+        {
+          "match" => {
+            "file_name" => "*.rb"
+          }
+        },
+        {
+          "match" => {
+            "content" => ".where"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+
+
 ##### Ranges
 You can use ranges to search for documents where a field's value falls within a certain range. For example,
 ```ruby
