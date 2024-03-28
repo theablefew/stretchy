@@ -33,6 +33,11 @@ module Stretchy
       class << self
         attr_accessor :model, :group_id 
 
+        def model(model_name = nil, **args)
+          return @model if model_name.nil?
+          @model = self.new(**{model: model_name}.merge(args))
+        end
+
         def all
           client.get_model
         end
@@ -118,6 +123,7 @@ module Stretchy
       end
 
       def registered?
+        return false unless @task_id
         response = status
         @model_id = response['model_id'] if response['model_id']
         response['state'] == 'COMPLETED' && @model_id.present?
@@ -167,7 +173,8 @@ module Stretchy
           version: self.version,
           description: self.description,
           model_format: self.model_format,
-          is_enabled: self.enabled?
+          is_enabled: self.enabled?,
+          uid: self.class.name.underscore
         }.compact
       end
 
