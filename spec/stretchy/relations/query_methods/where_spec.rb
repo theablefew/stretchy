@@ -30,6 +30,13 @@ describe Stretchy::Relations::QueryMethods::Where do
       end
     end
 
+    context 'match' do
+      it 'handles match' do
+        relation.where(match: {title: 'Fun times'})
+        expect(relation_values).to eq([match: {title: 'Fun times'}])
+      end
+    end
+
 
     context 'when using ranges' do
         let(:relation_filter_values) { relation.values[:filter_query] }
@@ -210,6 +217,55 @@ describe Stretchy::Relations::QueryMethods::Where do
               },
               {
                 term: {
+                  color: 'blue'
+                }
+              }
+            ]
+          )
+        end
+      end
+
+      context 'match' do
+        it 'is a match query' do
+          values[:where] = [{match: {name: 'Fun times'}}]
+          expect(clause).to eq(
+            {
+              match: {
+                name: 'Fun times'
+              }
+            }
+          )
+        end
+
+        it 'multiple fields per match' do
+          values[:where] = [{:match=>{:file_name=>"*.rb", :content=>".where"}}]
+          expect(clause).to eq(
+            [
+              {
+                match: {
+                  file_name: "*.rb",
+                },
+              },
+              {
+                match: {
+                  content: ".where"
+                }
+              }
+            ]
+          )
+        end
+
+        it 'is a match query for each distinct field' do
+          values[:where] = [{match: {name: 'Fun times'}}, {match: {color: 'blue'}}]
+          expect(clause).to eq(
+            [
+              {
+                match: {
+                  name: 'Fun times'
+                }
+              },
+              {
+                match: {
                   color: 'blue'
                 }
               }

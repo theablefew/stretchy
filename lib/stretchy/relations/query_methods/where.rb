@@ -69,7 +69,9 @@ module Stretchy
                 range_options[upper_bound] = range.end
                 filter_query(:range, key => range_options)
               when Hash
-                opts.delete(key)
+                hash = opts.delete(key)
+                spawn.where!(key => hash) if [:match, :match_phrase, :match_phrase_prefix].include?(key)
+
                 filter_query(:range, key => value) if value.keys.any? { |k| [:gte, :lte, :gt, :lt].include?(k) }
               when ::Regexp
                 opts.delete(key)
