@@ -32,6 +32,13 @@ This class is used to define a hash attribute for a model. It provides support f
 # Public Instance Methods
 
       
+## keyword_field?() [](#method-i-keyword_field-3F)
+         
+  
+        
+---
+
+
 ## mappings(name) [](#method-i-mappings)
          
   

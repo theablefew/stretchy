@@ -6,7 +6,6 @@
 | ---- | ----------- |
 | **MULTI_VALUE_METHODS[](#MULTI_VALUE_METHODS)** | Not Documented |
 | **SINGLE_VALUE_METHODS[](#SINGLE_VALUE_METHODS)** | Not Documented |
-| **KEYWORD_AGGREGATION_FIELDS[](#KEYWORD_AGGREGATION_FIELDS)** | Not Documented |
 | **VALID_DIRECTIONS[](#VALID_DIRECTIONS)** | Not Documented |
 
 # Public Class Methods

@@ -31,7 +31,7 @@ end
 ```ruby
 class RepoFile < StretchyModel
 	attribute :name, :string
-    attribute :path, :string
+  attribute :path, :string
 	attribute :content, :text
 	attribute :file_embeddings, :dense_vector
 	attribute :method_definitions, :array

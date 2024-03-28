@@ -41,20 +41,6 @@ Goat.where(name: 'billy').to_elastic
 # Public Instance Methods
 
       
-## assume_keyword_field(args={}, parent_match=false) [](#method-i-assume_keyword_field)
-         
-If terms are used, we assume that the field is a keyword field
-and append .keyword to the field name
-{terms: {field: 'gender'}}
-or nested aggs
-{terms: {field: 'gender'}, aggs: {name: {terms: {field: 'position.name'}}}}
-should be converted to
-{terms: {field: 'gender.keyword'}, aggs: {name: {terms: {field: 'position.name.keyword'}}}}
-{date_histogram: {field: 'created_at', interval: 'day'}}  
-        
----
-
-
 ## cast_value_keys() [](#method-i-cast_value_keys)
          
   
@@ -62,7 +48,14 @@ should be converted to
 ---
 
 
-## keyword?(arg) [](#method-i-keyword-3F)
+## keyword_available?(arg) [](#method-i-keyword_available-3F)
+         
+  
+        
+---
+
+
+## keyword_field_for(arg) [](#method-i-keyword_field_for)
          
   
         
@@ -78,7 +71,9 @@ should be converted to
 
 ## transform(item, *ignore) [](#method-i-transform)
          
-  
+Add `.keyword` to attributes that have a keyword subfield but aren't `:keywords`
+this is for text fields that have a keyword subfield
+`:text` and `:string` fields add a `:keyword` subfield to the attribute mapping automatically  
         
 ---
 

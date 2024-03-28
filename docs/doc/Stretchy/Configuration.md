@@ -4,11 +4,7 @@
 
 ### Attributes
 
-#### client[RW] [](#attribute-i-client)
- 
- 
-
-#### opensearch[RW] [](#attribute-i-opensearch)
+#### options[RW] [](#attribute-i-options)
  
  
 
@@ -28,7 +24,7 @@
 # Public Instance Methods
 
       
-## client=(client) [](#method-i-client-3D)
+## client=(klient) [](#method-i-client-3D)
          
   
         

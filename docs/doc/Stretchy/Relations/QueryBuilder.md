@@ -85,6 +85,13 @@
 ---
 
 
+## match_query() [](#method-i-match_query)
+         
+  
+        
+---
+
+
 ## must_nots() [](#method-i-must_nots)
          
   

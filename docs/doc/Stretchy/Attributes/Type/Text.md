@@ -3,6 +3,12 @@ The Text attribute type
 
 This class is used to define a text attribute for a model. It provides support for the Elasticsearch text data type, which is a type of data type that can hold text strings.
 
+>[!NOTE]
+>
+> The default for the `:text` type is to have a keyword multified if `field:` is not specified and `fields:` is not explicitly false.
+> This can be disabled by setting `Stretchy.configuration.add_keyword_field_to_text_attributes` to false.
+> The default keyword field name is `:keyword`, but this can be changed by setting `Stretchy.configuration.default_keyword_field`.
+
 ### Parameters
 
 - `type:` `:text`.
@@ -42,9 +48,26 @@ This class is used to define a text attribute for a model. It provides support f
 | ---- | ----------- |
 | **OPTIONS[](#OPTIONS)** | Not Documented |
 
+# Public Class Methods
+
+      
+## new(**args) [](#method-c-new)
+         
+  
+        
+---
+
+
 # Public Instance Methods
 
       
+## keyword_field?() [](#method-i-keyword_field-3F)
+         
+The default for the `:text` type is to have a keyword field if no fields are specified.  
+        
+---
+
+
 ## mappings(name) [](#method-i-mappings)
          
   

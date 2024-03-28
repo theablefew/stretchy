@@ -18,6 +18,7 @@
     - [IP](doc/Stretchy/Attributes/Type/IP.md)
     - [Join](doc/Stretchy/Attributes/Type/Join.md)
     - [Keyword](doc/Stretchy/Attributes/Type/Keyword.md)
+    - [KnnVector](doc/Stretchy/Attributes/Type/KnnVector.md)
     - [MatchOnlyText](doc/Stretchy/Attributes/Type/MatchOnlyText.md)
     - [Nested](doc/Stretchy/Attributes/Type/Nested.md)
     - [Numeric](doc/Stretchy/Attributes/Type/Numeric.md)

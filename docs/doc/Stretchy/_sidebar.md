@@ -10,6 +10,7 @@
     - [GatewayDelegation](doc/Stretchy/Delegation/GatewayDelegation.md)
   - [Errors](doc/Stretchy/Errors.md)
     - [QueryOptionMissing](doc/Stretchy/Errors/QueryOptionMissing.md)
+  - [IndexSetting](doc/Stretchy/IndexSetting.md)
   - [Indexing](doc/Stretchy/Indexing.md)
     - [Bulk](doc/Stretchy/Indexing/Bulk.md)
   - [Instrumentation](doc/Stretchy/Instrumentation.md)
