@@ -40,6 +40,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "amazing_print", "~> 1.3"
   spec.add_dependency "jbuilder", "~> 2.11"
   spec.add_dependency "virtus", "~> 2.0"
+  spec.add_dependency "tty-spinner", "~> 0.9"
 
   spec.add_development_dependency "rspec", "~> 3.9"
   spec.add_development_dependency "simplecov", "~> 0.21.2"
