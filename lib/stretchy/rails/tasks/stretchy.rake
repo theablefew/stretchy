@@ -14,6 +14,7 @@ namespace :stretchy do
     Rake::Task['stretchy:index:create'].invoke
   end
 
+  desc "Delete all indexes, pipelines and undeploy all models"
   task down: :environment do
     Rake::Task['stretchy:ml:undeploy'].invoke
     Rake::Task['stretchy:ml:delete'].invoke
