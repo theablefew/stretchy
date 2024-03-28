@@ -318,10 +318,16 @@ module Stretchy
         q.each do |arg|
           case arg
           when Hash
-            arg = keyword_transformer.transform(arg)
+            arg = keyword_transformer.transform(arg, :match)
             arg.each_pair do |k,v| 
-              # If v is an array, we build a terms query otherwise a term query
-              _must << (v.is_a?(Array) ? {terms: Hash[k,v]} : {term: Hash[k,v]}) 
+              if k == :match
+                v.each do |field, value|
+                  _must << (field.is_a?(Hash) ? { k => field} : { k => {field => value}})
+                end
+              else
+                # If v is an array, we build a terms query otherwise a term query
+                _must << (v.is_a?(Array) ? {terms: Hash[k,v]} : {term: Hash[k,v]}) 
+              end
             end
           when String
             _must << {term: Hash[[arg.split(/:/).collect(&:strip)]]}
