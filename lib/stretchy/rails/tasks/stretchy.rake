@@ -4,7 +4,7 @@ require 'tty-spinner'
 JUSTIFICATION = 90 unless defined?(JUSTIFICATION)
 
 path = File.expand_path(__dir__)
-Dir.glob("#{path}/**/*.rake").each { |f| import f }
+Dir.glob("#{path}/tasks/*.rake").each { |f| import f }
 namespace :stretchy do
   desc "Create all indexes, pipelines and deploy all models"
   task up: :environment do
@@ -21,4 +21,17 @@ namespace :stretchy do
     Rake::Task['stretchy:pipeline:delete'].invoke
     Rake::Task['stretchy:index:delete'].invoke
   end
+
+  desc "Enable Machine Learning on all nodes"
+  task ml_on_all_nodes: :environment do
+    puts "Enabling Machine Learning on all nodes..."
+    puts Stretchy::MachineLearning::Model.ml_on_all_nodes!
+  end
+
+  desc "Machine Learning on ML nodes only"
+  task ml_on_ml_nodes: :environment do
+    puts "Enabling Machine Learning on ML nodes only..."
+    puts Stretchy::MachineLearning::Model.ml_on_ml_nodes!
+  end
+
 end
