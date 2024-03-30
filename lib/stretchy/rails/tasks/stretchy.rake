@@ -4,7 +4,10 @@ require 'tty-spinner'
 JUSTIFICATION = 90 unless defined?(JUSTIFICATION)
 
 path = File.expand_path(__dir__)
-Dir.glob("#{path}/tasks/**/*.rake").each { |f| import f }
+Dir.glob("#{path}/**/*.rake").each do |f|
+  import f unless f == __FILE__
+end
+
 namespace :stretchy do
   desc "Create all indexes, pipelines and deploy all models"
   task up: :environment do
@@ -33,6 +36,5 @@ namespace :stretchy do
     puts "Enabling Machine Learning on ML nodes only..."
     puts Stretchy::MachineLearning::Model.ml_on_ml_nodes!
   end
-
 
 end
