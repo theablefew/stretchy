@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'stretchy/machine_learning/errors'
 
 describe Stretchy::MachineLearning::Model do
 
@@ -33,6 +34,58 @@ describe Stretchy::MachineLearning::Model do
         "is_async": true
       }.with_indifferent_access
     }
+
+    context 'connector' do
+      before(:each) do
+        stub_const('SomeConnector', connector)
+      end
+
+      let(:connector) { double('SomeConnector', id: nil) }
+
+      it 'should have a connector id' do
+        allow(connector).to receive(:id).and_return('123456')
+        model.connector :some_connector
+        expect(model.connector_id).to eq(connector.id)
+      end
+
+      it 'should be in the model hash' do
+        allow(connector).to receive(:id).and_return('123456')
+        model.connector :some_connector
+        expect(model.to_hash[:connector_id]).to eq(connector.id)
+      end
+
+      context 'connector not created' do
+        xit 'should raise an error' do
+          expect { model.connector :some_connector }.to raise_error(Stretchy::MachineLearning::Errors::ConnectorMissingError)
+        end
+      end
+
+    end
+
+    context 'enabled' do
+      it 'should be enabled' do
+        model.enabled true
+        expect(model.enabled).to be_truthy
+      end
+
+      it 'should be in the model hash' do
+        model.enabled true
+        expect(model.to_hash[:is_enabled]).to be_truthy
+      end
+    end
+
+    context 'function_name' do
+      it 'should have a function name' do
+        model.function_name :remote
+        expect(model.function_name).to eq(:remote)
+      end
+
+      it 'should be in the model hash' do
+        model.function_name :remote
+        expect(model.to_hash[:function_name]).to eq(:remote)
+      end
+      
+    end
 
     context 'settings', opensearch_only: true do
       it 'runs ml on all nodes' do
