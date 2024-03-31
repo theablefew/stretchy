@@ -235,7 +235,7 @@ Run the following to start the deployment:
 rake stretchy:up
 ```
 
-![[docs/media/stretchy_up.mov]]
+![rake](../media/stretchy_up.mov)
 
 >[!TIP]
 >Registering and deploying machine learning models can take some time. 
