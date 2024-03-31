@@ -1,6 +1,9 @@
+require 'stretchy/machine_learning/errors'
+
 module Stretchy 
   module MachineLearning
     class Model
+
       PRETRAINED_MODELS = {
         :neural_sparse => {
           :encoding => 'amazon/neural-sparse/opensearch-neural-sparse-encoding-v1',
@@ -31,7 +34,7 @@ module Stretchy
       end
 
       class << self
-
+        include Errors
         # delegate :find, :status, :deployed?, :registered?, :task_id, :deploy_id, :model_id, :register, :deploy, :undeploy, :delete, to: :model
 
         METHODS = [
@@ -57,12 +60,18 @@ module Stretchy
           define_method(method) do |args = nil|
             return settings[method] unless args.present?
             settings[method] = args
-          end
-        end
 
-        def model(model = nil)
-          return settings[:model] unless model
-          settings[:model] = model_lookup(model)
+            if method == :connector
+              connector_class = "#{args.to_s.camelize}".constantize
+              settings[:connector] = connector_class
+              # raise ConnectorMissingError if connector_class.id.nil?
+              settings[:connector_id] = connector_class.id
+            end
+
+            if method == :model
+              settings[:model] = model_lookup(args)
+            end
+          end
         end
 
         def model_id
@@ -79,7 +88,7 @@ module Stretchy
 
 
         def registry
-          @registry ||= Stretchy::MachineLearning::Registry.register(class_name: self.name)
+          @registry ||= Stretchy::MachineLearning::Registry.register(class_name: self.name, class_type: 'model')
         end
 
         def register
@@ -147,20 +156,26 @@ module Stretchy
         def find 
           begin
             client.get_model(id: self.model_id)
-          rescue "#{Stretchy.search_backend_const}::Transport::Transport::Errors::InternalServerError".constantize => e
+          rescue "#{Stretchy.configuration.search_backend_const}::Transport::Transport::Errors::InternalServerError".constantize => e
             raise Stretchy::MachineLearning::Errors::ModelMissingError
           end
+        end
+
+        def model_name(model_name = nil)
+          @model_name = model_name if model_name
+          @model_name || to_s.demodulize.underscore 
         end
   
         def to_hash
           {
-            name: self.model,
+            name: self.model || self.model_name,
             model_group_id: self.group_id,
             version: self.version,
             description: self.description,
             model_format: self.model_format,
             is_enabled: self.enabled?,
-            uid: self.class.name.underscore
+            connector_id: self.connector.present? ? self.connector.id : nil,
+            function_name: self.function_name
           }.compact
         end
   

@@ -5,6 +5,7 @@ namespace :stretchy do
       Rake::Task['stretchy:index:status'].invoke
       Rake::Task['stretchy:pipeline:status'].invoke
       Rake::Task['stretchy:ml:status'].invoke
+      Rake::Task['stretchy:connector:status'].invoke
     end
   end
 

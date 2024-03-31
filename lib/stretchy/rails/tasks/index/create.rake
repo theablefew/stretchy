@@ -3,6 +3,7 @@ namespace :stretchy do
     desc "Create indices"
     task create: :environment do
       klass = ENV['MODEL']
+      Rails.application.eager_load!
       models = klass.nil? ? StretchyModel.descendants : [klass.constantize]
         models.each do |model|
           next if model.name == "Stretchy::MachineLearning::Registry"

@@ -3,6 +3,7 @@ namespace :stretchy do
     desc "Create pipeline"
     task create: :environment do
       klass = ENV['MODEL']
+      Rails.application.eager_load!
       models = klass.nil? ? Stretchy::Pipeline.descendants : [klass.constantize]
         models.each do |model|
           spinner = TTY::Spinner.new("Creating Pipeline #{model} ".ljust(JUSTIFICATION) + ":spinner", format: :dots)
@@ -12,7 +13,6 @@ namespace :stretchy do
             response = model.create!
           rescue => e
             spinner.stop(Rainbow("[FAILED]").red)
-            puts e.message
             next
           end
           status = if response['acknowledged']

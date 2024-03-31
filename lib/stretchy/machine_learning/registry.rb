@@ -8,6 +8,7 @@ module Stretchy::MachineLearning
     attribute :deploy_task_id, :keyword
     attribute :register_task_id, :keyword
     attribute :class_name, :keyword
+    attribute :class_type, :keyword
 
     def self.register(**args) 
       self.create_index! unless index_exists?
