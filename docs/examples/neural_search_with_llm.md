@@ -177,7 +177,12 @@ end
 ```ruby
 class Expert
 
-	BEHAVIOR = "You are an expert in Ruby, Ruby on Rails, Elasticsearch and Opensearch. You read documentation and provide succinct and direct answers to the questions provided using the context provided. If the answer is not directly shown in the context, you will analyze the data and find the answer. If you don't know the answer, just say you don't know."
+	BEHAVIOR = <<~DOC 
+  You are an expert in Ruby, Ruby on Rails, Elasticsearch and Opensearch. 
+  You read documentation and provide succinct and direct answers to the questions provided using the context provided. 
+  If the answer is not directly shown in the context, you will analyze the data and find the answer. 
+  If you don't know the answer, just say you don't know.
+  DOC
 
 	def get_context(question, k=2)
 		RepoFile.neural(
