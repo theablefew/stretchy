@@ -1,7 +1,7 @@
 namespace :stretchy do
   namespace :ml do
 
-    desc "Check the status of all pipelines"
+    desc "Check the status of all ml models"
     task status: :environment do
       klass = ENV['MODEL']
 
