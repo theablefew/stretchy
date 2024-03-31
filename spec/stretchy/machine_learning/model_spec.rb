@@ -37,25 +37,25 @@ describe Stretchy::MachineLearning::Model do
 
     context 'connector' do
       before(:each) do
-        stub_const('SomeConnector', connector)
+        stub_const('SomeConnector', Class.new do
+          def self.id; end
+        end)
+        allow(SomeConnector).to receive(:id).and_return('123456')
       end
 
-      let(:connector) { double('SomeConnector', id: nil) }
-
       it 'should have a connector id' do
-        allow(connector).to receive(:id).and_return('123456')
         model.connector :some_connector
-        expect(model.connector_id).to eq(connector.id)
+        expect(model.connector_id).to eq('123456')
       end
 
       it 'should be in the model hash' do
-        allow(connector).to receive(:id).and_return('123456')
         model.connector :some_connector
-        expect(model.to_hash[:connector_id]).to eq(connector.id)
+        expect(model.to_hash[:connector_id]).to eq('123456')
       end
 
       context 'connector not created' do
         xit 'should raise an error' do
+          connector = double('SomeConnector', id: nil)
           expect { model.connector :some_connector }.to raise_error(Stretchy::MachineLearning::Errors::ConnectorMissingError)
         end
       end
