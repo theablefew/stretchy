@@ -12,4 +12,4 @@
 * __Examples__
     * [Data Analysis](examples/data_analysis)
     * [Simple Ingest Pipeline](examples/simple-ingest-pipeline)
-    * [Neural Search with LLM](examples/neural_search_with_llm)
+    * [Neural Search with LLM](examples/neural_search_with_llm?id=neural-search-with-llm-expert)
