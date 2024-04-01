@@ -1,5 +1,8 @@
 # Neural Search with LLM Expert
 
+> [!INFO|label:OpenSearch Only|style:flat]
+> This guide focuses on features available in OpenSearch 2.12+
+
 This guide provides a comprehensive walkthrough on creating a Retrieval-Augmented Generation (RAG) expert system utilizing stretchy-model, OpenSearch, and OpenAI. By integrating these technologies, you'll develop an application capable of understanding and answering complex questions with context derived from its own data.
 
 The process involves several key steps:
