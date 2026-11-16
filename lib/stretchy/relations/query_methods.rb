@@ -43,6 +43,7 @@ module Stretchy
         :neural_sparse,
         :neural,
         :hybrid,
+        :agentic,
         :regexp,
         :ids
       ]

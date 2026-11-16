@@ -17,7 +17,10 @@ This convention makes it easy to find the definition for a specific pipeline, wh
 
 ## Defining a Pipeline
 
-A pipeline in `stretchy-model` is defined as a Ruby class that inherits from `Stretchy::IngestPipeline`. It has a specific structure and includes several key components:
+>[!NOTE|label:Stretchy::Pipeline]
+> `Stretchy::Pipeline` is deprecated and will be removed in 0.8. Inherit from `Stretchy::IngestPipeline` instead.
+
+An ingest pipeline in `stretchy-model` is defined as a Ruby class that inherits from `Stretchy::IngestPipeline`. It has a specific structure and includes several key components:
 
 - `pipeline_name`: This is the ID of your pipeline. By default, it's inferred from the class name. 
 - `description`: This is a brief description of what your pipeline does. It's a good practice to provide a meaningful description so that others can understand the purpose of your pipeline at a glance.
@@ -105,6 +108,43 @@ Example:
 ```ruby
 MyPipeline.simulate([{ '_source' => { 'message' => 'hello world' } }])
 ```
+
+---
+
+## Search Pipelines
+A [search pipeline](https://docs.opensearch.org/latest/search-plugins/search-pipelines/index/) transforms search requests, the results passed between search phases, and responses. Search pipelines are OpenSearch only, and the pipeline rake tasks skip them on Elasticsearch.
+
+```ruby
+class HybridRagPipeline < Stretchy::SearchPipeline
+  description 'Hybrid search with a generated answer'
+  phase_results_processor :'normalization-processor', normalization: { technique: 'min_max' }
+  response_processor :retrieval_augmented_generation, model: :claude_model, context_field_list: [:body]
+end
+
+HybridRagPipeline.create!  # PUT /_search/pipeline/hybrid_rag_pipeline
+```
+
+- `request_processor` Runs before the search, such as `:filter_query` or `:agentic_query_translator`.
+- `phase_results_processor` Runs between the query and fetch phases, such as `:'normalization-processor'` for hybrid search.
+- `response_processor` Runs on the results, such as `:rename_field` or `:retrieval_augmented_generation`.
+
+`model:` and `agent:` options take a class name, a class or an id, and are sent as `model_id` and `agent_id`. Search pipelines respond to the same `create!`, `find`, `exists?`, `delete!` and `all` as ingest pipelines.
+
+### Using a search pipeline
+Set a default for every search on a model's index, or pick one per query. See [using a search pipeline](https://docs.opensearch.org/latest/search-plugins/search-pipelines/using-search-pipeline/).
+
+```ruby
+class Article < StretchyModel
+  default_search_pipeline :hybrid_rag_pipeline   # index.search.default_pipeline
+end
+
+Article.search_pipeline(:other_pipeline).where(title: 'hello')  # ?search_pipeline=other_pipeline
+```
+
+`default_search_pipeline` is written into the index settings, so it applies to indexes created after it is set.
+
+### Rake tasks
+`rake stretchy:pipeline:create`, `delete` and `status` manage ingest and search pipelines together. `PIPELINE=HybridRagPipeline` limits them to one.
 
 ---
 

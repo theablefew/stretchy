@@ -23,6 +23,7 @@ Stretchy simplifies the process of querying, aggregating, and managing Elasticse
 * Machine Learning
 * Vector and Neural search 
 * Integrated RAG and LLM connectors
+* ML Commons agents and agentic search
 * Validations, custom attributes, and more...
 
 Follow the guides to learn more about:
@@ -38,6 +39,7 @@ Follow the guides to learn more about:
  **Examples**
  - [Data Analysis](https://theablefew.github.io/stretchy/#/examples/data_analysis?id=data-analysis) example.
  - [Simple Ingest Pipeline](https://theablefew.github.io/stretchy/#/examples/simple-ingest-pipeline?id=simple-ingest-pipeline)
+ - [RAG Agent](https://theablefew.github.io/stretchy/#/examples/rag_agent?id=rag-agent)
 
 
 
@@ -55,9 +57,11 @@ If bundler is not being used to manage dependencies, install the gem by executin
 ```
 
 >[!TIP]
-> If using OpenSearch make sure to add the gem to your Gemfile.
+> If using OpenSearch make sure to add the gem to your Gemfile. Machine learning, agents and search pipelines need opensearch-ruby 4.
 >
-> `bundle add opensearch-ruby`
+> `bundle add opensearch-ruby --version ">= 4.0.0.pre.beta.5"`
+>
+> opensearch-ruby 4.0.0.pre.beta.5 does not work with json 3, so also pin `gem "json", "< 3"`.
 
 <details>
 <summary>Rails Configuration</summary>
@@ -100,7 +104,7 @@ end
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
 >[!TIP]
-> Full documentation on [Elasticsearch Query DSL and Aggregation options](https://github.com/elastic/elasticsearch-rails/tree/main/elasticsearch-persistence)
+> Full documentation on the [OpenSearch Query DSL](https://docs.opensearch.org/latest/query-dsl/) and [aggregations](https://docs.opensearch.org/latest/aggregations/)
 
 ## Testing
 <details>

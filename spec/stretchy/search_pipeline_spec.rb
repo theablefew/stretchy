@@ -46,6 +46,13 @@ describe Stretchy::SearchPipeline, opensearch_only: true do
     expect(pipeline_class.exists?).to be(false)
   end
 
+  it 'resolves an agent for the agentic query translator' do
+    stub_const('ProductSearchAgent', Class.new(Stretchy::MachineLearning::Agent))
+    allow(ProductSearchAgent).to receive(:remote_id).and_return('agent-1')
+    pipeline = Class.new(described_class) { request_processor :agentic_query_translator, agent: :product_search_agent }
+    expect(pipeline.to_hash['request_processors']).to eq([{ 'agentic_query_translator' => { 'agent_id' => 'agent-1' } }])
+  end
+
   it 'is only available on OpenSearch' do
     expect(pipeline_class.available?).to be(true)
   end

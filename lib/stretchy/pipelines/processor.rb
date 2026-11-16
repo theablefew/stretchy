@@ -1,6 +1,6 @@
 module Stretchy::Pipelines
-  # A processor in an ingest or search pipeline. `model:` takes a model class, a model class
-  # name such as `:embedding_model`, or a model id, and is sent as `model_id`.
+  # A processor in an ingest or search pipeline. `model:` and `agent:` take a class, a class
+  # name such as `:embedding_model`, or an id, and are sent as `model_id` and `agent_id`.
   #
   # Below is a list of ingest processors. Each processor has a specific function that can be applied to a document.
   # 
@@ -50,10 +50,12 @@ module Stretchy::Pipelines
       @description = opts[:description]
       @opts = opts
       @model = opts.delete(:model)
+      @agent = opts.delete(:agent)
     end
 
     def to_hash
       @opts[:model_id] = Stretchy::MachineLearning::Resource.remote_id_for(@model) if @model
+      @opts[:agent_id] = Stretchy::MachineLearning::Resource.remote_id_for(@agent) if @agent
       { type => @opts }
     end
   end
