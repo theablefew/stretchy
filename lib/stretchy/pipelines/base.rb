@@ -24,6 +24,12 @@ module Stretchy
           true
         end
 
+        # The pipeline name for a pipeline class, its class name such as `:rag_pipeline`, or a name.
+        def pipeline_name_for(pipeline)
+          pipeline = pipeline.to_s.camelize.safe_constantize || pipeline if pipeline.is_a?(Symbol)
+          pipeline.respond_to?(:pipeline_name) ? pipeline.pipeline_name : pipeline.to_s
+        end
+
         def pipeline_name(name = nil)
           @pipeline_name = name.to_s if name
           @pipeline_name || self.name.split('::').last.underscore

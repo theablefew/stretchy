@@ -139,6 +139,15 @@ describe "QueryMethods" do
                     expect(described_class.routing('123').search_option_values).to include(routing: '123')
                 end
 
+                it 'sets the search pipeline by name' do
+                    expect(described_class.search_pipeline('rag').search_option_values).to include(search_pipeline: 'rag')
+                end
+
+                it 'sets the search pipeline from a pipeline class name' do
+                    stub_const('RagPipeline', Class.new(Stretchy::SearchPipeline) { pipeline_name 'rag' })
+                    expect(described_class.search_pipeline(:rag_pipeline).search_option_values).to include(search_pipeline: 'rag')
+                end
+
                 it 'set pretty' do
                     expect(described_class.search_options(pretty: true).search_option_values).to include(pretty: true)
                 end

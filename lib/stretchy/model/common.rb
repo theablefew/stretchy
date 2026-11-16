@@ -143,6 +143,21 @@ module Stretchy
                     @default_pipeline
                 end
 
+                # The search pipeline every search on the index runs through unless a query picks
+                # another, set as the `index.search.default_pipeline` index setting.
+                #
+                # ```ruby
+                #   class Post < StretchyModel
+                #       default_search_pipeline :rag_pipeline
+                #   end
+                # ```
+                #
+                # See https://docs.opensearch.org/latest/search-plugins/search-pipelines/using-search-pipeline/
+                def default_search_pipeline(pipeline = nil)
+                    @default_search_pipeline = Stretchy::Pipelines::Base.pipeline_name_for(pipeline) unless pipeline.nil?
+                    @default_search_pipeline
+                end
+
                 private
 
                 # Return a Relation instance to chain queries

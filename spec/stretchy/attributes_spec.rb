@@ -48,9 +48,18 @@ describe Stretchy::Attributes do
           end
         end
 
+        context 'with search pipeline' do
+          it 'includes the default search pipeline' do
+            stub_const('RagPipeline', Class.new(Stretchy::SearchPipeline))
+            model.default_search_pipeline :rag_pipeline
+            expect(model.settings['index.search.default_pipeline']).to eq('rag_pipeline')
+          end
+        end
+
         context 'without pipeline' do
           it 'does not include pipeline' do
             expect(model.settings).not_to have_key(:default_pipeline)
+            expect(model.settings).not_to have_key('index.search.default_pipeline')
           end
         end
       end
