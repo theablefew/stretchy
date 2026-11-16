@@ -29,10 +29,6 @@ module Stretchy
       transport_errors::InternalServerError
     end
 
-    # Adds the machine learning APIs Stretchy relies on to the client.
-    def install!
-    end
-
     def ==(other)
       other.class == self.class
     end

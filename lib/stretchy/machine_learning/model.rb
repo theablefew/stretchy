@@ -3,6 +3,23 @@ require 'stretchy/machine_learning/errors'
 module Stretchy 
   module MachineLearning
     class Model
+      include Resource
+
+      self.registry_type = 'model'
+
+      settings :model,
+               :group_id,
+               :version,
+               :description,
+               :model_format,
+               :enabled,
+               :connector_id,
+               :connector,
+               :model_group,
+               :function_name,
+               :model_config,
+               :model_content_hash_value,
+               :url
 
       PRETRAINED_MODELS = {
         :neural_sparse => {
@@ -29,53 +46,31 @@ module Stretchy
         }
       }
 
-      cattr_reader :client do 
-        Stretchy.configuration.client.ml
-      end
-
       class << self
         include Errors
         # delegate :find, :status, :deployed?, :registered?, :task_id, :deploy_id, :model_id, :register, :deploy, :undeploy, :delete, to: :model
 
-        METHODS = [
-                    :model,
-                    :group_id, 
-                    :version, 
-                    :description, 
-                    :model_format, 
-                    :enabled, 
-                    :connector_id, 
-                    :connector, 
-                    :function_name, 
-                    :model_config, 
-                    :model_content_hash_value, 
-                    :url  
-                  ]
-
-        def settings
-          @settings ||= {}
+        # The pretrained model path for a known key such as `:sentence_transformers_minilm_12`, or the given name.
+        def model(model = nil)
+          return super() if model.nil?
+          super(model_lookup(model))
         end
 
-        METHODS.each do |method|
-          define_method(method) do |args = nil|
-            return settings[method] unless args.present?
-            settings[method] = args
+        def connector(connector = nil)
+          return super() if connector.nil?
+          connector_class = connector.to_s.camelize.constantize
+          connector_id(connector_class.id)
+          super(connector_class)
+        end
 
-            if method == :connector
-              connector_class = "#{args.to_s.camelize}".constantize
-              settings[:connector] = connector_class
-              # raise ConnectorMissingError if connector_class.id.nil?
-              settings[:connector_id] = connector_class.id
-            end
-
-            if method == :model
-              settings[:model] = model_lookup(args)
-            end
-          end
+        # The ModelGroup this model registers into, e.g. `model_group :embeddings`.
+        def model_group(model_group = nil)
+          return super() if model_group.nil?
+          super(model_group.to_s.camelize.constantize)
         end
 
         def model_id
-          @model_id || registry.model_id
+          remote_id
         end
 
         def task_id
@@ -86,79 +81,65 @@ module Stretchy
           @deploy_id || registry.deploy_task_id
         end
 
-
-        def registry
-          @registry ||= Stretchy::MachineLearning::Registry.register(class_name: self.name, class_type: 'model')
-        end
-
+        # Registers the model, recording the register task. Returns false and logs when the request fails.
         def register
-          begin
-  
-            response = client.register(body: self.to_hash, deploy: true)
-  
-            @task_id = response['task_id']
-  
-            self.registry.update(register_task_id: @task_id)
-  
-            yield self if block_given? 
-  
-            registered?
-            self.registry.update(model_id: @model_id) 
-            @model_id
-          rescue => e
-            Stretchy.logger.error "Error registering model: #{e.message}"
-            false
-          end
+          response = client.register_model(body: to_hash)
+          @task_id = response['task_id']
+          registry.update(register_task_id: @task_id)
+
+          yield self if block_given?
+
+          self.remote_id = @remote_id if registered?
           true
+        rescue => e
+          Stretchy.logger.error "Error registering model: #{e.message}"
+          false
         end
 
         def registered?
           return false unless task_id
           response = status
-          @model_id = response['model_id'] if response['model_id']
-          response['state'] == 'COMPLETED' && @model_id.present?
-        end
-  
-        def status
-          client.get_status(task_id: self.task_id)
+          @remote_id = response['model_id'] if response['model_id']
+          response['state'] == 'COMPLETED' && @remote_id.present?
         end
 
+        def status
+          client.get_task(task_id: task_id)
+        end
 
         def deploy
-          @deployed = nil
-
-          @deploy_id = client.deploy(id: self.model_id)['task_id']
-          self.registry.update(deploy_task_id: @deploy_id)
-          yield self if block_given? 
+          @deploy_id = client.deploy_model(model_id: model_id)['task_id']
+          registry.update(deploy_task_id: @deploy_id)
+          yield self if block_given?
           @deploy_id
         end
-  
+
         def undeploy
-          @deployed = nil
-          response = client.undeploy(id: self.model_id)
-          self.registry.update(deploy_task_id: nil)
-          yield self if block_given? 
+          response = client.undeploy_model(model_id: model_id)
+          registry.update(deploy_task_id: nil)
+          yield self if block_given?
           response
         end
-  
+
         def deployed?
-          return @deployed if @deployed
-          response = client.get_model(id: self.model_id)
-          # raise "Model not deployed" if response['model_state'] == 'FAILED'
-          @deployed = response['model_state'] == 'DEPLOYED'
-        end
-  
-        def delete
-          self.registry.delete
-          client.delete_model(id: self.model_id)
+          find['model_state'] == 'DEPLOYED'
+        rescue ModelMissingError
+          false
         end
 
-        def find 
-          begin
-            client.get_model(id: self.model_id)
-          rescue Stretchy.configuration.backend.server_error => e
-            raise Stretchy::MachineLearning::Errors::ModelMissingError
-          end
+        # Deletes the remote model, then forgets it in the registry.
+        def delete
+          response = client.delete_model(model_id: model_id)
+          registry.delete
+          reset_remote_id!
+          response
+        end
+
+        def find
+          raise ModelMissingError if model_id.blank?
+          client.get_model(model_id: model_id)
+        rescue Stretchy.configuration.backend.not_found_error
+          raise ModelMissingError
         end
 
         def model_name(model_name = nil)
@@ -169,7 +150,7 @@ module Stretchy
         def to_hash
           {
             name: self.model || self.model_name,
-            model_group_id: self.group_id,
+            model_group_id: model_group&.group_id || group_id,
             version: self.version,
             description: self.description,
             model_format: self.model_format,
@@ -195,7 +176,7 @@ module Stretchy
         end
 
         def all
-          client.get_model
+          client.search_models(body: { query: { match_all: {} } })
         end
 
         def ml_on_all_nodes!

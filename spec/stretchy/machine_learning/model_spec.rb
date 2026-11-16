@@ -1,10 +1,10 @@
 require 'spec_helper'
 require 'stretchy/machine_learning/errors'
 
-describe Stretchy::MachineLearning::Model do
+describe Stretchy::MachineLearning::Model, opensearch_only: true do
 
   it 'should have a client' do
-    expect(Stretchy::MachineLearning::Model.client).to be_a("#{Stretchy.configuration.search_backend_const}::API::MachineLearning::Models::MachineLearningClient".constantize)
+    expect(Stretchy::MachineLearning::Model.client).to respond_to(:register_model)
   end
 
   it 'should lookup a model' do
@@ -113,8 +113,14 @@ describe Stretchy::MachineLearning::Model do
 
     context 'register' do
       before(:each) do
-        allow(model.client).to receive(:register).and_return({task_id: '123456', status: "CREATED"}.with_indifferent_access)
-        allow(model.client).to receive(:get_status).and_return(status_complete)
+        allow(model.client).to receive(:register_model).and_return({task_id: '123456', status: "CREATED"}.with_indifferent_access)
+        allow(model.client).to receive(:get_task).and_return(status_complete)
+      end
+
+      it 'returns false and logs when registering fails' do
+        allow(model.client).to receive(:register_model).and_raise(StandardError, 'boom')
+        expect(Stretchy.logger).to receive(:error).with(/boom/)
+        expect(model.register).to be(false)
       end
 
       it 'should register and return the task id' do
@@ -126,7 +132,7 @@ describe Stretchy::MachineLearning::Model do
         model.register do |model|
           model.wait_until_complete do
             response = model.status
-            model.instance_variable_set(:@model_id, response['model_id'])
+            model.instance_variable_set(:@remote_id, response['model_id'])
             response['state'] == 'COMPLETED'
           end
         end
@@ -137,8 +143,8 @@ describe Stretchy::MachineLearning::Model do
 
     context 'status' do
       before(:each) do
-        allow(model.client).to receive(:register).and_return({task_id: '123456', status: "CREATED"}.with_indifferent_access)
-        allow(model.client).to receive(:get_status).and_return(status_complete)
+        allow(model.client).to receive(:register_model).and_return({task_id: '123456', status: "CREATED"}.with_indifferent_access)
+        allow(model.client).to receive(:get_task).and_return(status_complete)
 
       end
 
@@ -156,7 +162,7 @@ describe Stretchy::MachineLearning::Model do
 
       before(:each) do
         allow(model).to receive(:model_id).and_return('Qr1YbogBYOqeeqR7sI9L')
-        allow(model.client).to receive(:deploy).with(id: 'Qr1YbogBYOqeeqR7sI9L')
+        allow(model.client).to receive(:deploy_model).with(model_id: 'Qr1YbogBYOqeeqR7sI9L')
           .and_return({task_id: '78910', status: "DEPLOYING"}.with_indifferent_access)
       end
 
@@ -170,12 +176,18 @@ describe Stretchy::MachineLearning::Model do
         expect(model.deployed?).to be_truthy
       end
 
+      it 're-checks remote state after an undeploy made outside Stretchy' do
+        allow(model.client).to receive(:get_model).and_return(status_deployed, {"model_state": "UNDEPLOYED"}.with_indifferent_access)
+        expect(model.deployed?).to be(true)
+        expect(model.deployed?).to be(false)
+      end
+
       context 'not deployed' do
         it 'should check if deployed' do
           model.instance_variable_set(:@deployed, nil)
           allow(model).to receive(:model_id).and_return('78910')
           allow(model).to receive(:registry).and_return(double('Registry', model_id: '78910'))
-          allow(model.client).to receive(:get_model).with(id: '78910').and_return(status_deploying)
+          allow(model.client).to receive(:get_model).with(model_id: '78910').and_return(status_deploying)
           expect(model.deployed?).to be_falsey
         end
       end
@@ -196,7 +208,7 @@ describe Stretchy::MachineLearning::Model do
 
       it 'should undeploy' do
         allow(model).to receive(:model_id).and_return('Qr1YbogBYOqeeqR7sI9L')
-        allow(model.client).to receive(:undeploy).with(id: 'Qr1YbogBYOqeeqR7sI9L').and_return(undeploy_response)
+        allow(model.client).to receive(:undeploy_model).with(model_id: 'Qr1YbogBYOqeeqR7sI9L').and_return(undeploy_response)
         expect(model.undeploy).to eq(undeploy_response)
       end
     end
@@ -220,8 +232,26 @@ describe Stretchy::MachineLearning::Model do
 
       it 'should delete' do
         allow(model).to receive(:model_id).and_return('Qr1YbogBYOqeeqR7sI9L')
-        allow(model.client).to receive(:delete_model).with(id: 'Qr1YbogBYOqeeqR7sI9L').and_return(delete_response)
+        allow(model.client).to receive(:delete_model).with(model_id: 'Qr1YbogBYOqeeqR7sI9L').and_return(delete_response)
         expect(model.delete).to eq(delete_response)
+      end
+
+      it 'deletes the remote model before the registry entry' do
+        allow(model).to receive(:model_id).and_return('Qr1YbogBYOqeeqR7sI9L')
+        registry = double('Registry')
+        allow(model).to receive(:registry).and_return(registry)
+        expect(model.client).to receive(:delete_model).ordered.and_return(delete_response)
+        expect(registry).to receive(:delete).ordered
+        model.delete
+      end
+
+      it 'keeps the registry entry when the remote delete fails' do
+        allow(model).to receive(:model_id).and_return('Qr1YbogBYOqeeqR7sI9L')
+        registry = double('Registry')
+        allow(model).to receive(:registry).and_return(registry)
+        allow(model.client).to receive(:delete_model).and_raise(Stretchy.configuration.backend.server_error)
+        expect(registry).not_to receive(:delete)
+        expect { model.delete }.to raise_error(Stretchy.configuration.backend.server_error)
       end
     end
 
@@ -241,8 +271,14 @@ describe Stretchy::MachineLearning::Model do
 
       it 'should find' do
         allow(model).to receive(:model_id).and_return('Qr1YbogBYOqeeqR7sI9L')
-        allow(model.client).to receive(:get_model).with(id: 'Qr1YbogBYOqeeqR7sI9L').and_return(model_response)
+        allow(model.client).to receive(:get_model).with(model_id: 'Qr1YbogBYOqeeqR7sI9L').and_return(model_response)
         expect(model.find).to eq(model_response)
+      end
+
+      it 'raises ModelMissingError when the model is gone' do
+        allow(model).to receive(:model_id).and_return('Qr1YbogBYOqeeqR7sI9L')
+        allow(model.client).to receive(:get_model).and_raise(Stretchy.configuration.backend.not_found_error)
+        expect { model.find }.to raise_error(Stretchy::MachineLearning::Errors::ModelMissingError)
       end
     end
   
@@ -284,7 +320,7 @@ describe Stretchy::MachineLearning::Model do
       }
 
       it 'should list all models' do
-        allow(model.client).to receive(:get_model).and_return(all_response)
+        allow(model.client).to receive(:search_models).and_return(all_response)
         expect(described_class.all).to eq(all_response)
       end
     end

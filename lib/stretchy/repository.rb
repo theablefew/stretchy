@@ -31,7 +31,7 @@ module Stretchy
 
     def save(document, options = {})
       serialized = serialize(document)
-      client.index({ index: index_name, id: document_id(serialized), body: serialized }.merge(options))
+      client.index({ index: index_name, id: document_id(serialized), body: serialized }.compact.merge(options))
     end
 
     def update(document_or_id, options = {})
@@ -131,7 +131,7 @@ module Stretchy
       if query_or_definition.respond_to?(:to_hash)
         { body: query_or_definition.to_hash }
       elsif query_or_definition.is_a?(String)
-        { q: query_or_definition }
+        { body: { query: { query_string: { query: query_or_definition } } } }
       else
         raise ArgumentError, "Pass the search definition as a Hash-like object or the query as a String -- #{query_or_definition.class} given."
       end

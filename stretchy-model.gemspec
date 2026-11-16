@@ -45,7 +45,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "rspec", "~> 3.9"
   spec.add_development_dependency "simplecov", "~> 0.21.2"
-  spec.add_development_dependency "opensearch-ruby", "~> 3.4"
+  spec.add_development_dependency "opensearch-ruby", ">= 4.0.0.pre.beta.5", "< 5"
   spec.add_development_dependency "rdoc-markdown", "~> 0.4.2"
   spec.add_development_dependency "octokit", "~> 4.20"
   spec.add_development_dependency "versionomy", "~> 0.5.0"

@@ -1,111 +1,58 @@
 module Stretchy
   module MachineLearning
     class Connector
+      include Resource
 
-      cattr_reader :client do 
-        Stretchy.configuration.client.connector
-      end
+      self.registry_type = 'connector'
 
-      class Settings
-        def initialize(valid_keys = [])
-          @valid_keys = valid_keys
-          @settings = {}
-        end
+      settings :description, :version, :protocol, :credentials, :parameters, :actions
 
-        def as_json(*)
-          @settings.as_json
-        end
-      
-        def method_missing(method, *args, &block)
-          if block_given?
-            @settings[method] = self.class.new.tap { |obj| obj.instance_eval(&block) }
-          elsif args.empty?
-            value = @settings[method]
-            value.is_a?(Hash) ? Stretchy::HashWrapper[value] : value
-          elsif args.length == 1 && @valid_keys.empty? || @valid_keys.include?(method)
-            @settings[method] = args.first
-          else
-            super
-          end
-        end
-      
-        def respond_to_missing?(method, include_private = false)
-          @settings.key?(method) || super
-        end
-      end
-      
       class << self
         include Errors
-        
-        METHODS = [
-          :description,
-          :version,
-          :protocol,
-          :credentials,
-          :parameters,
-          :actions,
-          :name
-        ].freeze
-        
-        def settings
-          @settings ||= Settings.new(METHODS)
-        end
-    
-        delegate *METHODS, to: :settings
 
+        # The connector name sent to the cluster, defaulting to the underscored class name.
         def name(name = nil)
-          settings.name(name) if name 
-          settings.name || to_s.split('::').last.underscore
-        end
-
-        def registry
-          @registery ||= Stretchy::MachineLearning::Registry.register(class_name: self.name, class_type: 'connector')
+          settings[:name] = name if name
+          settings[:name] || to_s.split('::').last.underscore
         end
 
         def id
-          @id || registry.model_id
+          remote_id
         end
 
         concerning :API do
           def create!
-            response = client.post(body: self.to_hash.as_json).with_indifferent_access
-            registry.update(model_id: response.dig(:connector_id))
-            @id = response.dig(:connector_id)
+            response = client.create_connector(body: to_hash.as_json).with_indifferent_access
+            self.remote_id = response['connector_id']
           end
 
+          # Deletes the remote connector, then forgets it in the registry.
           def delete!
-            begin
-              response = client.delete(connector_id: self.id).with_indifferent_access
-            rescue Stretchy.configuration.backend.not_found_error => e
-              raise Stretchy::MachineLearning::Errors::ConnectorMissingError
-              
-            ensure
-              if response.dig(:result) == 'deleted'
-                registry.delete
-                @registry = nil
-                @id = nil
-              end
-              response
+            response = client.delete_connector(connector_id: id).with_indifferent_access
+            if response['result'] == 'deleted'
+              registry.delete
+              reset_remote_id!
             end
+            response
+          rescue Stretchy.configuration.backend.not_found_error
+            raise ConnectorMissingError
           end
 
           def update!
-            client.put(connector_id: self.id, body: self.to_hash)
+            client.update_connector(connector_id: id, body: to_hash.as_json)
           end
 
-          def find(id = nil)
-            begin
-              id = self.id if id.nil?
-              client.get(connector_id: id)
-            rescue ArgumentError => e
-              raise Stretchy::MachineLearning::Errors::ConnectorMissingError
-            rescue Stretchy.configuration.backend.not_found_error => e
-              # raise Stretchy::MachineLearning::Errors::ConnectorMissingError
-            end
+          def find(connector_id = id)
+            raise ConnectorMissingError if connector_id.blank?
+            client.get_connector(connector_id: connector_id)
+          rescue Stretchy.configuration.backend.not_found_error
+            raise ConnectorMissingError
           end
 
           def exists?
-            self.find(self.id).present?
+            find.present?
+          rescue ConnectorMissingError
+            false
           end
 
           def to_hash

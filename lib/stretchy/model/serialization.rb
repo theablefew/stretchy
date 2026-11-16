@@ -4,7 +4,7 @@ module Stretchy
             extend ActiveSupport::Concern
 
             def serialize(document)
-                document.to_hash
+                document.to_hash.as_json
             end
 
             def deserialize(document)
