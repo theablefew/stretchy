@@ -47,6 +47,10 @@ module Stretchy
         @hybrid ||= values[:hybrid]
       end
 
+      def agentic
+        @agentic ||= values[:agentic]&.last
+      end
+
       def must_nots
         @must_nots ||= compact_where(values[:must_not])
       end
@@ -125,7 +129,7 @@ module Stretchy
       end
 
       def missing_neural?
-        neural_sparse.nil? && neural.nil? && hybrid.nil?
+        neural_sparse.nil? && neural.nil? && hybrid.nil? && agentic.nil?
       end
 
       def no_query?
@@ -147,6 +151,10 @@ module Stretchy
               structure.extract! mq.last, *mq.last.keys
             end
           end unless match_query.nil?
+
+          structure.agentic do
+            structure.extract! agentic, *agentic.keys
+          end unless agentic.nil?
 
           structure.hybrid do
             structure.queries do
