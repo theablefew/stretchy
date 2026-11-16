@@ -106,7 +106,7 @@ end
 *app/pipelines/ingest/text_embedding_pipeline.rb*
 ```ruby
 module Ingest
-  class TextEmbeddingPipeline < Stretchy::Pipeline
+  class TextEmbeddingPipeline < Stretchy::IngestPipeline
 
     description "KNN text embedding pipeline"
 

@@ -70,6 +70,7 @@ module Stretchy
       # - If settings are provided, it sets the index settings to the provided settings.
       # - If no argument is provided, it retrieves the index settings. 
       # - If the `default_pipeline` is set, it merges it into the index settings.
+      # - If the `default_search_pipeline` is set, it merges it in as `index.search.default_pipeline`.
       #
       # ### Example
       #
@@ -82,6 +83,7 @@ module Stretchy
       def index_settings(settings={})
         @index_settings ||= settings
         @index_settings.merge!(default_pipeline: default_pipeline.to_s) if default_pipeline
+        @index_settings.merge!('index.search.default_pipeline' => default_search_pipeline) if default_search_pipeline
         @index_settings.with_indifferent_access
       end
 

@@ -17,7 +17,7 @@ This convention makes it easy to find the definition for a specific pipeline, wh
 
 ## Defining a Pipeline
 
-A pipeline in `stretchy-model` is defined as a Ruby class that inherits from `Stretchy::Pipeline`. It has a specific structure and includes several key components:
+A pipeline in `stretchy-model` is defined as a Ruby class that inherits from `Stretchy::IngestPipeline`. It has a specific structure and includes several key components:
 
 - `pipeline_name`: This is the ID of your pipeline. By default, it's inferred from the class name. 
 - `description`: This is a brief description of what your pipeline does. It's a good practice to provide a meaningful description so that others can understand the purpose of your pipeline at a glance.
@@ -27,7 +27,7 @@ A pipeline in `stretchy-model` is defined as a Ruby class that inherits from `St
 Here's an example of a pipeline with these components:
 
 ```ruby
-class NLPSparsePipeline < Stretchy::Pipeline
+class NLPSparsePipeline < Stretchy::IngestPipeline
 
 	#inferred from class by default
 	pipeline_name 'nlp-sparse-pipeline' 

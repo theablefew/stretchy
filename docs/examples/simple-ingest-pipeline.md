@@ -51,7 +51,7 @@ By doing these transformations as part of the ingest process, we ensure that the
 _app/pipelines/intake_form_pipeline.rb_
 
 ```ruby
-class IntakeFormPipeline < Stretchy::Pipeline
+class IntakeFormPipeline < Stretchy::IngestPipeline
 
 	description "Ingests intake forms and scrubs ssn of html"
 	  

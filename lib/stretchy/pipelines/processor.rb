@@ -1,7 +1,8 @@
 module Stretchy::Pipelines
-  # Creates a new processor for a pipeline
-  # 
-  # Below is a list of processors that can be used in a pipeline. Each processor has a specific function that can be applied to a document.
+  # A processor in an ingest or search pipeline. `model:` takes a model class, a model class
+  # name such as `:embedding_model`, or a model id, and is sent as `model_id`.
+  #
+  # Below is a list of ingest processors. Each processor has a specific function that can be applied to a document.
   # 
   # For more information on processors, see the [Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/ingest-processors.html).
   # or [OpenSearch](https://opensearch.org/docs/latest/ingest-pipelines/processors/index-processors/) documentation.
@@ -52,7 +53,7 @@ module Stretchy::Pipelines
     end
 
     def to_hash
-      @opts[:model_id] = @model.model_id if @model
+      @opts[:model_id] = Stretchy::MachineLearning::Resource.remote_id_for(@model) if @model
       { type => @opts }
     end
   end

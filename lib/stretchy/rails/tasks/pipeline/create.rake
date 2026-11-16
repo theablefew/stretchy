@@ -1,27 +1,14 @@
 namespace :stretchy do
   namespace :pipeline do
-    desc "Create pipeline"
+    desc "Create ingest and search pipelines, or the pipeline ENV['PIPELINE']"
     task create: :environment do
-      klass = ENV['MODEL']
-      Rails.application.eager_load!
-      models = klass.nil? ? Stretchy::Pipeline.descendants : [klass.constantize]
-        models.each do |model|
-          spinner = TTY::Spinner.new("Creating Pipeline #{model} ".ljust(JUSTIFICATION) + ":spinner", format: :dots)
-          spinner.auto_spin
-
-          begin
-            response = model.create!
-          rescue => e
-            spinner.stop(Rainbow("[FAILED]").red)
-            next
-          end
-          status = if response['acknowledged']
-            Rainbow("[SUCCESS]").green
-          else
-            Rainbow("[FAILED]").red
-          end
-          spinner.stop(status)
-        end
+      pipelines = Stretchy::RakeHelpers.resources(Stretchy::Pipelines::Base, env: 'PIPELINE').select(&:available?)
+      Stretchy::RakeHelpers.each_with_spinner(pipelines, "Creating Pipeline") do |pipeline|
+        pipeline.create!['acknowledged'] ? Rainbow("[SUCCESS]").green : Rainbow("[FAILED]").red
+      rescue => e
+        Stretchy.logger.error "Error creating pipeline #{pipeline}: #{e.message}"
+        Rainbow("[FAILED]").red
       end
+    end
   end
 end

@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe Stretchy::Pipeline do
+describe Stretchy::IngestPipeline do
 
     let!(:pipeline_class)  do
-      TestPipeline ||= Class.new(Stretchy::Pipeline) do
+      TestIngestPipeline ||= Class.new(Stretchy::IngestPipeline) do
         description 'A test pipeline'
         processor :sparse_encoding, model_id: 'q32Pw02BJ3squ3VZa',
 				field_map: {
@@ -14,7 +14,7 @@ describe Stretchy::Pipeline do
 
 
     it 'should have an inferred pipeline name' do
-      expect(pipeline_class.pipeline_name).to eq('test_pipeline')
+      expect(pipeline_class.pipeline_name).to eq('test_ingest_pipeline')
     end
 
     it 'should have a description' do
@@ -35,7 +35,7 @@ describe Stretchy::Pipeline do
     let(:pipeline) { pipeline_class.new }
     context 'instance' do
       it 'should have a pipeline name' do
-        expect(pipeline.pipeline_name).to eq('test_pipeline')
+        expect(pipeline.pipeline_name).to eq('test_ingest_pipeline')
       end
 
       it 'should have a description' do
@@ -103,7 +103,7 @@ describe Stretchy::Pipeline do
       end
 
       it 'should simulate a pipeline' do
-        uppercase = Class.new(Stretchy::Pipeline) do
+        uppercase = Class.new(Stretchy::IngestPipeline) do
           pipeline_name 'uppercase-pipeline'
           description 'Uppercase'
           processor :uppercase, field: :name
@@ -127,4 +127,12 @@ describe Stretchy::Pipeline do
         expect(pipeline_class.delete!).to eq({"acknowledged"=>true})
       end
     end
+end
+describe Stretchy::Pipeline do
+  it 'warns and builds an ingest pipeline when inherited' do
+    expect(Stretchy.deprecator).to receive(:warn).with(/Stretchy::IngestPipeline/)
+    legacy = Class.new(described_class) { processor :uppercase, field: :name }
+    expect(legacy).to be < Stretchy::IngestPipeline
+    expect(legacy.to_hash['processors']).to eq([{ 'uppercase' => { 'field' => 'name' } }])
+  end
 end
