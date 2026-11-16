@@ -35,7 +35,7 @@ describe 'ML Model', opensearch_only: true, type: :integration do
 
   let(:sparse_pipeline) do
     model_id = sparse_model.model_id
-    NLPSparsePipeline ||= Class.new(Stretchy::Pipeline) do
+    NLPSparsePipeline ||= Class.new(Stretchy::IngestPipeline) do
       description "Sparse encoding pipeline"
       
       processor :sparse_encoding, 

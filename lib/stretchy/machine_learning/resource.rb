@@ -20,6 +20,16 @@ module Stretchy
     module Resource
       extend ActiveSupport::Concern
 
+      # The remote id for a reference to a resource: a class or class name such as
+      # `:embedding_model` resolves to that resource's remote id, and a String is used as given.
+      def self.remote_id_for(reference)
+        case reference
+        when Class then reference.remote_id
+        when Symbol then reference.to_s.camelize.constantize.remote_id
+        else reference
+        end
+      end
+
       included do
         class_attribute :registry_type, instance_writer: false
         class_attribute :missing_error, instance_writer: false, default: Errors::ResourceMissingError
@@ -57,14 +67,8 @@ module Stretchy
           @remote_id = id
         end
 
-        # The remote id for a reference to another resource: a class or class name such as
-        # `:embedding_model` resolves to that resource's remote id, and a String is used as given.
         def remote_id_for(reference)
-          case reference
-          when Class then reference.remote_id
-          when Symbol then reference.to_s.camelize.constantize.remote_id
-          else reference
-          end
+          Resource.remote_id_for(reference)
         end
 
         # Fetches the resource from the cluster, e.g. `get_agent(agent_id: remote_id)`.

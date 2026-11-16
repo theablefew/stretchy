@@ -3,7 +3,7 @@ require 'faker'
 
 describe 'Ingest Pipeline', type: :integration do
   let(:intake_pipeline) do
-    IntakeFormPipeline ||= Class.new(Stretchy::Pipeline) do
+    IntakeFormPipeline ||= Class.new(Stretchy::IngestPipeline) do
 
       description "Ingests intake forms and scrubs ssn of html"
       

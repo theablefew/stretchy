@@ -34,6 +34,10 @@ module Stretchy
     Stretchy::Delegation::GatewayDelegation.send(:include, Rails::Instrumentation::Publishers::Record)
   end
 
+  def self.deprecator
+    @deprecator ||= ActiveSupport::Deprecation.new('0.8', 'stretchy-model')
+  end
+
   def self.env
     ENV['RACK_ENV'] || ENV['RAILS_ENV'] || 'development'
   end
