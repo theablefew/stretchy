@@ -78,6 +78,7 @@ module Stretchy
       ActiveModel::Type.register(:token_count, Stretchy::Attributes::Type::TokenCount)
       ActiveModel::Type.register(:dense_vector, Stretchy::Attributes::Type::DenseVector)
 
+      ActiveModel::Type.register(:semantic, Stretchy::Attributes::Type::Semantic)
       ActiveModel::Type.register(:search_as_you_type, Stretchy::Attributes::Type::SearchAsYouType)
       ActiveModel::Type.register(:sparse_vector, Stretchy::Attributes::Type::SparseVector)
       ActiveModel::Type.register(:string, Stretchy::Attributes::Type::String)
