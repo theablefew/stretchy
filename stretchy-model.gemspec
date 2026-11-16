@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description = "Provides a familiar ActiveRecord-like interface for working with Elasticsearch"
   spec.homepage = "https://github.com/theablefew/stretchy"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 2.6.0"
+  spec.required_ruby_version = ">= 3.1"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/theablefew/stretchy"
@@ -44,7 +44,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "rspec", "~> 3.9"
   spec.add_development_dependency "simplecov", "~> 0.21.2"
-  spec.add_development_dependency "opensearch-ruby", "~> 3.0"
+  spec.add_development_dependency "opensearch-ruby", "~> 3.4"
   spec.add_development_dependency "rdoc-markdown", "~> 0.4.2"
   spec.add_development_dependency "octokit", "~> 4.20"
   spec.add_development_dependency "versionomy", "~> 0.5.0"

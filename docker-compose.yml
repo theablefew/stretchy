@@ -15,7 +15,7 @@ services:
 
 
   opensearch:
-    image: opensearchproject/opensearch:latest
+    image: opensearchproject/opensearch:${OPENSEARCH_VERSION:-3.9.0}
     container_name: opensearch-node1
     # build:
     #   context: .
