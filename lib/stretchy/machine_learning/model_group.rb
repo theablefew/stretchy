@@ -18,6 +18,7 @@ module Stretchy
       include Resource
 
       self.registry_type = 'model_group'
+      self.missing_error = Errors::ModelGroupMissingError
 
       settings :description, :access_mode
 
@@ -31,29 +32,6 @@ module Stretchy
         def register!
           response = client.register_model_group(body: to_hash)
           self.remote_id = response['model_group_id']
-        end
-
-        def find
-          raise ModelGroupMissingError if group_id.blank?
-          client.get_model_group(model_group_id: group_id)
-        rescue Stretchy.configuration.backend.not_found_error
-          raise ModelGroupMissingError
-        end
-
-        def exists?
-          find.present?
-        rescue ModelGroupMissingError
-          false
-        end
-
-        # Deletes the remote model group, then forgets it in the registry.
-        def delete!
-          response = client.delete_model_group(model_group_id: group_id)
-          registry.delete
-          reset_remote_id!
-          response
-        rescue Stretchy.configuration.backend.not_found_error
-          raise ModelGroupMissingError
         end
 
         def to_hash

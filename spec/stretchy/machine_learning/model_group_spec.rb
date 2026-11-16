@@ -39,7 +39,7 @@ describe Stretchy::MachineLearning::ModelGroup, opensearch_only: true do
     end
 
     it 'raises ModelGroupMissingError when the group is gone' do
-      allow(group).to receive(:group_id).and_return('grp-1')
+      allow(group).to receive(:remote_id).and_return('grp-1')
       allow(group.client).to receive(:get_model_group).and_raise(Stretchy.configuration.backend.not_found_error)
       expect(group.exists?).to be(false)
     end
@@ -47,7 +47,7 @@ describe Stretchy::MachineLearning::ModelGroup, opensearch_only: true do
 
   context 'delete!' do
     it 'deletes the remote group before forgetting it' do
-      allow(group).to receive(:group_id).and_return('grp-1')
+      allow(group).to receive(:remote_id).and_return('grp-1')
       expect(group.client).to receive(:delete_model_group).with(model_group_id: 'grp-1').ordered.and_return('result' => 'deleted')
       expect(registry).to receive(:delete).ordered
       group.delete!
@@ -57,7 +57,7 @@ describe Stretchy::MachineLearning::ModelGroup, opensearch_only: true do
   context 'with a model' do
     it 'sends the group id in the register body' do
       group
-      allow(group).to receive(:group_id).and_return('grp-1')
+      allow(group).to receive(:remote_id).and_return('grp-1')
       embedding_model = Class.new(Stretchy::MachineLearning::Model) do
         model :sentence_transformers_minilm_12
         model_group :embeddings
