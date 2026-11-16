@@ -45,10 +45,6 @@ module Stretchy
         }
       }
 
-      cattr_reader :client do 
-        Stretchy.configuration.client.ml
-      end
-
       class << self
         include Errors
         # delegate :find, :status, :deployed?, :registered?, :task_id, :deploy_id, :model_id, :register, :deploy, :undeploy, :delete, to: :model
@@ -78,25 +74,19 @@ module Stretchy
           @deploy_id || registry.deploy_task_id
         end
 
+        # Registers the model, recording the register task. Returns false and logs when the request fails.
         def register
-          begin
-  
-            response = client.register(body: self.to_hash, deploy: true)
-  
-            @task_id = response['task_id']
-  
-            self.registry.update(register_task_id: @task_id)
-  
-            yield self if block_given? 
-  
-            registered?
-            self.remote_id = @remote_id if @remote_id
-            @remote_id
-          rescue => e
-            Stretchy.logger.error "Error registering model: #{e.message}"
-            false
-          end
+          response = client.register_model(body: to_hash)
+          @task_id = response['task_id']
+          registry.update(register_task_id: @task_id)
+
+          yield self if block_given?
+
+          self.remote_id = @remote_id if registered?
           true
+        rescue => e
+          Stretchy.logger.error "Error registering model: #{e.message}"
+          false
         end
 
         def registered?
@@ -105,47 +95,44 @@ module Stretchy
           @remote_id = response['model_id'] if response['model_id']
           response['state'] == 'COMPLETED' && @remote_id.present?
         end
-  
-        def status
-          client.get_status(task_id: self.task_id)
-        end
 
+        def status
+          client.get_task(task_id: task_id)
+        end
 
         def deploy
-          @deployed = nil
-
-          @deploy_id = client.deploy(id: self.model_id)['task_id']
-          self.registry.update(deploy_task_id: @deploy_id)
-          yield self if block_given? 
+          @deploy_id = client.deploy_model(model_id: model_id)['task_id']
+          registry.update(deploy_task_id: @deploy_id)
+          yield self if block_given?
           @deploy_id
         end
-  
+
         def undeploy
-          @deployed = nil
-          response = client.undeploy(id: self.model_id)
-          self.registry.update(deploy_task_id: nil)
-          yield self if block_given? 
+          response = client.undeploy_model(model_id: model_id)
+          registry.update(deploy_task_id: nil)
+          yield self if block_given?
           response
         end
-  
+
         def deployed?
-          return @deployed if @deployed
-          response = client.get_model(id: self.model_id)
-          # raise "Model not deployed" if response['model_state'] == 'FAILED'
-          @deployed = response['model_state'] == 'DEPLOYED'
-        end
-  
-        def delete
-          self.registry.delete
-          client.delete_model(id: self.model_id)
+          find['model_state'] == 'DEPLOYED'
+        rescue ModelMissingError
+          false
         end
 
-        def find 
-          begin
-            client.get_model(id: self.model_id)
-          rescue Stretchy.configuration.backend.server_error => e
-            raise Stretchy::MachineLearning::Errors::ModelMissingError
-          end
+        # Deletes the remote model, then forgets it in the registry.
+        def delete
+          response = client.delete_model(model_id: model_id)
+          registry.delete
+          reset_remote_id!
+          response
+        end
+
+        def find
+          raise ModelMissingError if model_id.blank?
+          client.get_model(model_id: model_id)
+        rescue Stretchy.configuration.backend.not_found_error
+          raise ModelMissingError
         end
 
         def model_name(model_name = nil)
@@ -182,7 +169,7 @@ module Stretchy
         end
 
         def all
-          client.get_model
+          client.search_models(body: { query: { match_all: {} } })
         end
 
         def ml_on_all_nodes!

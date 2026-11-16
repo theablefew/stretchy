@@ -7,10 +7,6 @@ module Stretchy
 
       settings :description, :version, :protocol, :credentials, :parameters, :actions
 
-      cattr_reader :client do 
-        Stretchy.configuration.client.connector
-      end
-
       class << self
         include Errors
 
@@ -26,42 +22,37 @@ module Stretchy
 
         concerning :API do
           def create!
-            response = client.post(body: self.to_hash.as_json).with_indifferent_access
-            self.remote_id = response.dig(:connector_id)
+            response = client.create_connector(body: to_hash.as_json).with_indifferent_access
+            self.remote_id = response['connector_id']
           end
 
+          # Deletes the remote connector, then forgets it in the registry.
           def delete!
-            begin
-              response = client.delete(connector_id: self.id).with_indifferent_access
-            rescue Stretchy.configuration.backend.not_found_error => e
-              raise Stretchy::MachineLearning::Errors::ConnectorMissingError
-              
-            ensure
-              if response.dig(:result) == 'deleted'
-                registry.delete
-                reset_remote_id!
-              end
-              response
+            response = client.delete_connector(connector_id: id).with_indifferent_access
+            if response['result'] == 'deleted'
+              registry.delete
+              reset_remote_id!
             end
+            response
+          rescue Stretchy.configuration.backend.not_found_error
+            raise ConnectorMissingError
           end
 
           def update!
-            client.put(connector_id: self.id, body: self.to_hash)
+            client.update_connector(connector_id: id, body: to_hash.as_json)
           end
 
-          def find(id = nil)
-            begin
-              id = self.id if id.nil?
-              client.get(connector_id: id)
-            rescue ArgumentError => e
-              raise Stretchy::MachineLearning::Errors::ConnectorMissingError
-            rescue Stretchy.configuration.backend.not_found_error => e
-              # raise Stretchy::MachineLearning::Errors::ConnectorMissingError
-            end
+          def find(connector_id = id)
+            raise ConnectorMissingError if connector_id.blank?
+            client.get_connector(connector_id: connector_id)
+          rescue Stretchy.configuration.backend.not_found_error
+            raise ConnectorMissingError
           end
 
           def exists?
-            self.find(self.id).present?
+            find.present?
+          rescue ConnectorMissingError
+            false
           end
 
           def to_hash

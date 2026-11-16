@@ -32,6 +32,11 @@ module Stretchy
           @settings ||= Settings.new
         end
 
+        # The ML Commons API of the configured OpenSearch client.
+        def client
+          Stretchy.configuration.client.ml
+        end
+
         def registry
           @registry ||= Registry.register(class_name: name, class_type: registry_type)
         end

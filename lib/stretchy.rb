@@ -11,8 +11,6 @@ require 'active_support/all'
 require_relative "stretchy/version"
 require_relative "stretchy/rails/instrumentation/railtie" if defined?(Rails)
 require_relative "stretchy/rails/railtie" if defined?(Rails)
-require_relative 'elasticsearch/api/namespace/machine_learning/model'
-require_relative 'elasticsearch/api/namespace/connector'
 
 module Stretchy
 
@@ -29,7 +27,6 @@ module Stretchy
 
   def self.boot!
     loader.setup
-    Stretchy::Backend::Elasticsearch.new.install!
     Stretchy::Attributes.register!
   end
 
@@ -64,7 +61,6 @@ module Stretchy
     def client=(klient)
         @options[:client] = klient
         @backend = nil
-        backend.install!
     end
 
     # The Stretchy::Backend for the configured client.

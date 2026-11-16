@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Stretchy::MachineLearning::Connector do
+describe Stretchy::MachineLearning::Connector, opensearch_only: true do
 
   let(:connector) do
     ClaudeConnector ||= Class.new(Stretchy::MachineLearning::Connector) do
@@ -181,13 +181,15 @@ describe Stretchy::MachineLearning::Connector do
     end
     
     context 'exists' do
+      before(:each) { allow(connector).to receive(:id).and_return('123456') }
+
       it 'should return true if connector exists' do
-        expect(connector.client).to receive(:get).and_return({"name": "BedRock Claude-Instant v1", "version": "1"})
+        expect(connector.client).to receive(:get_connector).and_return({"name": "BedRock Claude-Instant v1", "version": "1"})
         expect(connector.exists?).to eq(true)
       end
 
       it 'should return false if connector does not exist' do
-        expect(connector.client).to receive(:get).and_return({})
+        expect(connector.client).to receive(:get_connector).and_return({})
         expect(connector.exists?).to eq(false)
       end
     end
@@ -195,14 +197,14 @@ describe Stretchy::MachineLearning::Connector do
     context 'create' do
       
       it 'should create a connector' do
-        expect(connector.client).to receive(:post).and_return({"connector_id": "123456"})
+        expect(connector.client).to receive(:create_connector).and_return({"connector_id": "123456"})
         expect(connector.create!).to be_truthy
         expect(connector.id).to eq("123456")
       end
 
       context 'registry' do
         it 'should update registry' do
-          expect(connector.client).to receive(:post).and_return({"connector_id": "123456"})
+          expect(connector.client).to receive(:create_connector).and_return({"connector_id": "123456"})
           expect(connector.create!).to be_truthy
           expect(connector.id).to eq("123456")
           expect(connector.registry.remote_id).to eq("123456")
@@ -212,21 +214,27 @@ describe Stretchy::MachineLearning::Connector do
     end
 
     context 'find' do
+      before(:each) { allow(connector).to receive(:id).and_return('123456') }
+
       it 'should find a connector' do
-        expect(connector.client).to receive(:get).and_return({"name": "BedRock Claude-Instant v1", "version": "1"})
+        expect(connector.client).to receive(:get_connector).and_return({"name": "BedRock Claude-Instant v1", "version": "1"})
         expect(connector.find).to eq({"name": "BedRock Claude-Instant v1", "version": "1"})
       end
 
-      xit 'should raise an error if connector does not exist' do
-        allow(connector).to receive(:id).and_return(1)
-        expect(connector.client).to receive(:get).and_call_original
+      it 'should raise an error if connector does not exist' do
+        allow(connector.client).to receive(:get_connector).and_raise(Stretchy.configuration.backend.not_found_error)
+        expect { connector.find }.to raise_error(Stretchy::MachineLearning::Errors::ConnectorMissingError)
+      end
+
+      it 'is not found when it has no id' do
+        allow(connector).to receive(:id).and_return(nil)
         expect { connector.find }.to raise_error(Stretchy::MachineLearning::Errors::ConnectorMissingError)
       end
     end
 
     context 'update' do
       it 'should update a connector' do
-        expect(connector.client).to receive(:put).and_return({
+        expect(connector.client).to receive(:update_connector).and_return({
           "_index": ".plugins-ml-connector",
           "_id": "u3DEbI0BfUsSoeNTti-1",
           "_version": 2,
@@ -263,7 +271,7 @@ describe Stretchy::MachineLearning::Connector do
         registry_double = double('Registry', remote_id: nil)
         allow(registry_double).to receive(:delete)
         allow(connector).to receive(:registry).and_return(registry_double)
-        expect(connector.client).to receive(:delete).and_return(delete_response)
+        expect(connector.client).to receive(:delete_connector).and_return(delete_response)
         expect(connector.delete!).to be_truthy
         expect(connector.id).to be_nil
       end
@@ -274,7 +282,7 @@ describe Stretchy::MachineLearning::Connector do
           allow(registry_double).to receive(:delete)
           allow(registry_double).to receive(:remote_id).and_return(nil)
           allow(connector).to receive(:registry).and_return(registry_double)
-          expect(connector.client).to receive(:delete).and_return(delete_response)
+          expect(connector.client).to receive(:delete_connector).and_return(delete_response)
           expect(connector.delete!).to be_truthy
           expect(connector.id).to be_nil
           expect(connector.registry.remote_id).to be_nil
