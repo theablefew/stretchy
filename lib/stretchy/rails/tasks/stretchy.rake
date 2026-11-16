@@ -9,17 +9,19 @@ Dir.glob("#{path}/**/*.rake").each do |f|
 end
 
 namespace :stretchy do
-  desc "Create all indexes, pipelines and deploy all models"
+  desc "Create all indexes, pipelines and agents, and deploy all models"
   task up: :environment do
     Rake::Task['stretchy:connector:create'].invoke
     Rake::Task['stretchy:ml:register'].invoke
     Rake::Task['stretchy:ml:deploy'].invoke
+    Rake::Task['stretchy:ml:agent:create'].invoke
     Rake::Task['stretchy:pipeline:create'].invoke
     Rake::Task['stretchy:index:create'].invoke
   end
 
-  desc "Delete all indexes, pipelines and undeploy all models"
+  desc "Delete all indexes, pipelines and agents, and undeploy all models"
   task down: :environment do
+    Rake::Task['stretchy:ml:agent:delete'].invoke
     Rake::Task['stretchy:ml:undeploy'].invoke
     Rake::Task['stretchy:ml:delete'].invoke
     Rake::Task['stretchy:connector:delete'].invoke
