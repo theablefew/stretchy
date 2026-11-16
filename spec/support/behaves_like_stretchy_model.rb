@@ -271,6 +271,12 @@ shared_examples 'CRUD' do |model_class, attributes, update_with|
       expect(document.id).not_to be_nil 
     end
 
+    it 'stores attribute values unchanged' do
+      attribute, value = update_with.first
+      document = model_class.create(attributes.merge(update_with))
+      expect(model_class.find(document.id).send(attribute.to_sym)).to eq(value)
+    end
+
     it 'deletes' do
       document = model_class.create(attributes)
       expect(document.delete).to be_truthy

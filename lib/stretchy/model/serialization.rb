@@ -4,7 +4,7 @@ module Stretchy
             extend ActiveSupport::Concern
 
             def serialize(document)
-                Hash[document.to_hash.map { |k,v|  v.upcase! if k == :title; [k,v] }]
+                document.to_hash
             end
 
             def deserialize(document)
@@ -18,4 +18,3 @@ module Stretchy
         end
     end
 end
-    
