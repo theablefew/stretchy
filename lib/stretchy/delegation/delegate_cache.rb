@@ -43,7 +43,7 @@ module Stretchy
     delegate :aggregations, to: :response
     
 
-    delegate :mapping, :index_name, :document_type, :to => :klass
+    delegate :mapping, :index_name, :to => :klass
 
     module ClassSpecificRelation # :nodoc:
       extend ActiveSupport::Concern

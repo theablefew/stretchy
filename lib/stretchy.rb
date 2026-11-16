@@ -3,8 +3,8 @@ require 'zeitwerk'
 require 'amazing_print'
 require 'rainbow'
 require 'jbuilder'
-require 'elasticsearch/model'
-require 'elasticsearch/persistence'
+require 'elasticsearch'
+require 'hashie'
 require 'active_model'
 require 'active_support/all'
 
@@ -44,6 +44,7 @@ module Stretchy
 
   module Errors
     class QueryOptionMissing < StandardError; end
+    class RecordNotFound < StandardError; end
   end
 
   class Configuration

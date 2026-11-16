@@ -20,8 +20,7 @@ shared_examples 'a stretchy model' do |model_class|
   end
 
   it 'counts' do
-    allow_any_instance_of(Elasticsearch::Persistence::Repository).to receive(:count).and_return(2)
-    allow_any_instance_of(Elasticsearch::Persistence::Repository::Search).to receive(:count).and_return(2)
+    allow_any_instance_of(Stretchy::Repository).to receive(:count).and_return(2)
     expect(model_class.count).to be_a(Numeric)
   end
 
@@ -128,8 +127,8 @@ shared_examples 'a stretchy model' do |model_class|
     end
     
     it 'fetches results at end of chain' do
-      allow_any_instance_of(Elasticsearch::Persistence::Repository).to receive(:search).and_return(
-      Elasticsearch::Persistence::Repository::Response::Results.new(described_class.gateway, {
+      allow_any_instance_of(Stretchy::Repository).to receive(:search).and_return(
+      Stretchy::Repository::Results.new(described_class.gateway, {
         "took": 688,
         "timed_out": false,
         "_shards": {

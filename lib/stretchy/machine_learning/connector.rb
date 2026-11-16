@@ -21,7 +21,7 @@ module Stretchy
             @settings[method] = self.class.new.tap { |obj| obj.instance_eval(&block) }
           elsif args.empty?
             value = @settings[method]
-            value.is_a?(Hash) ? Elasticsearch::Model::HashWrapper[value] : value
+            value.is_a?(Hash) ? Stretchy::HashWrapper[value] : value
           elsif args.length == 1 && @valid_keys.empty? || @valid_keys.include?(method)
             @settings[method] = args.first
           else

@@ -48,7 +48,7 @@ module Stretchy::Attributes::Type
     private
 
     def cast_value(value)
-      Elasticsearch::Model::HashWrapper[value]
+      Stretchy::HashWrapper[value]
     end
   end
 end

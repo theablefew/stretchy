@@ -5,7 +5,7 @@ describe 'opensearch neural search', opensearch_only: true do
   describe EmbeddingModel do
       context 'neural_sparse' do
           let(:results) do
-              Elasticsearch::Persistence::Repository::Response::Results.new(described_class.gateway, 
+              Stretchy::Repository::Results.new(described_class.gateway, 
               {
                   "took": 688,
                   "timed_out": false,
@@ -72,14 +72,14 @@ describe 'opensearch neural search', opensearch_only: true do
           end
 
           it 'has rank_features' do
-              allow_any_instance_of(Elasticsearch::Persistence::Repository).to receive(:search).and_return(results)
+              allow_any_instance_of(Stretchy::Repository).to receive(:search).and_return(results)
               expect(described_class.neural_sparse(passage_embedding: 'hello world', model_id: '1234', max_token_score: 2).map(&:passage_embedding)).to all(be_a(Hash))
           end
       end
 
       context 'neural' do
         let(:results) do
-            Elasticsearch::Persistence::Repository::Response::Results.new(described_class.gateway, 
+            Stretchy::Repository::Results.new(described_class.gateway, 
             {
                 "took": 25,
                 "timed_out": false,
@@ -124,7 +124,7 @@ describe 'opensearch neural search', opensearch_only: true do
         end
 
         it 'returns results' do
-            allow_any_instance_of(Elasticsearch::Persistence::Repository).to receive(:search).and_return(results)
+            allow_any_instance_of(Stretchy::Repository).to receive(:search).and_return(results)
             expect(described_class.neural(passage_embedding: 'hello world', model_id: '1234', k:2).total).to eq(2)
         end
 
