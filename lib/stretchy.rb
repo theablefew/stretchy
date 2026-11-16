@@ -29,8 +29,7 @@ module Stretchy
 
   def self.boot!
     loader.setup
-    Elasticsearch::API.send(:include, Elasticsearch::API::Connector)
-    Elasticsearch::API.send(:include, Elasticsearch::API::MachineLearning::Models)
+    Stretchy::Backend::Elasticsearch.new.install!
     Stretchy::Attributes.register!
   end
 
@@ -58,27 +57,27 @@ module Stretchy
           default_keyword_field: :keyword,
           add_keyword_field_to_text_attributes: true,
           auto_target_keywords: true,
-          opensearch: false,
           client: Elasticsearch::Client.new(url: 'http://localhost:9200')
         )
     end
 
     def client=(klient)
         @options[:client] = klient
-        self.opensearch = true if klient.class.name =~ /OpenSearch/
+        @backend = nil
+        backend.install!
+    end
+
+    # The Stretchy::Backend for the configured client.
+    def backend
+        @backend ||= Backend.for(client)
     end
 
     def search_backend_const
-        self.opensearch? ? OpenSearch : Elasticsearch
-    end
-
-    def opensearch=(bool)
-        @options[:opensearch] = bool
-        OpenSearchCompatibility.opensearch_patch! if bool
+        backend.namespace
     end
 
     def opensearch?
-        @options[:opensearch]
+        backend.opensearch?
     end
 
 

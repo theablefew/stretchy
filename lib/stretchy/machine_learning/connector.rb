@@ -76,7 +76,7 @@ module Stretchy
           def delete!
             begin
               response = client.delete(connector_id: self.id).with_indifferent_access
-            rescue "#{Stretchy.configuration.search_backend_const}::Transport::Transport::Errors::NotFound".constantize => e
+            rescue Stretchy.configuration.backend.not_found_error => e
               raise Stretchy::MachineLearning::Errors::ConnectorMissingError
               
             ensure
@@ -99,7 +99,7 @@ module Stretchy
               client.get(connector_id: id)
             rescue ArgumentError => e
               raise Stretchy::MachineLearning::Errors::ConnectorMissingError
-            rescue "#{Stretchy.configuration.search_backend_const}::Transport::Transport::Errors::NotFound".constantize => e
+            rescue Stretchy.configuration.backend.not_found_error => e
               # raise Stretchy::MachineLearning::Errors::ConnectorMissingError
             end
           end

@@ -109,7 +109,7 @@ describe Stretchy::Repository do
     it 'ignores a missing index only when forced' do
       repository.delete_index!
       expect { repository.delete_index!(force: true) }.not_to raise_error
-      expect { repository.delete_index! }.to raise_error(Stretchy.configuration.search_backend_const::Transport::Transport::Errors::NotFound)
+      expect { repository.delete_index! }.to raise_error(Stretchy.configuration.backend.not_found_error)
     end
   end
 end

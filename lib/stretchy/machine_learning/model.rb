@@ -156,7 +156,7 @@ module Stretchy
         def find 
           begin
             client.get_model(id: self.model_id)
-          rescue "#{Stretchy.configuration.search_backend_const}::Transport::Transport::Errors::InternalServerError".constantize => e
+          rescue Stretchy.configuration.backend.server_error => e
             raise Stretchy::MachineLearning::Errors::ModelMissingError
           end
         end

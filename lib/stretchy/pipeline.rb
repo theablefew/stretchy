@@ -67,7 +67,7 @@ module Stretchy
 
       protected 
       def not_found
-        @not_found ||= Object.const_get("#{client.class.name.split('::').first}::Transport::Transport::Errors::NotFound") 
+        Stretchy.configuration.backend.not_found_error
       end
 
     end

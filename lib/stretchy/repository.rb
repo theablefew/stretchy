@@ -145,7 +145,7 @@ module Stretchy
     end
 
     def not_found_error
-      Stretchy.configuration.search_backend_const::Transport::Transport::Errors::NotFound
+      Stretchy.configuration.backend.not_found_error
     end
 
     def document_id(document)
