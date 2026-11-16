@@ -3,6 +3,22 @@ require 'stretchy/machine_learning/errors'
 module Stretchy 
   module MachineLearning
     class Model
+      include Resource
+
+      self.registry_type = 'model'
+
+      settings :model,
+               :group_id,
+               :version,
+               :description,
+               :model_format,
+               :enabled,
+               :connector_id,
+               :connector,
+               :function_name,
+               :model_config,
+               :model_content_hash_value,
+               :url
 
       PRETRAINED_MODELS = {
         :neural_sparse => {
@@ -37,45 +53,21 @@ module Stretchy
         include Errors
         # delegate :find, :status, :deployed?, :registered?, :task_id, :deploy_id, :model_id, :register, :deploy, :undeploy, :delete, to: :model
 
-        METHODS = [
-                    :model,
-                    :group_id, 
-                    :version, 
-                    :description, 
-                    :model_format, 
-                    :enabled, 
-                    :connector_id, 
-                    :connector, 
-                    :function_name, 
-                    :model_config, 
-                    :model_content_hash_value, 
-                    :url  
-                  ]
-
-        def settings
-          @settings ||= {}
+        # The pretrained model path for a known key such as `:sentence_transformers_minilm_12`, or the given name.
+        def model(model = nil)
+          return super() if model.nil?
+          super(model_lookup(model))
         end
 
-        METHODS.each do |method|
-          define_method(method) do |args = nil|
-            return settings[method] unless args.present?
-            settings[method] = args
-
-            if method == :connector
-              connector_class = "#{args.to_s.camelize}".constantize
-              settings[:connector] = connector_class
-              # raise ConnectorMissingError if connector_class.id.nil?
-              settings[:connector_id] = connector_class.id
-            end
-
-            if method == :model
-              settings[:model] = model_lookup(args)
-            end
-          end
+        def connector(connector = nil)
+          return super() if connector.nil?
+          connector_class = connector.to_s.camelize.constantize
+          connector_id(connector_class.id)
+          super(connector_class)
         end
 
         def model_id
-          @model_id || registry.model_id
+          remote_id
         end
 
         def task_id
@@ -84,11 +76,6 @@ module Stretchy
 
         def deploy_id
           @deploy_id || registry.deploy_task_id
-        end
-
-
-        def registry
-          @registry ||= Stretchy::MachineLearning::Registry.register(class_name: self.name, class_type: 'model')
         end
 
         def register
@@ -103,8 +90,8 @@ module Stretchy
             yield self if block_given? 
   
             registered?
-            self.registry.update(model_id: @model_id) 
-            @model_id
+            self.remote_id = @remote_id if @remote_id
+            @remote_id
           rescue => e
             Stretchy.logger.error "Error registering model: #{e.message}"
             false
@@ -115,8 +102,8 @@ module Stretchy
         def registered?
           return false unless task_id
           response = status
-          @model_id = response['model_id'] if response['model_id']
-          response['state'] == 'COMPLETED' && @model_id.present?
+          @remote_id = response['model_id'] if response['model_id']
+          response['state'] == 'COMPLETED' && @remote_id.present?
         end
   
         def status

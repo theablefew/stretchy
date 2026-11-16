@@ -126,7 +126,7 @@ describe Stretchy::MachineLearning::Model do
         model.register do |model|
           model.wait_until_complete do
             response = model.status
-            model.instance_variable_set(:@model_id, response['model_id'])
+            model.instance_variable_set(:@remote_id, response['model_id'])
             response['state'] == 'COMPLETED'
           end
         end

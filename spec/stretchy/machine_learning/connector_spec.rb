@@ -205,7 +205,7 @@ describe Stretchy::MachineLearning::Connector do
           expect(connector.client).to receive(:post).and_return({"connector_id": "123456"})
           expect(connector.create!).to be_truthy
           expect(connector.id).to eq("123456")
-          expect(connector.registry.model_id).to eq("123456")
+          expect(connector.registry.remote_id).to eq("123456")
         end
       end
 
@@ -260,7 +260,7 @@ describe Stretchy::MachineLearning::Connector do
         }
       }
       it 'should delete a connector' do
-        registry_double = double('Registry', model_id: nil)
+        registry_double = double('Registry', remote_id: nil)
         allow(registry_double).to receive(:delete)
         allow(connector).to receive(:registry).and_return(registry_double)
         expect(connector.client).to receive(:delete).and_return(delete_response)
@@ -272,12 +272,12 @@ describe Stretchy::MachineLearning::Connector do
         it 'should delete registry' do
           registry_double = double('Registry')
           allow(registry_double).to receive(:delete)
-          allow(registry_double).to receive(:model_id).and_return(nil)
+          allow(registry_double).to receive(:remote_id).and_return(nil)
           allow(connector).to receive(:registry).and_return(registry_double)
           expect(connector.client).to receive(:delete).and_return(delete_response)
           expect(connector.delete!).to be_truthy
           expect(connector.id).to be_nil
-          expect(connector.registry.model_id).to be_nil
+          expect(connector.registry.remote_id).to be_nil
         end
       end
     end

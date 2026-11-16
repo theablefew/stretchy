@@ -1,76 +1,33 @@
 module Stretchy
   module MachineLearning
     class Connector
+      include Resource
+
+      self.registry_type = 'connector'
+
+      settings :description, :version, :protocol, :credentials, :parameters, :actions
 
       cattr_reader :client do 
         Stretchy.configuration.client.connector
       end
 
-      class Settings
-        def initialize(valid_keys = [])
-          @valid_keys = valid_keys
-          @settings = {}
-        end
-
-        def as_json(*)
-          @settings.as_json
-        end
-      
-        def method_missing(method, *args, &block)
-          if block_given?
-            @settings[method] = self.class.new.tap { |obj| obj.instance_eval(&block) }
-          elsif args.empty?
-            value = @settings[method]
-            value.is_a?(Hash) ? Stretchy::HashWrapper[value] : value
-          elsif args.length == 1 && @valid_keys.empty? || @valid_keys.include?(method)
-            @settings[method] = args.first
-          else
-            super
-          end
-        end
-      
-        def respond_to_missing?(method, include_private = false)
-          @settings.key?(method) || super
-        end
-      end
-      
       class << self
         include Errors
-        
-        METHODS = [
-          :description,
-          :version,
-          :protocol,
-          :credentials,
-          :parameters,
-          :actions,
-          :name
-        ].freeze
-        
-        def settings
-          @settings ||= Settings.new(METHODS)
-        end
-    
-        delegate *METHODS, to: :settings
 
+        # The connector name sent to the cluster, defaulting to the underscored class name.
         def name(name = nil)
-          settings.name(name) if name 
-          settings.name || to_s.split('::').last.underscore
-        end
-
-        def registry
-          @registery ||= Stretchy::MachineLearning::Registry.register(class_name: self.name, class_type: 'connector')
+          settings[:name] = name if name
+          settings[:name] || to_s.split('::').last.underscore
         end
 
         def id
-          @id || registry.model_id
+          remote_id
         end
 
         concerning :API do
           def create!
             response = client.post(body: self.to_hash.as_json).with_indifferent_access
-            registry.update(model_id: response.dig(:connector_id))
-            @id = response.dig(:connector_id)
+            self.remote_id = response.dig(:connector_id)
           end
 
           def delete!
@@ -82,8 +39,7 @@ module Stretchy
             ensure
               if response.dig(:result) == 'deleted'
                 registry.delete
-                @registry = nil
-                @id = nil
+                reset_remote_id!
               end
               response
             end
