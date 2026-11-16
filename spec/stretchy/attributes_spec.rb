@@ -34,7 +34,7 @@ describe Stretchy::Attributes do
 
     context 'hash' do
       it 'cast_value' do
-        expect(model.attribute_types['data'].cast({})).to be_a Elasticsearch::Model::HashWrapper
+        expect(model.attribute_types['data'].cast({})).to be_a Stretchy::HashWrapper
       end
     end
 

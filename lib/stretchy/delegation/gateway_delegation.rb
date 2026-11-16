@@ -4,8 +4,6 @@ module Stretchy
       delegate :settings,
                 :mappings,
                 :mapping,
-                :document_type,
-                :document_type=,
                 :index_name,
                 :index_name=,
                 :search,
@@ -104,7 +102,7 @@ module Stretchy
       # ### Behavior
       #
       # - If the repository doesn't exist or if the client of the existing repository is not the current client from the Stretchy configuration, 
-      #   it creates a new repository with the current `client`, `index_name`, `class`, `mapping`, and `settings`.
+      #   it creates a new repository with the current `client`, `index_name`, `class`, `mappings`, and `settings`.
       # - If a block is given, it is evaluated in the context of the repository.
       # - It always returns the repository.
       #
@@ -121,7 +119,7 @@ module Stretchy
       def gateway(&block)
           reload_gateway_configuration! if @gateway && @gateway.client != Stretchy.configuration.client
 
-          @gateway ||= Stretchy::Repository.create(client: Stretchy.configuration.client, index_name: index_name, klass: base_class, mapping: base_class.attribute_mappings.merge(dynamic: true), settings: index_settings) 
+          @gateway ||= Stretchy::Repository.new(client: Stretchy.configuration.client, index_name: index_name, klass: base_class, mappings: base_class.attribute_mappings.merge(dynamic: true), settings: index_settings)
           # block.arity < 1 ? @gateway.instance_eval(&block) : block.call(@gateway) if block_given?
           @gateway
       end
