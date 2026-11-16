@@ -1,7 +1,7 @@
 # Dockerfile.opensearch
 
 # Base image
-FROM opensearchproject/opensearch:2.12.0
+FROM opensearchproject/opensearch:3.9.0
 # Environment variables
 # disables bootstrap checks that are enabled when network.host is set to a non-loopback address
 ENV discovery.type=single-node

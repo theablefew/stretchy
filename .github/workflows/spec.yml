@@ -12,13 +12,13 @@ jobs:
     strategy:
       matrix:
         os: ['ubuntu']
-        ruby: ['3.1', '3.2']
+        ruby: ['3.2', '3.3']
         elasticsearch: ['7.x-SNAPSHOT', '8.12.2']
 
     steps:
       - uses: actions/checkout@v4
       - name: Set up Ruby ${{ matrix.ruby }}
-        uses: ruby/setup-ruby@ec02537da5712d66d4d50a0f33b7eb52773b5ed1
+        uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
         with:
           ruby-version: ${{ matrix.ruby }}
       - name: Increase system limits
@@ -44,8 +44,8 @@ jobs:
       strategy:
         matrix:
           os: ['ubuntu']
-          ruby: ['3.1']
-          opensearch: ['2.12.0']
+          ruby: ['3.2', '3.3']
+          opensearch: ['2.19.7', '3.9.0']
 
       env:
         BACKEND: opensearch
@@ -61,7 +61,7 @@ jobs:
             security-disabled: true
 
         - name: Set up Ruby ${{ matrix.ruby }}
-          uses: ruby/setup-ruby@ec02537da5712d66d4d50a0f33b7eb52773b5ed1
+          uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199 # v1.338.0
           with:
             ruby-version: ${{ matrix.ruby }}
 
