@@ -51,6 +51,7 @@ Attributes are defined using `Stretchy::Attributes::Type` attributes.
 * `:hash` - Used for structured JSON objects. Each field can be of any data type, including another object.
 * `:ip` - Used to store IP addresses.
 * `:join` - Used to create parent/child relation within documents.
+* `:knn_vector` - Used to store vectors for [k-NN search](https://docs.opensearch.org/latest/mappings/supported-field-types/knn-vector/). Accepts `dimension`, `data_type`, `space_type`, `mode`, `compression_level`, `method` and `model_id`. OpenSearch only.
 * `:keyword` - Used for exact match searches, sorting, and aggregations. This field is not analyzed.
 * `:match_only_text` - Used for full-text search.
 * `:nested` - Used to index arrays of objects as separate documents.
@@ -62,6 +63,7 @@ Attributes are defined using `Stretchy::Attributes::Type` attributes.
 * `:token_count` - Used to count the number of tokens in a string.
 * `:dense_vector` - Used to store dense vectors of float values.
 * `:search_as_you_type` - Used for full-text search, especially for auto-complete functionality.
+* `:semantic` - Generates embeddings at ingest and query time from `model_id`, without a separate ingest pipeline. Takes a model id or class name. See [semantic field](https://docs.opensearch.org/latest/mappings/supported-field-types/semantic/). OpenSearch 3.1 and later.
 * `:sparse_vector` - Used to store sparse vectors of float values.
 * `:string` - Used to store text. This field is analyzed, which means that its value is broken down into separate searchable terms. _an alias of `:text`_
 * `:version` - Used to store version numbers.

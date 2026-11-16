@@ -1,43 +1,37 @@
 module Stretchy::Attributes::Type
   # The KnnVector attribute type.
   #
-  # This class is used to define a `knn_vector` attribute for a model. 
-  # It provides support for the Elasticsearch `knn_vector` data type, 
-  # which is a type of data type that can hold vectors of float values.
+  # Defines an OpenSearch `knn_vector` field for approximate k-NN search.
+  # See https://docs.opensearch.org/latest/mappings/supported-field-types/knn-vector/
   #
   # ### Parameters
   #
-  # The `knn_vector` data type supports the following options:
   # - `dimension`: The number of dimensions in the vector.
-  # - `method`: The method used for nearest neighbor search. This is a hash that can include the following keys:
-  #   - `name`: The name of the method.
-  #   - `space_type`: The type of space used for the method.
-  #   - `engine`: The engine used for the method.
-  #   - `parameters`: Any additional parameters for the method.
+  # - `data_type`: `float` (default), `half_float`, `byte` or `binary`.
+  # - `space_type`: The distance function, such as `l2` or `cosinesimil`.
+  # - `mode`: `in_memory` (default) or `on_disk`.
+  # - `compression_level`: `1x`, `2x`, `4x`, `8x`, `16x` or `32x`.
+  # - `method`: The ANN algorithm, as a Hash of `name`, `space_type`, `engine` and `parameters`.
+  # - `model_id`: A trained model, for methods that need training.
   #
   # ---
   #
   # ### Examples
   #
-  #
-  # #### Define a `knn_vector` attribute
-  #
   # ```ruby
   #   class MyModel < StretchyModel
-  #     attribute :my_vector, :knn_vector
+  #     attribute :my_vector, :knn_vector, dimension: 384, space_type: 'cosinesimil', mode: 'on_disk', compression_level: '32x'
   #   end
   # ```
   #
-  # #### Define a `knn_vector` attribute with options
-  #
   # ```ruby
   #   class MyModel < StretchyModel
-  #     attribute :my_vector, :knn_vector, dimension: 3, method: { name: "hnsw", space_type: "cosinesimil", engine: "nmslib", parameters: { ef_construction: 200 } }
+  #     attribute :my_vector, :knn_vector, dimension: 384, method: { name: 'hnsw', space_type: 'l2', engine: 'faiss', parameters: { ef_construction: 100, m: 16 } }
   #   end
   # ```
   #
   class KnnVector < Stretchy::Attributes::Type::Base
-      OPTIONS = [:dimension, :method]
+      OPTIONS = [:dimension, :data_type, :space_type, :mode, :compression_level, :method, :model_id]
 
       def type
         :knn_vector

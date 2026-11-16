@@ -41,8 +41,18 @@ describe "KnnVector" do
         }.as_json
       )
     end
+
+    it 'maps the memory optimized options' do
+      model_class.attribute :vec, :knn_vector, dimension: 384, data_type: 'float', space_type: 'cosinesimil', mode: 'on_disk', compression_level: '32x'
+      expect(model_class.attribute_types['vec'].mappings('vec')).to eq(
+        { vec: { type: :knn_vector, dimension: 384, data_type: 'float', space_type: 'cosinesimil', mode: 'on_disk', compression_level: '32x' } }.as_json
+      )
+    end
+
+    it 'maps a faiss method' do
+      method = { name: 'hnsw', space_type: 'l2', engine: 'faiss', parameters: { ef_construction: 100, m: 16 } }
+      model_class.attribute :vec, :knn_vector, dimension: 3, method: method
+      expect(model_class.attribute_types['vec'].mappings('vec')).to eq({ vec: { type: :knn_vector, dimension: 3, method: method } }.as_json)
+    end
   end
-
-
-
 end
