@@ -37,6 +37,12 @@ module Stretchy
           Stretchy.configuration.client.ml
         end
 
+        # The name sent to the cluster, defaulting to the underscored class name.
+        def remote_name(value = nil)
+          settings[:remote_name] = value if value
+          settings[:remote_name] || to_s.demodulize.underscore
+        end
+
         def registry
           @registry ||= Registry.register(class_name: name, class_type: registry_type)
         end

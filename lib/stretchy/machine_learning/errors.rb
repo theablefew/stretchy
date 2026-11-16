@@ -23,6 +23,12 @@ module Stretchy::MachineLearning::Errors
     end
   end
 
+  class ModelGroupMissingError < StandardError
+    def initialize(msg="Model group is missing. Register it with `register!`.")
+      super
+    end
+  end
+
   class AgentNotRegisteredError < StandardError
     def initialize(msg="Agent is not registered. Please run `rake stretchy:ml:agent:create` to create it.")
       super

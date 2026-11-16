@@ -15,6 +15,7 @@ module Stretchy
                :enabled,
                :connector_id,
                :connector,
+               :model_group,
                :function_name,
                :model_config,
                :model_content_hash_value,
@@ -60,6 +61,12 @@ module Stretchy
           connector_class = connector.to_s.camelize.constantize
           connector_id(connector_class.id)
           super(connector_class)
+        end
+
+        # The ModelGroup this model registers into, e.g. `model_group :embeddings`.
+        def model_group(model_group = nil)
+          return super() if model_group.nil?
+          super(model_group.to_s.camelize.constantize)
         end
 
         def model_id
@@ -143,7 +150,7 @@ module Stretchy
         def to_hash
           {
             name: self.model || self.model_name,
-            model_group_id: self.group_id,
+            model_group_id: model_group&.group_id || group_id,
             version: self.version,
             description: self.description,
             model_format: self.model_format,
