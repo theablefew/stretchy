@@ -13,3 +13,4 @@
     * [Data Analysis](examples/data_analysis)
     * [Simple Ingest Pipeline](examples/simple-ingest-pipeline)
     * [Neural Search with LLM](examples/neural_search_with_llm)
+    * [RAG Agent](examples/rag_agent)

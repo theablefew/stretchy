@@ -33,6 +33,7 @@ Follow the guides to learn more about:
 **Examples**
  - [Data Analysis](examples/data_analysis?id=data-analysis)
  - [Simple Ingest Pipeline](examples/simple-ingest-pipeline?id=simple-ingest-pipeline)
+ - [RAG Agent](examples/rag_agent?id=rag-agent)
 
 
 ## Installation

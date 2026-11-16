@@ -162,7 +162,7 @@ module Models
 	  connector 'Connectors::GPTConnector'
 	
 	  def self.predict(prompt)
-	    response = client.predict(model_id: self.model_id, body: prompt)
+	    response = client.predict_model(model_id: self.model_id, body: prompt)
 		response.dig('inference_results')
 			.first.dig('output')
 			.first.dig('dataAsMap', 'choices')
